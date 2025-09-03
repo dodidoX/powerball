@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Buttons</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
+    <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      margin: 20px 0;
+      border: 1px solid black;
+      border-collapse: collapse;
+      height: 27px
+    }
+
+
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+      height: 42px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f8f8;
+    }
+
+    tr:hover {
+      background-color: #e6e6e6;
+    }
+
+    #combination-label1, #combination-label2 {
+      font-weight: bold;
+    }
+
+    .number-buttons {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .numpadding {
+      padding: 0 20px;
+    }
+
+    .number-buttons button {
+    /* 버튼 디자인 관련 스타일 추가 */
+    background-color: #000000; /* 배경색 */
+    border: none; /* 테두리 없음 */
+    color: white; /* 글자색 */
+    text-align: center; /* 텍스트 정렬 */
+    text-decoration: none; /* 텍스트 장식 없음 */
+    display: inline-block; /* 인라인 블록 표시 */
+    font-size: 16px; /* 글꼴 크기 */
+    margin: 1px 1px; /* 마진 설정 */
+    cursor: pointer; /* 커서를 포인터로 변경 */
+    border-radius: 4px; /* 모서리 둥글게 */
+    padding: 8px 16px; /* 패딩 설정 */
+    }
+
+    .option-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 5px 0 0 20px;
+    }
+
+    #historyTable td,
+    #historyTable th {
+      height: 6px; /* 행 높이 설정 */
+      min-height: 5px; /* 최소 높이 설정 */
+    }
+    </style>
+    <style>
+      #toggleCompare {
+          transition: all 0.3s; /* 부드러운 전환 효과 */
+          padding: 10px 20px;
+          border: none;
+          cursor: pointer;
+          outline: none;
+          border-radius: 5px;
+      }
+  
+      #toggleCompare.on {
+          background-color: #4CAF50; /* 눌러진 상태의 배경색 */
+          color: white; /* 눌러진 상태의 글자색 */
+          box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5); /* 움푹 파인 효과 */
+      }
+  
+      #toggleCompare.off {
+          color: black; /* 튀어나온 상태의 글자색 */
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 튀어나온 효과 */
+          transform: translateY(-2px); /* 버튼을 약간 위로 올림 */
+      }
+
+      .tooltip-leftalign .tooltip-inner { text-align: left; }
+
+      #historyTable th:last-child,
+      #historyTable td:last-child {
+        padding: 4px 6px;         /* 세로 패딩 축소 */
+        white-space: nowrap;      /* 줄바꿈 방지 */
+        width: 72px;              /* 고정 폭(원하면 조절) */
+      }
+
+      /* 삭제 버튼 자체를 작게 */
+      #historyTable .deleteBtn {
+        padding: 2px 8px;
+        font-size: 12px;
+        line-height: 1.1;
+        height: 24px;             /* 한 줄 높이 고정 느낌 */
+        border-radius: 4px;
+      }
+
+      /* 헤더 2열(전체선택) 여유 폭 & 패딩 */
+      #historyTable thead th:nth-child(2) {
+        width: 56px;
+        padding: 4px 6px;
+      }
+
+      /* 클릭 커서 */
+      #selectAllHistory { cursor: pointer; }
+
+    </style>
+  
+  
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">로또 라이프 <sup></sup></div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+            
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
+                    aria-expanded="true" aria-controls="collapseOne">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>로또 번호 생성</span>
+                </a>
+                <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="numbers_generator.html">번호 생성</a>
+                    </div>
+                </div>
+            </li> 
+
+
+
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
+
+            <!-- Main Content -->
+            <div id="content" class="flex-grow-1">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-4 text-gray-800">번호 생성</h1>
+
+                    <div class="row">
+
+                        <div class="col-lg-6">
+
+                            <!-- Circle Buttons -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">로또 번호 생성기</h6>
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="container">
+                                      <div class="generator">
+                                      <h1>로또 번호 생성기</h1>
+                                      <p>
+                                        조건 1. 포함할 숫자를 입력하세요. ex) 1, 17, 35
+                                        <input type="text" id="included" value="">
+                                      </p>
+                                      <p>
+                                        조건 2. 제외할 숫자를 입력하세요. ex) 8, 23, 39
+                                        <input type="text" id="excluded" value="">
+                                      </p>
+                                      <p>
+                                        조건 3. 가중치를 설정할 숫자를 입력하세요. ex) 5, 43
+                                        <input type="text" id="weighted" value="">
+                                      </p>
+                                      <p>
+                                        조건 4. 원하는 총합 범위를 입력하세요 ex) 96 ~ 175
+                                        <input type="text" id="sum_range_min" size="5" value=""> ~
+                                        <input type="text" id="sum_range_max" size="5" value="">
+                                      </p>
+                                      <p>
+                                        조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 14.5
+                                        <input type="text" id="stddev_range_min" size="5" value=""> ~
+                                        <input type="text" id="stddev_range_max" size="5" value="">
+                                      </p>
+                                      <p>조건 6. '새로운 번호 생성하기' 버튼을 눌러주세요 </p>
+                                      <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                      <!-- <button type="button" onclick="function1(); function2()">버튼</button> -->
+                                      
+                                      </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div> <!---->
+
+                        <div class="col-lg-6">
+
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6>
+                                </div>
+                                <div class="selection option-container"> 
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="includeCheck"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="1. 숫자 6개 이하 선택 시 무조건 출현<br>2. 숫자 7개 이상 선택 시 선택된 번호에서만 출현"
+                                    />
+                                    <label for="includeCheck">숫자 포함</label>
+                                  </p>
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="excludeCheck"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="선택 시 출현 번호에서 무조건 제외(최대 39개 선택 가능)"
+                                    />
+                                    <label for="excludeCheck">숫자 제외</label>
+                                  </p>
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="weightedCheck"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="선택 후 가중치 설정 가능<br>ex1) 0% → 미출현<br>ex2) 100% → 미선택 번호와 동일 확률<br>ex3) 700% → 미선택 번호보다 700% 출현 확률 up"
+                                    />
+                                    <label for="weightedCheck">가중치 설정(0%~700%)</label>
+                                  </p>
+                                  <p>
+                                    <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="7.0">
+                                  </p>
+                                  <p>
+                                    <button id="resetButton">숫자 초기화</button>
+                                  </p>
+                                </div>
+                                <div class="numpadding">
+                                  <div class="number-buttons">
+                                    <button class="number-button">1</button>
+                                    <button class="number-button">2</button>
+                                    <button class="number-button">3</button>
+                                    <button class="number-button">4</button>
+                                    <button class="number-button">5</button>
+                                    <button class="number-button">6</button>
+                                    <button class="number-button">7</button>
+                                    <button class="number-button">8</button>
+                                    <button class="number-button">9</button>
+                                    <button class="number-button">10</button>
+                                    <button class="number-button">11</button>
+                                    <button class="number-button">12</button>
+                                    <button class="number-button">13</button>
+                                    <button class="number-button">14</button>
+                                    <button class="number-button">15</button>
+                                    <button class="number-button">16</button>
+                                    <button class="number-button">17</button>
+                                    <button class="number-button">18</button>
+                                    <button class="number-button">19</button>
+                                    <button class="number-button">20</button>
+                                    <button class="number-button">21</button>
+                                    <button class="number-button">22</button>
+                                    <button class="number-button">23</button>
+                                    <button class="number-button">24</button>
+                                    <button class="number-button">25</button>
+                                    <button class="number-button">26</button>
+                                    <button class="number-button">27</button>
+                                    <button class="number-button">28</button>
+                                    <button class="number-button">29</button>
+                                    <button class="number-button">30</button>
+                                    <button class="number-button">31</button>
+                                    <button class="number-button">32</button>
+                                    <button class="number-button">33</button>
+                                    <button class="number-button">34</button>
+                                    <button class="number-button">35</button>
+                                    <button class="number-button">36</button>
+                                    <button class="number-button">37</button>
+                                    <button class="number-button">38</button>
+                                    <button class="number-button">39</button>
+                                    <button class="number-button">40</button>
+                                    <button class="number-button">41</button>
+                                    <button class="number-button">42</button>
+                                    <button class="number-button">43</button>
+                                    <button class="number-button">44</button>
+                                    <button class="number-button">45</button>
+                                  </div>
+                                </div>
+
+
+                                  <script>
+                                  // ===== 유틸 =====
+                                  function percentToFactor(input) {
+                                  let s = (input || "").toString().trim();
+                                  if (s.endsWith("%")) s = s.slice(0, -1);
+                                  let n = parseFloat(s);
+                                  if (!Number.isFinite(n)) return 1;                // 입력 없으면 100%
+                                  n = Math.max(0, Math.min(700, n));               // 0%~700%로 클램프
+                                  return n / 100;                                    // 100% => 1.0배
+                                }
+
+                                // 입력값을 항상 "숫자%" 형태로 정리: "10" -> "10%", "300.5" -> "300.5%"
+                                function normalizePercentText(el) {
+                                  let s = (el.value || "").toString().trim();
+                                  if (s === "") { el.value = ""; return; }
+                                  if (s.endsWith("%")) s = s.slice(0, -1);
+                                  let n = parseFloat(s);
+                                  if (!Number.isFinite(n)) n = 0;
+                                  n = Math.max(0, Math.min(700, n));
+                                  // 소수 허용(원하면 Math.round(n)로 정수화 가능)
+                                  el.value = n + "%";
+                                }
+
+                                  const NUM_MIN = 1, NUM_MAX = 45;
+                                  function parseNumList(str) {
+                                    if (!str) return [];
+                                    return Array.from(
+                                      new Set(
+                                        str.split(",")
+                                          .map(s => s.trim())
+                                          .filter(s => s !== "")
+                                          .map(n => Number(n))
+                                          .filter(n => Number.isInteger(n) && n >= NUM_MIN && n <= NUM_MAX)
+                                      )
+                                    ).sort((a,b)=>a-b);
+                                  }
+                                  function byId(id){ return document.getElementById(id); }
+
+                                  function ensureHistDT() {
+                                    if ($.fn.DataTable.isDataTable('#historyTable')) return histDT;
+
+                                    histDT = $('#historyTable').DataTable({
+                                      destroy: true,
+                                      searching: false,
+                                      info: true,
+                                      language: { emptyTable: "생성된 번호가 없습니다." },
+                                      order: [],
+                                      aLengthMenu: [[-1], ["All"]],
+                                      iDisplayLength: -1,
+                                      columnDefs: [
+                                        // 숫자 정렬 필요한 열
+                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
+
+                                        // 정렬 비활성화: 선택체크박스, 비교결과 6칸, 삭제버튼
+                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
+                                      ]
+                                    });
+                                    return histDT;
+                                  }
+
+                                  // ===== 전역 참조(나중에 DOMContentLoaded에서 할당) =====
+                                  let includedInput, excludedInput, weightedInput, weightValueInput;
+                                  let sumMinInput, sumMaxInput, stdMinInput, stdMaxInput;
+                                  let numberButtons, includeCheck, excludeCheck, weightedCheck, resetButton;
+                                  let generatedTbl, generatedTbody, histTbl, histTbody, pickSelects;
+                                  let histDT = null;
+
+                                  // ★ 연번 카운터(전역) — 행 삭제되어도 번호 재사용/재부여 안 함
+                                  let historySeq = 1;
+
+                                  // ===== 버튼 페인팅 =====
+                                  function paintButtons() {
+                                    if (!numberButtons) return;
+                                    const include = parseNumList(includedInput.value);
+                                    const exclude = parseNumList(excludedInput.value);
+                                    const weight  = parseNumList(weightedInput.value);
+
+                                    numberButtons.forEach((btn, idx) => {
+                                      const number = idx + 1;
+                                      let bg = "black";
+                                      if (include.includes(number)) bg = "green";
+                                      else if (weight.includes(number)) bg = "blue";
+                                      else if (exclude.includes(number)) bg = "red";
+                                      btn.style.backgroundColor = bg;
+                                      btn.style.borderColor = "gray";
+                                      btn.style.borderWidth = "1px";
+                                      btn.style.borderRadius = "3px";
+                                      btn.style.color = "white";
+                                    });
+                                  }
+
+                                  // ===== 버튼 모드 전환 =====
+                                  function attachButtonHandlers(mode) {
+                                    if (!numberButtons) return;
+                                    // 기존 리스너 제거를 위해 clone
+                                    numberButtons.forEach(btn => { btn.replaceWith(btn.cloneNode(true)); });
+                                    // 다시 쿼리
+                                    numberButtons = document.querySelectorAll(".number-button");
+
+                                    numberButtons.forEach(btn => {
+                                      btn.addEventListener("click", () => {
+                                        const n = Number(btn.textContent);
+                                        const inc = parseNumList(includedInput.value);
+                                        const exc = parseNumList(excludedInput.value);
+                                        const wgt = parseNumList(weightedInput.value);
+
+                                        function toggle(list, setterInput) {
+                                          const set = new Set(list);
+                                          if (set.has(n)) set.delete(n); else set.add(n);
+                                          setterInput.value = Array.from(set).sort((a,b)=>a-b).join(", ");
+                                        }
+
+                                        if (mode === "include") {
+                                          excludedInput.value = exc.filter(x => x !== n).join(", ");
+                                          weightedInput.value = wgt.filter(x => x !== n).join(", ");
+                                          toggle(inc, includedInput);
+                                        } else if (mode === "exclude") {
+                                          includedInput.value = inc.filter(x => x !== n).join(", ");
+                                          weightedInput.value = wgt.filter(x => x !== n).join(", ");
+                                          toggle(exc, excludedInput);
+                                        } else if (mode === "weight") {
+                                          includedInput.value = inc.filter(x => x !== n).join(", ");
+                                          excludedInput.value = exc.filter(x => x !== n).join(", ");
+                                          toggle(wgt, weightedInput);
+                                        }
+
+                                        paintButtons();
+                                        compareInputWithTable();
+                                      });
+                                    });
+                                  }
+
+
+                                  // ===== DataTables 보조 =====
+                                  function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
+                                    const dt = ensureHistDT();
+                                    const newRowData = [
+                                      historySeq++,                                       // No.
+                                      '<input type="checkbox" class="row-select">',       // 체크박스
+                                      ...numbers,                                         // 6개 번호(2~7)
+                                      consecutive,                                        // 8
+                                      sum,                                                // 9
+                                      stddev,                                             // 10
+                                      oddCount,                                           // 11
+                                      evenCount,                                          // 12
+                                      sumRec,                                             // 13
+                                      stddevRec,                                          // 14
+                                      '', '', '', '', '', '',                             // 15~20: 비교 결과 "O" 들어갈 자리
+                                      '<button class="deleteBtn" type="button">삭제</button>', // 21
+                                    ];
+                                    const row = dt.row.add(newRowData).draw(false).node();
+
+                                    // 개별 삭제 버튼: 스크롤 점프 방지
+                                    $(row).find('button.deleteBtn').on('click', function(e){
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      const y = window.pageYOffset || document.documentElement.scrollTop;
+                                      dt.row($(this).closest('tr')).remove().draw(false);
+
+                                      if (dt.rows().count() === 0) {
+                                        historySeq = 1;
+                                      }
+
+                                      window.scrollTo(0, y);
+                                      compareInputWithTable();
+                                    });
+                                  }
+
+                                  function deleteHistory() {
+                                    const dt = ensureHistDT();
+                                    dt.clear().draw(false);
+
+                                    // ✔ 전체 삭제 후에만 연번 초기화
+                                    historySeq = 1;
+
+                                    // 헤더의 전체선택 체크박스도 해제
+                                    const selectAll = document.getElementById('selectAllHistory');
+                                    if (selectAll) selectAll.checked = false;
+                                  }
+
+                                  // ===== 비교 기능 =====
+                                  let isCompareFunctionOn = false;
+                                  function toggleCompareFunction() {
+                                    isCompareFunctionOn = !isCompareFunctionOn;
+                                    const btn = byId('toggleCompare');
+                                    if (isCompareFunctionOn) {
+                                      btn.innerText = "비교 기능 On";
+                                      btn.classList.remove('off'); btn.classList.add('on');
+                                      compareInputWithTable();
+                                    } else {
+                                      btn.innerText = "비교 기능 Off";
+                                      btn.classList.remove('on'); btn.classList.add('off');
+                                      resetCompareIndicators();
+                                    }
+                                  }
+
+                                  // 페이지 로드 시 버튼을 Off 상태로 표시
+                                  document.addEventListener('DOMContentLoaded', () => {
+                                    const btn = byId('toggleCompare');
+                                    if (btn) {
+                                      btn.innerText = "비교 기능 Off";
+                                      btn.classList.remove('on');
+                                      btn.classList.add('off');
+                                    }
+                                      if (window.jQuery && $.fn.tooltip) {
+                                      $('[data-toggle="tooltip"]').tooltip({ html: true, container: 'body', trigger: 'hover'});
+                                    }
+                                  });
+
+                                  function resetCompareIndicators() {
+                                    const dt = ensureHistDT();
+                                    dt.rows().every(function(){
+                                      const row = this.node();
+                                      for (let j=15; j<=20; j++) row.children[j].innerText = "";
+                                    });
+                                  }
+                                  function compareInputWithTable() {
+                                    if (!isCompareFunctionOn) return;
+                                    const dt = ensureHistDT();
+                                    const picks = pickSelects.map(sel => Number(sel.value));
+                                    dt.rows().every(function() {
+                                      const row = this.node();
+                                      const cells = row.getElementsByTagName('td');
+                                      const rowNums = Array.from({ length: 6 }, (_, i) => Number(cells[2 + i].innerText));
+                                      picks.forEach((pick, idx) => {
+                                        const col = 15 + idx; // 비교결과 열은 15~20
+                                        cells[col].innerText = rowNums.includes(pick) ? "O" : "";
+                                      });
+                                    });
+                                  }
+
+                                    // === (A) 번호 생성: 서버 호출 버전 ===
+                                    async function generateNewNumbers() {
+                                      // 1) 입력값 수집
+                                      const include = parseNumList(byId("included").value);
+                                      const exclude = parseNumList(byId("excluded").value);
+                                      const weighted = parseNumList(byId("weighted").value);
+                                      const weightPercent = (function () {
+                                        let s = (byId("weightValue").value || "").trim();
+                                        if (s.endsWith("%")) s = s.slice(0, -1);
+                                        const n = parseFloat(s);
+                                        if (!Number.isFinite(n)) return 100;
+                                        return Math.max(0, Math.min(700, n));
+                                      })();
+
+                                      const sumMin = parseFloat(byId("sum_range_min").value);
+                                      const sumMax = parseFloat(byId("sum_range_max").value);
+                                      const stdMin = parseFloat(byId("stddev_range_min").value);
+                                      const stdMax = parseFloat(byId("stddev_range_max").value);
+
+                                      // 2) 서버 호출
+                                      let res;
+                                      try {
+                                        res = await fetch("/api/generate", {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({
+                                            include, exclude, weighted,
+                                            weightPercent,
+                                            count: 2,              // 한 번에 몇 조합 생성할지
+                                            sumMin, sumMax, stdMin, stdMax
+                                          })
+                                        });
+                                      } catch (e) {
+                                        alert("서버 연결 실패: " + e);
+                                        return;
+                                      }
+
+                                      let data;
+                                      try { data = await res.json(); } catch { data = {}; }
+                                      if (!res.ok || !data.ok) {
+                                        alert("생성 실패: " + (data.error || res.status));
+                                        return;
+                                      }
+
+                                      // 3) 생성 테이블 갱신 + 히스토리 추가
+                                      if (!generatedTbody) return;
+                                      generatedTbody.innerHTML = ""; // 기존 생성표 비우기
+
+                                      for (let i = 0; i < data.results.length; i++) {
+                                        const r = data.results[i];
+                                        const tr = document.createElement("tr");
+                                        tr.innerHTML = `
+                                          <td>조합 ${i + 1}</td>
+                                          ${r.numbers.map(n => `<td>${n}</td>`).join("")}
+                                          <td>${r.consecutive}</td>
+                                          <td>${r.sum}</td>
+                                          <td>${Number(r.stddev).toFixed(2)}</td>
+                                          <td>${r.oddCount}</td>
+                                          <td>${r.evenCount}</td>
+                                          <td>${r.sumRec || ""}</td>
+                                          <td>${r.stddevRec || ""}</td>
+                                        `;
+                                        generatedTbody.appendChild(tr);
+
+                                        // 히스토리에도 즉시 추가
+                                        updateHistory(
+                                          r.numbers,
+                                          r.sum,
+                                          r.consecutive,
+                                          Number(r.stddev).toFixed(2),
+                                          r.oddCount,
+                                          r.evenCount,
+                                          r.sumRec || "",
+                                          r.stddevRec || ""
+                                        );
+                                      }
+
+                                      // UI 보조
+                                      paintButtons();
+                                      compareInputWithTable();
+                                    }
+
+                                  // 선택 저장: GeneratedNumbers의 현재 행들을 히스토리에 중복 없이 저장
+                                  function saveCombinations(){
+                                    if (!generatedTbody) return;
+                                    const dt = ensureHistDT();
+                                    const existing = new Set(dt.rows().data().toArray()
+                                      .map(r => r.slice(0,6).join(',')));
+                                    generatedTbody.querySelectorAll('tr').forEach(tr => {
+                                      const tds = tr.querySelectorAll('td');
+                                      if (tds.length < 14) return;
+                                      const nums = Array.from({length:6}, (_,i)=> Number(tds[i+1].textContent));
+                                      const key = nums.join(',');
+                                      if (existing.has(key)) return; // 중복 방지
+                                      const cons = tds[7].textContent;
+                                      const sum  = Number(tds[8].textContent);
+                                      const std  = tds[9].textContent;
+                                      const odd  = Number(tds[10].textContent);
+                                      const even = Number(tds[11].textContent);
+                                      const sumRec = tds[12].textContent;
+                                      const stdRec = tds[13].textContent;
+                                      updateHistory(nums, sum, cons, std, odd, even, sumRec, stdRec);
+                                      existing.add(key);
+                                    });
+                                  }
+
+                                  // ===== 초기화 =====
+                                  document.addEventListener('DOMContentLoaded', () => {
+                                    // DOM 요소 할당 (이제 테이블/셀렉트가 이미 DOM에 존재함)
+                                    includedInput = byId("included");
+                                    excludedInput = byId("excluded");
+                                    weightedInput = byId("weighted");
+                                    weightValueInput = byId("weightValue");
+
+                                    // 가중치 입력: 포커스 시 % 제거, 블러 시 % 붙이기, 입력 중엔 숫자/소수점만 허용
+                                    weightValueInput.addEventListener("focus", () => {
+                                      weightValueInput.value = weightValueInput.value.replace(/\s*%$/, "");
+                                    });
+                                    weightValueInput.addEventListener("input", () => {
+                                      // 숫자, 소수점만 유지 (원하면 소수점 없이도 OK)
+                                      weightValueInput.value = weightValueInput.value.replace(/[^\d.]/g, "");
+                                    });
+                                    weightValueInput.addEventListener("blur", () => {
+                                      normalizePercentText(weightValueInput);
+                                    });
+
+                                    // 초기 표시(페이지 첫 로드 때 값이 있으면 % 형태로 맞춤)
+                                    normalizePercentText(weightValueInput);
+
+
+                                    sumMinInput = byId("sum_range_min");
+                                    sumMaxInput = byId("sum_range_max");
+                                    stdMinInput = byId("stddev_range_min");
+                                    stdMaxInput = byId("stddev_range_max");
+
+                                    numberButtons = document.querySelectorAll(".number-button");
+                                    includeCheck = byId("includeCheck");
+                                    excludeCheck = byId("excludeCheck");
+                                    weightedCheck = byId("weightedCheck");
+                                    resetButton = byId("resetButton");
+
+                                    generatedTbl = byId("GeneratedNumbers");
+                                    generatedTbody = generatedTbl ? generatedTbl.querySelector("tbody") : null;
+                                    histTbl = byId("historyTable");
+                                    histTbody = byId("historyBody");
+
+                                    pickSelects = Array.from({length:6}, (_,i)=> byId(`number-input${i+1}`));
+
+                                    // 비교 select 옵션 채우기
+                                    pickSelects.forEach(sel => {
+                                      if (!sel) return;
+                                      sel.innerHTML = "";
+                                      for (let i=NUM_MIN; i<=NUM_MAX; i++){
+                                        const op = document.createElement("option");
+                                        op.value = i; op.textContent = i;
+                                        sel.appendChild(op);
+                                      }
+                                      sel.addEventListener('input', compareInputWithTable);
+                                      sel.addEventListener('change', compareInputWithTable);
+                                    });
+
+                                    // DataTables 준비
+                                    ensureHistDT();
+                                    
+                                    // ▼ [추가] 히스토리 전체 선택 토글
+                                    const selectAll = byId('selectAllHistory');
+                                    if (selectAll) {
+                                      selectAll.addEventListener('change', () => {
+                                        const dt = ensureHistDT();
+                                        dt.rows().every(function () {
+                                          const row = this.node();
+                                          const cb = row.querySelector('.row-select');
+                                          if (cb) cb.checked = selectAll.checked;
+                                        });
+                                      });
+                                    }
+
+                                    // 헤더 셀 전체를 클릭해도 토글되도록(체크박스 외 영역 클릭도 허용)
+                                    const thSelectCol = document.querySelector('#historyTable thead th:nth-child(2)');
+                                    const selectAllEl = document.getElementById('selectAllHistory');
+                                    if (thSelectCol && selectAllEl) {
+                                      thSelectCol.style.cursor = 'pointer';
+                                      thSelectCol.addEventListener('click', (e) => {
+                                        // 체크박스 자체 클릭이면 기본 동작, 빈 공간 클릭 시만 토글
+                                        if (e.target !== selectAllEl) {
+                                          selectAllEl.checked = !selectAllEl.checked;
+                                          // 기존 change 로직 재사용
+                                          selectAllEl.dispatchEvent(new Event('change', { bubbles: true }));
+                                        }
+                                      });
+                                    }
+
+                                    // 셀(2열) 아무 데나 클릭해도 해당 행 체크 토글
+                                    const historyTableEl = document.getElementById('historyTable');
+                                    if (historyTableEl) {
+                                      historyTableEl.addEventListener('click', (e) => {
+                                        const td = e.target.closest('td');
+                                        if (!td) return;
+
+                                        const isBodyCell = td.parentElement && td.parentElement.parentElement && td.parentElement.parentElement.tagName === 'TBODY';
+                                        if (!isBodyCell) return;         // 헤더는 제외 (헤더는 따로 처리)
+
+                                        // 두 번째 열(셀 인덱스 1)만 토글
+                                        if (td.cellIndex === 1) {
+                                          const cb = td.querySelector('.row-select');
+                                          if (cb && e.target !== cb) {
+                                            cb.checked = !cb.checked;
+                                          }
+                                        }
+                                      });
+                                    }
+
+                                    // 버튼 모드 토글
+                                    includeCheck.addEventListener("change", ()=>{
+                                      if (includeCheck.checked) { excludeCheck.checked=false; weightedCheck.checked=false; attachButtonHandlers("include"); }
+                                      else attachButtonHandlers(null);
+                                    });
+                                    excludeCheck.addEventListener("change", ()=>{
+                                      if (excludeCheck.checked) { includeCheck.checked=false; weightedCheck.checked=false; attachButtonHandlers("exclude"); }
+                                      else attachButtonHandlers(null);
+                                    });
+                                    weightedCheck.addEventListener("change", ()=>{
+                                      if (weightedCheck.checked) { includeCheck.checked=false; excludeCheck.checked=false; attachButtonHandlers("weight"); }
+                                      else attachButtonHandlers(null);
+                                    });
+
+                                    // 입력→색칠
+                                    [includedInput, excludedInput, weightedInput].forEach(inp => {
+                                      inp.addEventListener("input", paintButtons);
+                                    });
+                                    excludedInput.addEventListener("input", () => {
+                                      const exc = parseNumList(excludedInput.value);
+                                      if (exc.length >= 40) alert("너무 많은 번호를 입력하였습니다.");
+                                    });
+                                      resetButton = byId("resetButton");
+
+                                    // ▼ 추가: 초기화 클릭 핸들러
+                                    resetButton.addEventListener("click", () => {
+                                      // 입력값 초기화
+                                      includedInput.value = "";
+                                      excludedInput.value = "";
+                                      weightedInput.value = "";
+                                      weightValueInput.value = "";  // 가중치 값도 초기화
+
+                                      // 체크박스 해제 + 버튼 모드 해제
+                                      includeCheck.checked = false;
+                                      excludeCheck.checked = false;
+                                      weightedCheck.checked = false;
+                                      attachButtonHandlers(null);
+
+                                      // 색칠/비교 표시 초기화
+                                      paintButtons();
+                                      resetCompareIndicators();
+                                      compareInputWithTable();
+                                    });
+
+                                    // 초기 상태
+                                    attachButtonHandlers(null);
+                                    paintButtons();
+                                    // renderGeneratedRows(2); 
+                                  });
+                                  </script>
+
+                                <script></script>
+
+                            </div>
+
+                            <script>
+                              async function exportTableToExcel(filename) {
+                                const dt = ensureHistDT();
+                                const table = document.getElementById('historyTable');
+                                const workbook = new ExcelJS.Workbook();
+                                const ws = workbook.addWorksheet('전체');
+
+                                // 포함할 컬럼 인덱스(2열 = 1 인덱스는 제거)
+                                const headerCells = table.tHead.rows[0].cells;
+                                const includeCols = [];
+                                for (let c = 0; c < headerCells.length; c++) {
+                                  if (c === 1) continue; // ✔ "선택" 열 제거
+                                  includeCols.push(c);
+                                }
+
+                                // 헤더 작성
+                                const selVals = [];
+                                for (let k = 1; k <= 6; k++) {
+                                  const sel = document.getElementById(`number-input${k}`);
+                                  selVals[k] = sel ? sel.value : '';
+                                }
+                                includeCols.forEach((c, i) => {
+                                  let label = headerCells[c].innerText.trim();
+                                  // 비교 열(15~20): 셀렉트 모든 옵션 텍스트 방지 → "비교n(선택값)"
+                                  if (c >= 15 && c <= 20) {
+                                    const idx = c - 14; // 1~6
+                                    label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
+                                  }
+                                  ws.getCell(1, i + 1).value = label || '';
+                                });
+
+                                // 바디(모든 행) 작성
+                                let r = 2;
+                                dt.rows().every(function () {
+                                  const cells = this.node().cells;
+                                  includeCols.forEach((c, i) => {
+                                    const excelCell = ws.getCell(r, i + 1);
+                                    // 버튼/체크박스/빈칸 처리
+                                    const text = (cells[c].innerText || '').trim();
+                                    if (text === '') {
+                                      excelCell.value = null;
+                                    } else if (!isNaN(text)) {
+                                      excelCell.value = parseFloat(text);
+                                    } else {
+                                      excelCell.value = text;
+                                    }
+                                  });
+                                  r++;
+                                });
+
+                                ws.views = [{ state: 'frozen', ySplit: 1, topLeftCell: 'A2', activeCell: 'A2' }];
+
+                                const buffer = await workbook.xlsx.writeBuffer();
+                                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(blob);
+                                link.download = filename;
+                                link.click();
+                              }
+
+
+                              function deleteSelectedRows() {
+                                const dt = ensureHistDT();
+                                const y = window.pageYOffset || document.documentElement.scrollTop;
+
+                                // ✔ 체크된 행만 한 번에 제거(반복 중 remove로 인한 스킵 방지)
+                                dt.rows(function (_idx, _data, node) {
+                                  const cb = node.querySelector('.row-select');
+                                  return cb && cb.checked;
+                                }).remove().draw(false);
+
+                                if (dt.rows().count() === 0) {
+                                  historySeq = 1;
+                                }
+
+                                window.scrollTo(0, y);
+                                compareInputWithTable();
+                              }
+
+                              async function exportSelectedToExcel(filename) {
+                                const dt = ensureHistDT();
+                                const table = document.getElementById('historyTable');
+                                const workbook = new ExcelJS.Workbook();
+                                const ws = workbook.addWorksheet('선택');
+
+                                // 포함할 컬럼 인덱스(2열 = 1 인덱스는 제거)
+                                const headerCells = table.tHead.rows[0].cells;
+                                const includeCols = [];
+                                for (let c = 0; c < headerCells.length; c++) {
+                                  if (c === 1) continue; // ✔ "선택" 열 제거
+                                  includeCols.push(c);
+                                }
+
+                                // 헤더 작성
+                                const selVals = [];
+                                for (let k = 1; k <= 6; k++) {
+                                  const sel = document.getElementById(`number-input${k}`);
+                                  selVals[k] = sel ? sel.value : '';
+                                }
+                                includeCols.forEach((c, i) => {
+                                  let label = headerCells[c].innerText.trim();
+                                  if (c >= 15 && c <= 20) {
+                                    const idx = c - 14; // 1~6
+                                    label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
+                                  }
+                                  ws.getCell(1, i + 1).value = label || '';
+                                });
+
+                                // 선택된 행만 작성
+                                let r = 2;
+                                dt.rows(function (_idx, _data, node) {
+                                  const cb = node.querySelector('.row-select');
+                                  return cb && cb.checked;
+                                }).every(function () {
+                                  const cells = this.node().cells;
+                                  includeCols.forEach((c, i) => {
+                                    const excelCell = ws.getCell(r, i + 1);
+                                    const text = (cells[c].innerText || '').trim();
+                                    if (text === '') {
+                                      excelCell.value = null;
+                                    } else if (!isNaN(text)) {
+                                      excelCell.value = parseFloat(text);
+                                    } else {
+                                      excelCell.value = text;
+                                    }
+                                  });
+                                  r++;
+                                });
+
+                                if (r === 2) { alert("선택된 행이 없습니다."); return; }
+
+                                ws.views = [{ state: 'frozen', ySplit: 1, topLeftCell: 'A2', activeCell: 'A2' }];
+
+                                const buffer = await workbook.xlsx.writeBuffer();
+                                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(blob);
+                                link.download = filename;
+                                link.click();
+                              }
+
+
+                            </script>
+                        </div>
+                          <div class="col-12">
+                            <div class="card shadow mb-4">
+                              <div class="generation card-body">
+                                <table id="GeneratedNumbers">
+                                  <thead>
+                                    <tr>
+                                      <th>추첨 조합</th>
+                                      <th>첫번째</th>
+                                      <th>두번째</th>
+                                      <th>세번째</th>
+                                      <th>네번째</th>
+                                      <th>다섯번째</th>
+                                      <th>여섯번째</th>
+                                      <th>연번</th>
+                                      <th>총합</th>
+                                      <th>표준편차</th>
+                                      <th>홀수</th>
+                                      <th>짝수</th>
+                                      <th>총합 기준</th>
+                                      <th>표준편차 기준</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody></tbody>
+                                </table>
+
+
+                                <p>update history</p>
+                                <button id="toggleCompare" class="on" onclick="toggleCompareFunction()">비교 기능 On</button>
+                                <script>
+
+                                </script>
+
+
+                                <table id="historyTable">
+                                  <thead>
+                                    <tr>
+                                      <th id="noHeader"
+                                          data-toggle="tooltip"
+                                          data-placement="top"
+                                          title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
+                                          No. </th>
+                                      <th><input type="checkbox" id="selectAllHistory"></th>
+                                      <th>첫번째</th>
+                                      <th>두번째</th>
+                                      <th>세번째</th>
+                                      <th>네번째</th>
+                                      <th>다섯번째</th>
+                                      <th>여섯번째</th>
+                                      <th>연번</th>
+                                      <th>총합</th>
+                                      <th>표준편차</th>
+                                      <th>홀수</th>
+                                      <th>짝수</th>
+                                      <th>총합 기준</th>
+                                      <th>표준편차 기준</th>
+                                      <th><select id="number-input1" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input2" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input3" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input4" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input5" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input6" placeholder="1~45 입력"></select></th>
+                                      <th>삭제</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody id="historyBody">
+                                  </tbody>
+                                </table>
+
+
+                                <button onclick="deleteSelectedRows()" style="margin-top: 5px;">선택 삭제</button>
+                                <button onclick="deleteHistory()" style="margin-top: 5px;">전체 삭제</button>
+                                <button onclick="exportSelectedToExcel('선택_다운로드.xlsx')" style="margin-top: 5px;">선택 저장</button>
+                                <button onclick="exportTableToExcel('다운로드.xlsx')">전체 저장</button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white mt-auto">
+                <div class="container py-2">
+                    <div class="text-center"> 
+                        <span>Copyright &copy; Your Website 2020</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ExcelJS (필요 시 1회) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
+
+    <!-- jQuery & Bootstrap -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery Easing (sb-admin-2가 쓰면 유지) -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- SB Admin 2 -->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables core + Bootstrap4 integration -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+</body>
+
+</html>
