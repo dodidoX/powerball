@@ -210,7 +210,7 @@
         <div id="content-wrapper" class="d-flex flex-column min-vh-100">
 
             <!-- Main Content -->
-            <<div id="content" class="flex-grow-1">
+            <div id="content" class="flex-grow-1">
 
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -513,48 +513,6 @@
                                     });
                                   }
 
-                                  // ===== 번호 생성 =====
-                                  function generateRandomCombo(n, include, exclude, weightList, weightFactor) {
-                                    const EXCLUDED = new Set(exclude);
-                                    const INCLUDED = new Set(include);
-                                    const WEIGHTED = new Set(weightList);
-
-                                    const w = Number.isFinite(weightFactor) ? Math.max(0, weightFactor) : 1;
-                                    const BIG_W = 1e9; // ‘숫자 선택’에 부여할 아주 큰 가중치
-
-                                    // 풀 만들기: 제외는 아예 빼버림
-                                    const pool = [];
-                                    for (let i = NUM_MIN; i <= NUM_MAX; i++) {
-                                      if (EXCLUDED.has(i)) continue;            // 제외 → 후보 X
-                                      let score = Math.random();                // 비선택 기본 점수
-                                      if (WEIGHTED.has(i)) score *= w;          // 가중치
-                                      if (INCLUDED.has(i)) score *= BIG_W;      // 숫자 선택 → 사실상 상위 랭크
-                                      pool.push({ number: i, score });
-                                    }
-
-                                    if (pool.length < n) {
-                                      // 여기 오면 제외가 과했거나 입력이 잘못된 것 → 상위에서 이미 검증, 그래도 안전망
-                                      throw new Error("선택 가능한 숫자가 부족합니다.");
-                                    }
-
-                                    // 상위 n개 추출
-                                    pool.sort((a, b) => b.score - a.score);
-                                    return pool.slice(0, n).map(x => x.number).sort((a, b) => a - b);
-                                  }
-
-
-                                  function consecutiveLabel(nums) {
-                                    let maxRun = 1, run = 1;
-                                    for (let i=0; i<nums.length-1; i++){
-                                      if (nums[i]+1 === nums[i+1]) { run++; maxRun = Math.max(maxRun, run); }
-                                      else run = 1;
-                                    }
-                                    return maxRun >= 3 ? `${maxRun}연번` : "";
-                                  }
-                                  function checkInRange(val, min, max) {
-                                    if (!isFinite(val) || !isFinite(min) || !isFinite(max)) return "";
-                                    return (val >= min && val <= max) ? "추천" : "";
-                                  }
 
                                   // ===== DataTables 보조 =====
                                   function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
@@ -654,69 +612,87 @@
                                     });
                                   }
 
-                                  // ===== 생성 테이블 렌더 =====
-                                  function renderGeneratedRows(count) {
-                                    if (!generatedTbody) return;
+                                    // === (A) 번호 생성: 서버 호출 버전 ===
+                                    async function generateNewNumbers() {
+                                      // 1) 입력값 수집
+                                      const include = parseNumList(byId("included").value);
+                                      const exclude = parseNumList(byId("excluded").value);
+                                      const weighted = parseNumList(byId("weighted").value);
+                                      const weightPercent = (function () {
+                                        let s = (byId("weightValue").value || "").trim();
+                                        if (s.endsWith("%")) s = s.slice(0, -1);
+                                        const n = parseFloat(s);
+                                        if (!Number.isFinite(n)) return 100;
+                                        return Math.max(0, Math.min(700, n));
+                                      })();
 
-                                    const include = parseNumList(includedInput.value);
-                                    const exclude = parseNumList(excludedInput.value);
-                                    const weight  = parseNumList(weightedInput.value);
-                                    const weightFactor = percentToFactor(weightValueInput.value);
+                                      const sumMin = parseFloat(byId("sum_range_min").value);
+                                      const sumMax = parseFloat(byId("sum_range_max").value);
+                                      const stdMin = parseFloat(byId("stddev_range_min").value);
+                                      const stdMax = parseFloat(byId("stddev_range_max").value);
 
-                                    // 1) 제외 개수 안내 (최대 39개)
-                                    if (exclude.length > 39) {
-                                      alert("‘숫자 제외’는 최대 39개까지 가능합니다.");
-                                      return; // 기존 표 유지
+                                      // 2) 서버 호출
+                                      let res;
+                                      try {
+                                        res = await fetch("/api/generate", {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({
+                                            include, exclude, weighted,
+                                            weightPercent,
+                                            count: 2,              // 한 번에 몇 조합 생성할지
+                                            sumMin, sumMax, stdMin, stdMax
+                                          })
+                                        });
+                                      } catch (e) {
+                                        alert("서버 연결 실패: " + e);
+                                        return;
+                                      }
+
+                                      let data;
+                                      try { data = await res.json(); } catch { data = {}; }
+                                      if (!res.ok || !data.ok) {
+                                        alert("생성 실패: " + (data.error || res.status));
+                                        return;
+                                      }
+
+                                      // 3) 생성 테이블 갱신 + 히스토리 추가
+                                      if (!generatedTbody) return;
+                                      generatedTbody.innerHTML = ""; // 기존 생성표 비우기
+
+                                      for (let i = 0; i < data.results.length; i++) {
+                                        const r = data.results[i];
+                                        const tr = document.createElement("tr");
+                                        tr.innerHTML = `
+                                          <td>조합 ${i + 1}</td>
+                                          ${r.numbers.map(n => `<td>${n}</td>`).join("")}
+                                          <td>${r.consecutive}</td>
+                                          <td>${r.sum}</td>
+                                          <td>${Number(r.stddev).toFixed(2)}</td>
+                                          <td>${r.oddCount}</td>
+                                          <td>${r.evenCount}</td>
+                                          <td>${r.sumRec || ""}</td>
+                                          <td>${r.stddevRec || ""}</td>
+                                        `;
+                                        generatedTbody.appendChild(tr);
+
+                                        // 히스토리에도 즉시 추가
+                                        updateHistory(
+                                          r.numbers,
+                                          r.sum,
+                                          r.consecutive,
+                                          Number(r.stddev).toFixed(2),
+                                          r.oddCount,
+                                          r.evenCount,
+                                          r.sumRec || "",
+                                          r.stddevRec || ""
+                                        );
+                                      }
+
+                                      // UI 보조
+                                      paintButtons();
+                                      compareInputWithTable();
                                     }
-
-                                    // 2) 선택 가능한 숫자 수 검증 (제외 후 6개 미만이면 생성 불가)
-                                    const availableCount = (NUM_MAX - NUM_MIN + 1) - new Set(exclude).size;
-                                    if (availableCount < 6) {
-                                      alert("제외가 너무 많아 6개를 뽑을 수 없습니다. ‘숫자 제외’를 줄여주세요.");
-                                      return; // 기존 표 유지
-                                    }
-
-                                    // ✅ 검증 통과 후에만 지우고 다시 채움
-                                    generatedTbody.innerHTML = "";
-
-                                    const sumMin = parseFloat(sumMinInput.value);
-                                    const sumMax = parseFloat(sumMaxInput.value);
-                                    const stdMin = parseFloat(stdMinInput.value);
-                                    const stdMax = parseFloat(stdMaxInput.value);
-
-                                    for (let i=1; i<=count; i++){
-                                      const nums = generateRandomCombo(6, include, exclude, weight, weightFactor);
-                                      const sum = nums.reduce((a,b)=>a+b,0);
-                                      const mean = sum / nums.length;
-                                      const variance = nums.reduce((acc, v)=> acc + (v-mean)*(v-mean), 0) / nums.length;
-                                      const std = Math.sqrt(variance);
-                                      const odd = nums.filter(n=> n%2===1).length;
-                                      const even= nums.length - odd;
-                                      const cons= consecutiveLabel(nums);
-
-                                      const tr = document.createElement("tr");
-                                      tr.innerHTML = `
-                                        <td>조합 ${i}</td>
-                                        ${nums.map(n=>`<td>${n}</td>`).join("")}
-                                        <td>${cons}</td>
-                                        <td>${sum}</td>
-                                        <td>${std.toFixed(2)}</td>
-                                        <td>${odd}</td>
-                                        <td>${even}</td>
-                                        <td>${checkInRange(sum, sumMin, sumMax)}</td>
-                                        <td>${checkInRange(std, stdMin, stdMax)}</td>
-                                      `;
-                                      generatedTbody.appendChild(tr);
-
-                                      // 생성과 동시에 히스토리에도 추가
-                                      updateHistory(nums, sum, cons, std.toFixed(2), odd, even,
-                                                    checkInRange(sum, sumMin, sumMax),
-                                                    checkInRange(std, stdMin, stdMax));
-                                    }
-                                  }
-
-                                  // ===== 공개 함수 =====
-                                  function generateNewNumbers(){ renderGeneratedRows(2); }
 
                                   // 선택 저장: GeneratedNumbers의 현재 행들을 히스토리에 중복 없이 저장
                                   function saveCombinations(){
@@ -1074,7 +1050,17 @@
 
 
                                 <p>update history</p>
-                                <button id="toggleCompare" class="on" onclick="toggleCompareFunction()">비교 기능 On</button>
+                                <button
+                                  id="toggleCompare"
+                                  class="on"
+                                  onclick="toggleCompareFunction()"
+                                  data-toggle="tooltip"
+                                  data-placement="top"
+                                  data-html="true"
+                                  data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                  title="모든 번호를 다 생성한 이후<br>딱 1번만 켜시는걸 추천드립니다">
+                                  비교 기능 On
+                                </button>
                                 <script>
 
                                 </script>
