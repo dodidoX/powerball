@@ -33,27 +33,46 @@ function rand() {
 
 function generateOneCombo(include, exclude, weighted, weightFactor) {
   const EXCLUDED = new Set(exclude);
-  const INCLUDED = new Set(include);
   const WEIGHTED = new Set(weighted);
 
-  const w = Number.isFinite(weightFactor) ? clamp(weightFactor, 0, 7) : 1;
+  // exclude에 걸린 포함 숫자는 방어적으로 제외
+  const INC = include.filter(n => !EXCLUDED.has(n));
 
-  const pool = [];
-  for (let i = NUM_MIN; i <= NUM_MAX; i++) {
-    if (EXCLUDED.has(i)) continue;
-    let score = rand();                 // 기본 점수
-    if (WEIGHTED.has(i)) score *= w;    // 가중치 반영(0~7배)
-    if (INCLUDED.has(i)) score *= BIG_W;// 포함 숫자 = 최우선
-    pool.push({ number: i, score });
+  const w = Number.isFinite(weightFactor) ? clamp(weightFactor, 0, 7) : 1;
+  const NEED = 6;
+
+  // ── 케이스 1) 포함이 7개 이상: 포함 집합에서만 6개 추출(가중치 교차 적용)
+  if (INC.length >= NEED + 1) {
+    if (INC.length < NEED) throw new Error("포함 숫자가 부족합니다.");
+    const pool = INC.map(n => ({
+      number: n,
+      score: rand() * (WEIGHTED.has(n) ? w : 1), // 포함 집합 내부에서도 '가중치'로 편향 허용
+    }));
+    pool.sort((a, b) => b.score - a.score);
+    return pool.slice(0, NEED).map(x => x.number).sort((a, b) => a - b);
   }
 
-  if (pool.length < 6) {
+  // ── 케이스 2) 포함이 0~6개: 포함 숫자는 전부 '확정' + 나머지 뽑기
+  const result = [...INC]; // 전부 반드시 포함
+  const remain = NEED - result.length;
+
+  // 후보: 제외되지 않았고, 이미 포함에 들어가지 않은 수들
+  const candidates = [];
+  for (let i = NUM_MIN; i <= NUM_MAX; i++) {
+    if (EXCLUDED.has(i)) continue;
+    if (INC.includes(i)) continue; // 이미 확정된 포함 숫자 제외
+    let score = rand() * (WEIGHTED.has(i) ? w : 1);
+    candidates.push({ number: i, score });
+  }
+  if (candidates.length < remain) {
     throw new Error("선택 가능한 숫자가 6개 미만입니다. 제외를 줄이세요.");
   }
 
-  // 상위 6개 추출
-  pool.sort((a, b) => b.score - a.score);
-  return pool.slice(0, 6).map(x => x.number).sort((a, b) => a - b);
+  // 상위 remain개만 추가
+  candidates.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < remain; i++) result.push(candidates[i].number);
+
+  return result.sort((a, b) => a - b);
 }
 
 function consecutiveLabel(nums) {
