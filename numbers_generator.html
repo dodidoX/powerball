@@ -417,6 +417,32 @@
                                       )
                                     ).sort((a,b)=>a-b);
                                   }
+
+                                  // --- 통계/라벨/추천: 백엔드와 동일 로직 ---
+                                  function consecutiveLabel(nums) {
+                                    let maxRun = 1, run = 1;
+                                    for (let i = 0; i < nums.length - 1; i++) {
+                                      if (nums[i] + 1 === nums[i + 1]) { run++; maxRun = Math.max(maxRun, run); }
+                                      else run = 1;
+                                    }
+                                    return maxRun >= 3 ? `${maxRun}연번` : "";
+                                  }
+                                  function statsOf(nums) {
+                                    const sum = nums.reduce((a, b) => a + b, 0);
+                                    const mean = sum / nums.length;
+                                    const variance = nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / nums.length;
+                                    const std = Math.sqrt(variance);
+                                    const odd = nums.filter(n => n % 2 === 1).length;
+                                    const even = nums.length - odd;
+                                    return { sum, std: Number(std.toFixed(2)), odd, even };
+                                  }
+                                  function inRange(val, lo, hi) {
+                                    if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
+                                    return (val >= lo && val <= hi) ? "추천" : "";
+}
+
+
+
                                   function byId(id){ return document.getElementById(id); }
 
                                   function ensureHistDT() {
@@ -661,33 +687,43 @@
                                       generatedTbody.innerHTML = ""; // 기존 생성표 비우기
 
                                       for (let i = 0; i < data.results.length; i++) {
-                                        const r = data.results[i];
+                                        const r = data.results[i];                    // { numbers: [...] } 만 존재
+                                        const nums = r.numbers.slice().sort((a,b)=>a-b);
+
+                                        // ▼ 프론트에서 계산
+                                        const cons = consecutiveLabel(nums);
+                                        const st   = statsOf(nums); // { sum, std, odd, even } with std rounded to 2 decimals
+                                        const sumRec    = inRange(st.sum, sumMin, sumMax);
+                                        const stddevRec = inRange(st.std, stdMin, stdMax);
+
+                                        // 생성표 갱신
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
-                                          ${r.numbers.map(n => `<td>${n}</td>`).join("")}
-                                          <td>${r.consecutive}</td>
-                                          <td>${r.sum}</td>
-                                          <td>${Number(r.stddev).toFixed(2)}</td>
-                                          <td>${r.oddCount}</td>
-                                          <td>${r.evenCount}</td>
-                                          <td>${r.sumRec || ""}</td>
-                                          <td>${r.stddevRec || ""}</td>
+                                          ${nums.map(n => `<td>${n}</td>`).join("")}
+                                          <td>${cons}</td>
+                                          <td>${st.sum}</td>
+                                          <td>${st.std.toFixed(2)}</td>
+                                          <td>${st.odd}</td>
+                                          <td>${st.even}</td>
+                                          <td>${sumRec}</td>
+                                          <td>${stddevRec}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
-                                        // 히스토리에도 즉시 추가
+                                        // 히스토리 갱신 (DataTables)
                                         updateHistory(
-                                          r.numbers,
-                                          r.sum,
-                                          r.consecutive,
-                                          Number(r.stddev).toFixed(2),
-                                          r.oddCount,
-                                          r.evenCount,
-                                          r.sumRec || "",
-                                          r.stddevRec || ""
+                                          nums,
+                                          st.sum,
+                                          cons,
+                                          st.std.toFixed(2), // 표시상 2자리 고정
+                                          st.odd,
+                                          st.even,
+                                          sumRec,
+                                          stddevRec
                                         );
                                       }
+
 
                                       // UI 보조
                                       paintButtons();
