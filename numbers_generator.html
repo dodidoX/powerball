@@ -422,6 +422,8 @@
                                   function ensureHistDT() {
                                     if ($.fn.DataTable.isDataTable('#historyTable')) return histDT;
 
+                                    const COLS = document.querySelectorAll('#historyTable thead th').length;
+
                                     histDT = $('#historyTable').DataTable({
                                       destroy: true,
                                       searching: false,
@@ -430,16 +432,17 @@
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
+                                      autoWidth: false,
+                                      // ★ 모든 열에 기본 컨텐츠 공란 지정(미존재/undefined 방어)
+                                      columns: Array.from({ length: COLS }, () => ({ defaultContent: '' })),
                                       columnDefs: [
-                                        // 숫자 정렬 필요한 열
-                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
-
-                                        // 정렬 비활성화: 선택체크박스, 비교결과 6칸, 삭제버튼
-                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
+                                        { targets: [0,2,3,4,5,6,7,9,10,11,12], type: 'num' },
+                                        { targets: [1,15,16,17,18,19,20,21], orderable: false }
                                       ]
                                     });
                                     return histDT;
                                   }
+
 
                                   // ===== 전역 참조(나중에 DOMContentLoaded에서 할당) =====
                                   let includedInput, excludedInput, weightedInput, weightValueInput;
@@ -473,15 +476,6 @@
                                   }
 
 
-                                  // ==== 프론트 계산 전용 ====
-                                  function consecutiveLabel(nums) {
-                                    let maxRun = 1, run = 1;
-                                    for (let i = 0; i < nums.length - 1; i++) {
-                                      if (nums[i] + 1 === nums[i + 1]) { run++; maxRun = Math.max(maxRun, run); }
-                                      else run = 1;
-                                    }
-                                    return maxRun >= 3 ? `${maxRun}연번` : "";
-                                  }
 
                                   // 숫자 배열 강제 변환
                                   function toNum(arr) {
@@ -518,20 +512,6 @@
 
 
 
-                                  function statsOf(nums) {
-                                    const sum = nums.reduce((a, b) => a + b, 0);
-                                    const mean = sum / nums.length;
-                                    const variance = nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / nums.length;
-                                    const std = Math.sqrt(variance);
-                                    const odd = nums.filter(n => n % 2 === 1).length;
-                                    const even = nums.length - odd;
-                                    return { sum, std: Number(std.toFixed(2)), odd, even };
-                                  }
-
-                                  function inRange(val, lo, hi) {
-                                    if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
-                                    return (val >= lo && val <= hi) ? "추천" : "";
-                                  }
 
                                   // ===== 버튼 모드 전환 =====
                                   function attachButtonHandlers(mode) {
