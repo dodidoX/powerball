@@ -471,6 +471,30 @@
                                       btn.style.color = "white";
                                     });
                                   }
+                                  // ==== 프론트 계산 전용 ====
+                                  function consecutiveLabel(nums) {
+                                    let maxRun = 1, run = 1;
+                                    for (let i = 0; i < nums.length - 1; i++) {
+                                      if (nums[i] + 1 === nums[i + 1]) { run++; maxRun = Math.max(maxRun, run); }
+                                      else run = 1;
+                                    }
+                                    return maxRun >= 3 ? `${maxRun}연번` : "";
+                                  }
+
+                                  function statsOf(nums) {
+                                    const sum = nums.reduce((a, b) => a + b, 0);
+                                    const mean = sum / nums.length;
+                                    const variance = nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / nums.length;
+                                    const std = Math.sqrt(variance);
+                                    const odd = nums.filter(n => n % 2 === 1).length;
+                                    const even = nums.length - odd;
+                                    return { sum, std: Number(std.toFixed(2)), odd, even };
+                                  }
+
+                                  function inRange(val, lo, hi) {
+                                    if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
+                                    return (val >= lo && val <= hi) ? "추천" : "";
+                                  }
 
                                   // ===== 버튼 모드 전환 =====
                                   function attachButtonHandlers(mode) {
@@ -631,7 +655,7 @@
                                       const stdMin = parseFloat(byId("stddev_range_min").value);
                                       const stdMax = parseFloat(byId("stddev_range_max").value);
 
-                                      // 2) 서버 호출
+                                      // 2) 서버 호출(숫자만 받아오기 권장; 예전 응답 형식도 호환)
                                       let res;
                                       try {
                                         res = await fetch("/api/generate", {
@@ -640,8 +664,7 @@
                                           body: JSON.stringify({
                                             include, exclude, weighted,
                                             weightPercent,
-                                            count: 2,              // 한 번에 몇 조합 생성할지
-                                            sumMin, sumMax, stdMin, stdMax
+                                            count: 2 // 한 번에 몇 조합 생성할지
                                           })
                                         });
                                       } catch (e) {
@@ -651,48 +674,58 @@
 
                                       let data;
                                       try { data = await res.json(); } catch { data = {}; }
-                                      if (!res.ok || !data.ok) {
-                                        alert("생성 실패: " + (data.error || res.status));
+                                      if (!res.ok || !data) {
+                                        alert("생성 실패: " + (data?.error || res.status));
                                         return;
                                       }
 
-                                      // 3) 생성 테이블 갱신 + 히스토리 추가
+                                      // 3) 생성 테이블 갱신 + 히스토리 추가 (통계는 프론트에서 계산)
                                       if (!generatedTbody) return;
-                                      generatedTbody.innerHTML = ""; // 기존 생성표 비우기
+                                      generatedTbody.innerHTML = "";
 
-                                      for (let i = 0; i < data.results.length; i++) {
-                                        const r = data.results[i];
+                                      const results = Array.isArray(data.results) ? data.results : [];
+                                      results.forEach((r, i) => {
+                                        // r이 배열이거나, {numbers:[...]} 형태 모두 지원
+                                        const nums = Array.isArray(r) ? r : (r.numbers || []);
+                                        if (nums.length !== 6) return;
+
+                                        const cons = consecutiveLabel(nums);
+                                        const { sum, std, odd, even } = statsOf(nums);
+                                        const sumRec = inRange(sum, sumMin, sumMax);
+                                        const stdRec = inRange(std, stdMin, stdMax);
+
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
-                                          ${r.numbers.map(n => `<td>${n}</td>`).join("")}
-                                          <td>${r.consecutive}</td>
-                                          <td>${r.sum}</td>
-                                          <td>${Number(r.stddev).toFixed(2)}</td>
-                                          <td>${r.oddCount}</td>
-                                          <td>${r.evenCount}</td>
-                                          <td>${r.sumRec || ""}</td>
-                                          <td>${r.stddevRec || ""}</td>
+                                          ${nums.map(n => `<td>${n}</td>`).join("")}
+                                          <td>${cons}</td>
+                                          <td>${sum}</td>
+                                          <td>${std.toFixed(2)}</td>
+                                          <td>${odd}</td>
+                                          <td>${even}</td>
+                                          <td>${sumRec}</td>
+                                          <td>${stdRec}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
                                         // 히스토리에도 즉시 추가
                                         updateHistory(
-                                          r.numbers,
-                                          r.sum,
-                                          r.consecutive,
-                                          Number(r.stddev).toFixed(2),
-                                          r.oddCount,
-                                          r.evenCount,
-                                          r.sumRec || "",
-                                          r.stddevRec || ""
+                                          nums,
+                                          sum,
+                                          cons,
+                                          std.toFixed(2),
+                                          odd,
+                                          even,
+                                          sumRec,
+                                          stdRec
                                         );
-                                      }
+                                      });
 
                                       // UI 보조
                                       paintButtons();
                                       compareInputWithTable();
                                     }
+
 
                                   // 선택 저장: GeneratedNumbers의 현재 행들을 히스토리에 중복 없이 저장
                                   function saveCombinations(){
@@ -1158,20 +1191,12 @@
         </div>
     </div>
 
-    <!-- ExcelJS (필요 시 1회) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
 
-    <!-- jQuery & Bootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery Easing (sb-admin-2가 쓰면 유지) -->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- SB Admin 2 -->
     <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- DataTables core + Bootstrap4 integration -->
     <script src="vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
