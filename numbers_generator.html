@@ -471,6 +471,12 @@
                                       btn.style.color = "white";
                                     });
                                   }
+                                  // 숫자 배열 강제 변환
+                                  function toNum(arr) {
+                                    return (arr || []).map(x => Number(x)).filter(n => Number.isFinite(n));
+                                  }
+
+
                                   // ==== 프론트 계산 전용 ====
                                   function consecutiveLabel(nums) {
                                     let maxRun = 1, run = 1;
@@ -685,8 +691,8 @@
 
                                       const results = Array.isArray(data.results) ? data.results : [];
                                       results.forEach((r, i) => {
-                                        // r이 배열이거나, {numbers:[...]} 형태 모두 지원
-                                        const nums = Array.isArray(r) ? r : (r.numbers || []);
+                                        // r이 배열이거나 {numbers:[...]} 모두 지원 + 숫자 강제 변환
+                                        const nums = toNum(Array.isArray(r) ? r : (r.numbers || []));
                                         if (nums.length !== 6) return;
 
                                         const cons = consecutiveLabel(nums);
@@ -708,7 +714,6 @@
                                         `;
                                         generatedTbody.appendChild(tr);
 
-                                        // 히스토리에도 즉시 추가
                                         updateHistory(
                                           nums,
                                           sum,
