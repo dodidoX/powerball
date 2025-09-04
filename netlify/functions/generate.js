@@ -73,10 +73,6 @@ function json(status, body) {
   };
 }
 
-const NUMBERS_N = 45;
-const NEED = 6;
-const MAX_EXCLUDE = 39;
-
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return json(200, { ok: true });
   if (event.httpMethod !== "POST") return json(405, { error: "Method Not Allowed" });
@@ -107,7 +103,7 @@ exports.handler = async (event) => {
     const results = [];
     for (let i = 0; i < count; i++) {
       const nums = generateOneCombo(include, exclude, weighted, weightFactor);
-      results.push({ numbers: nums });
+      results.push({ numbers: nums }); // 통계는 프론트에서
     }
 
     return json(200, { ok: true, results });
