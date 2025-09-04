@@ -422,8 +422,6 @@
                                   function ensureHistDT() {
                                     if ($.fn.DataTable.isDataTable('#historyTable')) return histDT;
 
-                                    const COLS = document.querySelectorAll('#historyTable thead th').length;
-
                                     histDT = $('#historyTable').DataTable({
                                       destroy: true,
                                       searching: false,
@@ -432,17 +430,16 @@
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
-                                      autoWidth: false,
-                                      // ★ 모든 열에 기본 컨텐츠 공란 지정(미존재/undefined 방어)
-                                      columns: Array.from({ length: COLS }, () => ({ defaultContent: '' })),
                                       columnDefs: [
-                                        { targets: [0,2,3,4,5,6,7,9,10,11,12], type: 'num' },
-                                        { targets: [1,15,16,17,18,19,20,21], orderable: false }
+                                        // 숫자 정렬 필요한 열
+                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
+
+                                        // 정렬 비활성화: 선택체크박스, 비교결과 6칸, 삭제버튼
+                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
                                       ]
                                     });
                                     return histDT;
                                   }
-
 
                                   // ===== 전역 참조(나중에 DOMContentLoaded에서 할당) =====
                                   let includedInput, excludedInput, weightedInput, weightValueInput;
@@ -474,44 +471,6 @@
                                       btn.style.color = "white";
                                     });
                                   }
-
-
-
-                                  // 숫자 배열 강제 변환
-                                  function toNum(arr) {
-                                    return (arr || []).map(x => Number(x)).filter(n => Number.isFinite(n));
-                                  }
-
-                                  // ==== 프론트 계산 전용 (교체) ====
-                                  function consecutiveLabel(nums) {
-                                    const a = toNum(nums).sort((x, y) => x - y);
-                                    if (a.length < 2) return "";
-                                    let maxRun = 1, run = 1;
-                                    for (let i = 0; i < a.length - 1; i++) {
-                                      if (a[i] + 1 === a[i + 1]) { run++; maxRun = Math.max(maxRun, run); }
-                                      else run = 1;
-                                    }
-                                    return maxRun >= 3 ? `${maxRun}연번` : "";
-                                  }
-
-                                  function statsOf(nums) {
-                                    const a = toNum(nums);
-                                    const sum = a.reduce((acc, v) => acc + v, 0);   // 숫자 덧셈 보장
-                                    const mean = a.length ? sum / a.length : 0;
-                                    const variance = a.length ? a.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / a.length : 0;
-                                    const std = Math.sqrt(variance);
-                                    const odd = a.filter(n => n % 2 === 1).length;
-                                    const even = a.length - odd;
-                                    return { sum, std: Number(std.toFixed(2)), odd, even };
-                                  }
-
-                                  function inRange(val, lo, hi) {
-                                    if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
-                                    return (val >= lo && val <= hi) ? "추천" : "";
-                                  }
-
-
-
 
                                   // ===== 버튼 모드 전환 =====
                                   function attachButtonHandlers(mode) {
@@ -556,43 +515,39 @@
 
 
                                   // ===== DataTables 보조 =====
-                                  // 숫자 배열 안전 변환 헬퍼 (updateHistory 위쪽에 한 번만 선언)
-                                  function toNum(arr){ return Array.isArray(arr) ? arr.map(v => Number(v)) : []; }
-
                                   function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
                                     const dt = ensureHistDT();
-                                    const COLS = document.querySelectorAll('#historyTable thead th').length; // 22
-                                    const row = new Array(COLS).fill('');
+                                    const newRowData = [
+                                      historySeq++,                                       // No.
+                                      '<input type="checkbox" class="row-select">',       // 체크박스
+                                      ...numbers,                                         // 6개 번호(2~7)
+                                      consecutive,                                        // 8
+                                      sum,                                                // 9
+                                      stddev,                                             // 10
+                                      oddCount,                                           // 11
+                                      evenCount,                                          // 12
+                                      sumRec,                                             // 13
+                                      stddevRec,                                          // 14
+                                      '', '', '', '', '', '',                             // 15~20: 비교 결과 "O" 들어갈 자리
+                                      '<button class="deleteBtn" type="button">삭제</button>', // 21
+                                    ];
+                                    const row = dt.row.add(newRowData).draw(false).node();
 
-                                    row[0] = historySeq++;
-                                    row[1] = '<input type="checkbox" class="row-select">';
-
-                                    const nums = toNum(numbers);
-                                    for (let i = 0; i < 6; i++) row[2 + i] = (nums[i] ?? '');
-
-                                    row[8]  = (consecutive ?? '');
-                                    row[9]  = Number.isFinite(+sum)     ? +sum : '';
-                                    row[10] = Number.isFinite(+stddev)  ? (+stddev).toFixed(2) : '';
-                                    row[11] = Number.isFinite(+oddCount)? +oddCount : '';
-                                    row[12] = Number.isFinite(+evenCount)? +evenCount : '';
-                                    row[13] = (sumRec ?? '');
-                                    row[14] = (stddevRec ?? '');
-                                    // 15~20 (비교결과) 는 공란 유지
-                                    row[21] = '<button class="deleteBtn" type="button">삭제</button>';
-
-                                    const node = dt.row.add(row).draw(false).node();
-
-                                    $(node).find('button.deleteBtn').on('click', function(e){
+                                    // 개별 삭제 버튼: 스크롤 점프 방지
+                                    $(row).find('button.deleteBtn').on('click', function(e){
                                       e.preventDefault();
                                       e.stopPropagation();
                                       const y = window.pageYOffset || document.documentElement.scrollTop;
                                       dt.row($(this).closest('tr')).remove().draw(false);
-                                      if (dt.rows().count() === 0) historySeq = 1;
+
+                                      if (dt.rows().count() === 0) {
+                                        historySeq = 1;
+                                      }
+
                                       window.scrollTo(0, y);
                                       compareInputWithTable();
                                     });
                                   }
-
 
                                   function deleteHistory() {
                                     const dt = ensureHistDT();
@@ -676,7 +631,7 @@
                                       const stdMin = parseFloat(byId("stddev_range_min").value);
                                       const stdMax = parseFloat(byId("stddev_range_max").value);
 
-                                      // 2) 서버 호출(숫자만 받아오기 권장; 예전 응답 형식도 호환)
+                                      // 2) 서버 호출
                                       let res;
                                       try {
                                         res = await fetch("/api/generate", {
@@ -685,7 +640,8 @@
                                           body: JSON.stringify({
                                             include, exclude, weighted,
                                             weightPercent,
-                                            count: 2 // 한 번에 몇 조합 생성할지
+                                            count: 2,              // 한 번에 몇 조합 생성할지
+                                            sumMin, sumMax, stdMin, stdMax
                                           })
                                         });
                                       } catch (e) {
@@ -695,64 +651,55 @@
 
                                       let data;
                                       try { data = await res.json(); } catch { data = {}; }
-                                      if (!res.ok || !data) {
-                                        alert("생성 실패: " + (data?.error || res.status));
+                                      if (!res.ok || !data.ok) {
+                                        alert("생성 실패: " + (data.error || res.status));
                                         return;
                                       }
 
-                                      // 3) 생성 테이블 갱신 + 히스토리 추가 (통계는 프론트에서 계산)
+                                      // 3) 생성 테이블 갱신 + 히스토리 추가
                                       if (!generatedTbody) return;
-                                      generatedTbody.innerHTML = "";
+                                      generatedTbody.innerHTML = ""; // 기존 생성표 비우기
 
-                                      const results = Array.isArray(data.results) ? data.results : [];
-                                      results.forEach((r, i) => {
-                                        // r이 배열이거나 {numbers:[...]} 모두 지원 + 숫자 강제 변환
-                                        const nums = toNum(Array.isArray(r) ? r : (r.numbers || []));
-                                        if (nums.length !== 6) return;
-
-                                        const cons = consecutiveLabel(nums);
-                                        const { sum, std, odd, even } = statsOf(nums);
-                                        const sumRec = inRange(sum, sumMin, sumMax);
-                                        const stdRec = inRange(std, stdMin, stdMax);
-
+                                      for (let i = 0; i < data.results.length; i++) {
+                                        const r = data.results[i];
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
-                                          ${nums.map(n => `<td>${n}</td>`).join("")}
-                                          <td>${cons}</td>
-                                          <td>${sum}</td>
-                                          <td>${std.toFixed(2)}</td>
-                                          <td>${odd}</td>
-                                          <td>${even}</td>
-                                          <td>${sumRec}</td>
-                                          <td>${stdRec}</td>
+                                          ${r.numbers.map(n => `<td>${n}</td>`).join("")}
+                                          <td>${r.consecutive}</td>
+                                          <td>${r.sum}</td>
+                                          <td>${Number(r.stddev).toFixed(2)}</td>
+                                          <td>${r.oddCount}</td>
+                                          <td>${r.evenCount}</td>
+                                          <td>${r.sumRec || ""}</td>
+                                          <td>${r.stddevRec || ""}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
+                                        // 히스토리에도 즉시 추가
                                         updateHistory(
-                                          nums,
-                                          sum,
-                                          cons,
-                                          std,
-                                          odd,
-                                          even,
-                                          sumRec,
-                                          stdRec
+                                          r.numbers,
+                                          r.sum,
+                                          r.consecutive,
+                                          Number(r.stddev).toFixed(2),
+                                          r.oddCount,
+                                          r.evenCount,
+                                          r.sumRec || "",
+                                          r.stddevRec || ""
                                         );
-                                      });
+                                      }
 
                                       // UI 보조
                                       paintButtons();
                                       compareInputWithTable();
                                     }
 
-
                                   // 선택 저장: GeneratedNumbers의 현재 행들을 히스토리에 중복 없이 저장
                                   function saveCombinations(){
                                     if (!generatedTbody) return;
                                     const dt = ensureHistDT();
                                     const existing = new Set(dt.rows().data().toArray()
-                                      .map(r => r.slice(2,8).join(',')));
+                                      .map(r => r.slice(0,6).join(',')));
                                     generatedTbody.querySelectorAll('tr').forEach(tr => {
                                       const tds = tr.querySelectorAll('td');
                                       if (tds.length < 14) return;
