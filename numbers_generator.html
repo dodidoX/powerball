@@ -561,38 +561,33 @@
 
                                   function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
                                     const dt = ensureHistDT();
+                                    const COLS = document.querySelectorAll('#historyTable thead th').length; // 22
+                                    const row = new Array(COLS).fill('');
 
-                                    const row = [
-                                      historySeq++,
-                                      '<input type="checkbox" class="row-select">',
-                                      ...toNum(numbers),
-                                      (consecutive ?? ""),
-                                      (Number.isFinite(sum) ? sum : ""),
-                                      (stddev ?? ""),
-                                      (Number.isFinite(oddCount) ? oddCount : ""),
-                                      (Number.isFinite(evenCount) ? evenCount : ""),
-                                      (sumRec ?? ""),
-                                      (stddevRec ?? ""),
-                                      '', '', '', '', '', '',
-                                      '<button class="deleteBtn" type="button">삭제</button>',
-                                    ];
+                                    row[0] = historySeq++;
+                                    row[1] = '<input type="checkbox" class="row-select">';
 
-                                    // 열 개수 딱 맞추기(부족하면 채우고 많으면 자르기)
-                                    const COLS = document.querySelectorAll('#historyTable thead th').length;
-                                    while (row.length < COLS) row.push('');
-                                    if (row.length > COLS) row.length = COLS;
+                                    const nums = toNum(numbers);
+                                    for (let i = 0; i < 6; i++) row[2 + i] = (nums[i] ?? '');
+
+                                    row[8]  = (consecutive ?? '');
+                                    row[9]  = Number.isFinite(+sum)     ? +sum : '';
+                                    row[10] = Number.isFinite(+stddev)  ? (+stddev).toFixed(2) : '';
+                                    row[11] = Number.isFinite(+oddCount)? +oddCount : '';
+                                    row[12] = Number.isFinite(+evenCount)? +evenCount : '';
+                                    row[13] = (sumRec ?? '');
+                                    row[14] = (stddevRec ?? '');
+                                    // 15~20 (비교결과) 는 공란 유지
+                                    row[21] = '<button class="deleteBtn" type="button">삭제</button>';
 
                                     const node = dt.row.add(row).draw(false).node();
 
-                                    // 개별 삭제 버튼 (기존과 동일)
                                     $(node).find('button.deleteBtn').on('click', function(e){
                                       e.preventDefault();
                                       e.stopPropagation();
                                       const y = window.pageYOffset || document.documentElement.scrollTop;
                                       dt.row($(this).closest('tr')).remove().draw(false);
-
                                       if (dt.rows().count() === 0) historySeq = 1;
-
                                       window.scrollTo(0, y);
                                       compareInputWithTable();
                                     });
@@ -738,7 +733,7 @@
                                           nums,
                                           sum,
                                           cons,
-                                          std.toFixed(2),
+                                          std,
                                           odd,
                                           even,
                                           sumRec,
@@ -757,7 +752,7 @@
                                     if (!generatedTbody) return;
                                     const dt = ensureHistDT();
                                     const existing = new Set(dt.rows().data().toArray()
-                                      .map(r => r.slice(0,6).join(',')));
+                                      .map(r => r.slice(2,8).join(',')));
                                     generatedTbody.querySelectorAll('tr').forEach(tr => {
                                       const tds = tr.querySelectorAll('td');
                                       if (tds.length < 14) return;
