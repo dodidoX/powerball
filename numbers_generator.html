@@ -585,6 +585,9 @@
                                     // 헤더의 전체선택 체크박스도 해제
                                     const selectAll = document.getElementById('selectAllHistory');
                                     if (selectAll) selectAll.checked = false;
+
+                                    // ✔ 정렬/검색 초기화
+                                    dt.order([]).search('').columns().search('').draw();
                                   }
 
                                   // ===== 비교 기능 =====
@@ -988,6 +991,11 @@
 
                                 if (dt.rows().count() === 0) {
                                   historySeq = 1;
+                                  // ✔ 테이블이 비었으면 정렬/검색 초기화
+                                  dt.order([]).search('').columns().search('').draw();
+                                  // 헤더 전체선택도 안전하게 해제
+                                  const selectAll = document.getElementById('selectAllHistory');
+                                  if (selectAll) selectAll.checked = false;
                                 }
 
                                 window.scrollTo(0, y);
@@ -1157,7 +1165,7 @@
             <footer class="sticky-footer bg-white mt-auto">
                 <div class="container py-2">
                     <div class="text-center"> 
-                        <span>Copyright &copy; Your Website 2020</span>
+                        <span>Copyright &copy; https://blog.naver.com/lottocreator </span>
                     </div>
                 </div>
             </footer>
