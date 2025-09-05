@@ -975,14 +975,14 @@
 
 
                                 // 4) "선택" 열(엑셀 2번째 열) 숨김
-                                // 엑셀 1열 = No., 2열 = 선택(체크박스) 열이 됩니다.
+                                
                                 ws.getColumn(2).hidden = true;
 
-                                // 5) 테두리: 바깥쪽 외곽선만 + A열 오른쪽(B열 왼쪽) 경계선
+                                // 5) 테두리: 바깥쪽 외곽선 + 헤더 아랫줄 + A열/8열/15열 오른쪽 경계선
                                 const firstRow = 1;
-                                const lastRow  = r - 1;                  // 마지막 데이터 행
+                                const lastRow  = r - 1;              // 마지막 데이터 행
                                 const firstCol = 1;
-                                const lastCol  = includeCols.length;     // 마지막 데이터 열
+                                const lastCol  = includeCols.length; // 마지막 데이터 열
 
                                 // 테두리 세터(덮어쓰지 않고 기존 보더와 병합)
                                 function setEdge(cell, edge, style = 'thin') {
@@ -991,33 +991,41 @@
                                 }
 
                                 if (lastRow >= firstRow && lastCol >= firstCol) {
-                                  // 상단/하단 외곽
+                                  // 바깥쪽 외곽
                                   for (let c = firstCol; c <= lastCol; c++) {
                                     setEdge(ws.getCell(firstRow, c), 'top');
                                     setEdge(ws.getCell(lastRow,  c), 'bottom');
                                   }
-                                  // 좌/우 외곽
+
                                   for (let rr = firstRow; rr <= lastRow; rr++) {
                                     setEdge(ws.getCell(rr, firstCol), 'left');
                                     setEdge(ws.getCell(rr, lastCol),  'right');
                                   }
 
-                                  // A열 오른쪽(B열 왼쪽) 경계선 = A열 셀의 right 보더를 모두 thin으로
+                                  // ── 추가 1) 헤더(1행) 아래쪽 구분선
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(1, c), 'bottom'); // 'medium'으로 바꾸면 더 진하게
+                                  }
+
+                                  // ── A열 오른쪽(B열 왼쪽) 경계선
                                   for (let rr = firstRow; rr <= lastRow; rr++) {
                                     setEdge(ws.getCell(rr, 1), 'right');
                                   }
-                                }
 
-                                // A열 오른쪽(B열 왼쪽) 경계선 = A열 셀의 right 보더
-                                for (let rr = firstRow; rr <= lastRow; rr++) {
-                                  setEdge(ws.getCell(rr, 1), 'right');
-                                }
+                                  // ── 8번째 열 오른쪽 경계선(여섯번째 번호 끝)
+                                  const colRight8 = 8;
+                                  if (colRight8 >= firstCol && colRight8 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight8), 'right');
+                                    }
+                                  }
 
-                                // ▼ 8번째 열의 오른쪽 경계선(여섯번째 번호 오른쪽)
-                                const rightEdgeCol = 8; //
-                                if (rightEdgeCol >= firstCol && rightEdgeCol <= lastCol) {
-                                  for (let rr = firstRow; rr <= lastRow; rr++) {
-                                    setEdge(ws.getCell(rr, rightEdgeCol), 'right'); //
+                                  // ── 추가 2) 15번째 열 오른쪽 경계선(표준편차 기준 끝)
+                                  const colRight15 = 15;
+                                  if (colRight15 >= firstCol && colRight15 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight15), 'right');
+                                    }
                                   }
                                 }
 
