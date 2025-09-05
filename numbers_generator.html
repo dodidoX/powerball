@@ -947,6 +947,10 @@
                                     const idx = c - 14; // 1~6
                                     label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
                                   }
+                                  else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
+                                    label = '선택';
+                                  }
+
                                   ws.getCell(1, i + 1).value = label || '';
                                 });
 
@@ -1001,6 +1005,19 @@
                                   // A열 오른쪽(B열 왼쪽) 경계선 = A열 셀의 right 보더를 모두 thin으로
                                   for (let rr = firstRow; rr <= lastRow; rr++) {
                                     setEdge(ws.getCell(rr, 1), 'right');
+                                  }
+                                }
+
+                                // A열 오른쪽(B열 왼쪽) 경계선 = A열 셀의 right 보더
+                                for (let rr = firstRow; rr <= lastRow; rr++) {
+                                  setEdge(ws.getCell(rr, 1), 'right');
+                                }
+
+                                // ▼ 8번째 열의 오른쪽 경계선(여섯번째 번호 오른쪽)
+                                const rightEdgeCol = 8; //
+                                if (rightEdgeCol >= firstCol && rightEdgeCol <= lastCol) {
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, rightEdgeCol), 'right'); //
                                   }
                                 }
 
