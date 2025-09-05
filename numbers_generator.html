@@ -1072,10 +1072,12 @@
                                 // 포함할 컬럼 인덱스(2열 = 1 인덱스는 제거)
                                 const headerCells = table.tHead.rows[0].cells;
                                 const includeCols = [];
+                                const deleteColIndex = headerCells.length - 1; // = 21 (지금 구조 기준)
                                 for (let c = 0; c < headerCells.length; c++) {
-                                  if (c === 21) continue; // ✔ "선택" 열 제거
+                                  if (c === deleteColIndex) continue; // ✔ "삭제" 열 제거
                                   includeCols.push(c);
                                 }
+
 
                                 // 헤더 작성
                                 const selVals = [];
@@ -1085,10 +1087,15 @@
                                 }
                                 includeCols.forEach((c, i) => {
                                   let label = headerCells[c].innerText.trim();
+                                  // 비교 열(15~20): 셀렉트 모든 옵션 텍스트 방지 → "비교n(선택값)"
                                   if (c >= 15 && c <= 20) {
                                     const idx = c - 14; // 1~6
                                     label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
                                   }
+                                  else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
+                                    label = '선택';
+                                  }
+
                                   ws.getCell(1, i + 1).value = label || '';
                                 });
 
@@ -1114,6 +1121,60 @@
                                 });
 
                                 if (r === 2) { alert("선택된 행이 없습니다."); return; }
+
+                                // 4) "선택" 열(엑셀 2번째 열) 숨김
+                                ws.getColumn(2).hidden = true;
+
+                                // 5) 테두리: 바깥쪽 외곽선 + 헤더 아랫줄 + A열/8열/15열 오른쪽 경계선
+                                const firstRow = 1;
+                                const lastRow  = r - 1;              // 마지막 데이터 행
+                                const firstCol = 1;
+                                const lastCol  = includeCols.length; // 마지막 데이터 열
+
+                                // 테두리 세터(덮어쓰지 않고 기존 보더와 병합)
+                                function setEdge(cell, edge, style = 'thin') {
+                                  const b = cell.border || {};
+                                  cell.border = { ...b, [edge]: { style } };
+                                }
+
+                                if (lastRow >= firstRow && lastCol >= firstCol) {
+                                  // 바깥쪽 외곽
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(firstRow, c), 'top');
+                                    setEdge(ws.getCell(lastRow,  c), 'bottom');
+                                  }
+
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, firstCol), 'left');
+                                    setEdge(ws.getCell(rr, lastCol),  'right');
+                                  }
+
+                                  // ── 추가 1) 헤더(1행) 아래쪽 구분선
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(1, c), 'bottom'); // 'medium'으로 바꾸면 더 진하게
+                                  }
+
+                                  // ── A열 오른쪽(B열 왼쪽) 경계선
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, 1), 'right');
+                                  }
+
+                                  // ── 8번째 열 오른쪽 경계선(여섯번째 번호 끝)
+                                  const colRight8 = 8;
+                                  if (colRight8 >= firstCol && colRight8 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight8), 'right');
+                                    }
+                                  }
+
+                                  // ── 추가 2) 15번째 열 오른쪽 경계선(표준편차 기준 끝)
+                                  const colRight15 = 15;
+                                  if (colRight15 >= firstCol && colRight15 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight15), 'right');
+                                    }
+                                  }
+                                }
 
                                 ws.views = [{ state: 'frozen', ySplit: 1, topLeftCell: 'A2', activeCell: 'A2' }];
 
