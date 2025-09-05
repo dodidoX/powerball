@@ -568,6 +568,22 @@
 
                                       if (dt.rows().count() === 0) {
                                         historySeq = 1;
+                                      
+                                        // 헤더의 "전체선택" 체크박스 해제
+                                        const selectAll = document.getElementById('selectAllHistory');
+                                        if (selectAll) selectAll.checked = false;
+
+                                        // ✅ 정렬 및 검색(필터) 초기화
+                                        dt.search('');                 // 전역 검색어 초기화
+                                        dt.columns().every(function(){ // (혹시 모를) 컬럼 검색어 초기화
+                                          this.search('');
+                                        });
+                                        dt.order([]).draw(false);      // 정렬 초기화(아이콘도 원상복구)
+
+                                        // (선택) 혹시 정렬 아이콘이 남아있으면 수동으로 초기화
+                                        // $('#historyTable thead th')
+                                        //   .removeClass('sorting_asc sorting_desc')
+                                        //   .addClass('sorting');
                                       }
 
                                       window.scrollTo(0, y);
