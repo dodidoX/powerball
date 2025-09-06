@@ -1352,58 +1352,58 @@
     <script src="vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <script>
-  (function () {
-    // 네임스페이스는 함수에서 고정했으니 여기선 안 써도 됨
-    const ENDPOINT = "/.netlify/functions/counter"; // 같은 오리진
+    <script>
+    (function () {
+      const ENDPOINT = "/.netlify/functions/counter"; // 같은 오리진(Netlify Functions)
 
-    const todayStr = new Date().toISOString().slice(0,10);
-    const TODAY_KEY = `day-${todayStr}`;
-    const LOCAL_FLAG = `counted-${TODAY_KEY}`;
+      const todayStr  = new Date().toISOString().slice(0,10);
+      const TODAY_KEY = `day-${todayStr}`;
 
-    const $ = (id) => document.getElementById(id);
-    const setText = (ids, v) => ids.forEach(id => { const el = $(id); if (el) el.textContent = v; });
+      const $ = (id) => document.getElementById(id);
+      const setText = (ids, v) => ids.forEach(id => { const el = $(id); if (el) el.textContent = v; });
 
-    const join = (base, q) => base + (q.startsWith('?') ? q : ('?' + q.replace(/^\?+/,'')));
+      // 쿼리 문자열 유틸
+      const qs = (obj) => Object.entries(obj)
+        .map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
 
-    async function api(qs) {
-      const res = await fetch(join(ENDPOINT, qs), { cache: "no-store" });
-      if (!res.ok) throw new Error(`counter ${res.status}`);
-      return res.json();
-    }
-    const ensure = (key) => api(`op=ensure&key=${encodeURIComponent(key)}`);
-    const hit    = (key) => api(`op=hit&key=${encodeURIComponent(key)}`);
-    const get    = (key) => api(`op=get&key=${encodeURIComponent(key)}`);
-
-    async function initCounters() {
-      try {
-        await Promise.all([ ensure("total"), ensure(TODAY_KEY) ]);
-
-        // 같은 브라우저에서는 하루 1회만 증가 (원치 않으면 이 블록 삭제)
-        if (!localStorage.getItem(LOCAL_FLAG)) {
-          await Promise.all([ hit("total"), hit(TODAY_KEY) ]);
-          localStorage.setItem(LOCAL_FLAG, "1");
-        }
-
-        const [{ value: totalVal }, { value: todayVal }] = await Promise.all([
-          get("total"),
-          get(TODAY_KEY),
-        ]);
-
-        setText(["todayCount", "todayCountFooter"], todayVal);
-        setText(["totalCount", "totalCountFooter"], totalVal);
-      } catch (e) {
-        console.warn("Visitor counter init failed:", e);
+      async function api(params) {
+        const res = await fetch(`${ENDPOINT}?${qs(params)}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`counter ${res.status}`);
+        return res.json();
       }
-    }
+      const ensure = (key) => api({ op: "ensure", key });
+      const hit    = (key) => api({ op: "hit",    key });
+      const get    = (key) => api({ op: "get",    key });
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initCounters);
-    } else {
-      initCounters();
-    }
-  })();
-  </script>
+      async function initCounters() {
+        try {
+          // 키 생성 보장
+          await Promise.all([ ensure("total"), ensure(TODAY_KEY) ]);
+
+          // ✅ 매 방문마다 카운트(원하면 이 두 줄만 호출)
+          await Promise.all([ hit("total"), hit(TODAY_KEY) ]);
+
+          // 최신 값 조회
+          const [totalRes, todayRes] = await Promise.all([ get("total"), get(TODAY_KEY) ]);
+          // 함수 응답이 {value: number} 형태라고 가정. 혹시 다른 키면 fallback
+          const totalVal = totalRes?.value ?? totalRes?.count ?? totalRes ?? 0;
+          const todayVal = todayRes?.value ?? todayRes?.count ?? todayRes ?? 0;
+
+          setText(["todayCount", "todayCountFooter"], todayVal);
+          setText(["totalCount", "totalCountFooter"], totalVal);
+        } catch (e) {
+          console.warn("Visitor counter init failed:", e);
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initCounters);
+      } else {
+        initCounters();
+      }
+    })();
+    </script>
 
 </body>
 
