@@ -1,3 +1,56 @@
+// ── Rate limit 설정 ─────────────────────────────────────
+const SEC_LIMIT = 5;       // 1초당 3회
+const MIN_LIMIT = 250;     // 1분당 150회
+const WINDOW_SEC = 1000;   // 1초
+const WINDOW_MIN = 60000;  // 1분
+
+// 인스턴스가 warm 상태인 동안 유지되는 메모리 맵(IP별 타임스탬프 큐)
+const rateStore = new Map();
+
+/** 클라이언트 키(IP) 추출 */
+function getClientKey(event) {
+  const h = event.headers || {};
+  const xff = (h['x-forwarded-for'] || h['X-Forwarded-For'] || '').split(',')[0].trim();
+  const ip  = xff || h['x-real-ip'] || h['client-ip'] || 'anon';
+  return ip;
+}
+
+/** 레이트 리밋 검사(슬라이딩 윈도우) */
+function checkRateLimit(key) {
+  const now = Date.now();
+  let b = rateStore.get(key);
+  if (!b) { b = { sec: [], min: [] }; rateStore.set(key, b); }
+
+  // 윈도우 밖 이벤트 정리
+  const secCut = now - WINDOW_SEC;
+  while (b.sec.length && b.sec[0] <= secCut) b.sec.shift();
+
+  const minCut = now - WINDOW_MIN;
+  while (b.min.length && b.min[0] <= minCut) b.min.shift();
+
+  const secRemain = SEC_LIMIT - b.sec.length;
+  const minRemain = MIN_LIMIT - b.min.length;
+
+  if (secRemain <= 0 || minRemain <= 0) {
+    const secRetry = b.sec.length ? WINDOW_SEC - (now - b.sec[0]) : 0;
+    const minRetry = b.min.length ? WINDOW_MIN - (now - b.min[0]) : 0;
+    const retryMs  = Math.max(secRetry, minRetry, 0);
+    return { limited: true, retryMs, secRemain: Math.max(0, secRemain), minRemain: Math.max(0, minRemain) };
+  }
+
+  // 토큰 소비(현재 요청 기록 push)
+  b.sec.push(now);
+  b.min.push(now);
+
+  return {
+    limited: false,
+    secRemain: SEC_LIMIT - b.sec.length,
+    minRemain: MIN_LIMIT - b.min.length
+  };
+}
+
+
+
 // 서버리스 함수: 번호 생성 (통계/라벨/추천은 프론트 계산)
 // Node 18+ 실행. 외부 라이브러리 불필요.
 
@@ -60,7 +113,7 @@ function generateOneCombo(include, exclude, weighted, weightFactor) {
   return result.sort((a, b) => a - b);
 }
 
-function json(status, body) {
+function json(status, body, extraHeaders = {}) {
   return {
     statusCode: status,
     headers: {
@@ -68,6 +121,7 @@ function json(status, body) {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "Content-Type",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
+      ...extraHeaders,                      // ← 추가
     },
     body: JSON.stringify(body),
   };
@@ -76,6 +130,24 @@ function json(status, body) {
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return json(200, { ok: true });
   if (event.httpMethod !== "POST") return json(405, { error: "Method Not Allowed" });
+
+  // ── Rate limit 체크 (요청 초반에) ───────────────
+  const key = getClientKey(event);
+  const rl  = checkRateLimit(key);
+  if (rl.limited) {
+    // 429 응답 + Retry-After 및 상태 헤더
+    return json(
+      429,
+      { error: "Too Many Requests", retryAfterMs: rl.retryMs },
+      {
+        "Retry-After": String(Math.ceil(rl.retryMs / 1000)),
+        "X-RateLimit-Limit-Second": String(SEC_LIMIT),
+        "X-RateLimit-Limit-Minute": String(MIN_LIMIT),
+        "X-RateLimit-Remaining-Second": String(rl.secRemain),
+        "X-RateLimit-Remaining-Minute": String(rl.minRemain),
+      }
+    );
+  }
 
   try {
     const body = JSON.parse(event.body || "{}");
@@ -102,11 +174,21 @@ exports.handler = async (event) => {
     // 생성
     const results = [];
     for (let i = 0; i < count; i++) {
-      const nums = generateOneCombo(include, exclude, weighted, weightFactor);
-      results.push({ numbers: nums }); // 통계는 프론트에서
+      results.push({ numbers: generateOneCombo(include, exclude, weighted, weightFactor) });
     }
 
-    return json(200, { ok: true, results });
+
+    // 성공 응답에도 레이트 리밋 잔여치 헤더를 달아주면 클라이언트에서 참고하기 좋음
+    return json(
+      200,
+      { ok: true, results },
+      {
+        "X-RateLimit-Limit-Second": String(SEC_LIMIT),
+        "X-RateLimit-Limit-Minute": String(MIN_LIMIT),
+        "X-RateLimit-Remaining-Second": String(rl.secRemain),
+        "X-RateLimit-Remaining-Minute": String(rl.minRemain),
+      }
+    );
   } catch (e) {
     return json(500, { error: "Internal Server Error", detail: String(e?.message || e) });
   }
