@@ -138,7 +138,7 @@ exports.handler = async (event) => {
     // 429 응답 + Retry-After 및 상태 헤더
     return json(
       429,
-      { error: "Too Many Requests", retryAfterMs: rl.retryMs },
+      { error: "과도한 번호 생성은 제한됩니다.", retryAfterMs: rl.retryMs },
       {
         "Retry-After": String(Math.ceil(rl.retryMs / 1000)),
         "X-RateLimit-Limit-Second": String(SEC_LIMIT),
