@@ -1356,13 +1356,21 @@
     (function () {
       const ENDPOINT = "/api/counter"; // 같은 오리진(Netlify Functions)
 
-      const todayStr  = new Date().toISOString().slice(0,10);
+      // 로컬 날짜로 오늘 키 생성
+      const d = new Date();
+      const todayStr = [
+        d.getFullYear(),
+        String(d.getMonth()+1).padStart(2,'0'),
+        String(d.getDate()).padStart(2,'0')
+      ].join('-');
       const TODAY_KEY = `day-${todayStr}`;
+
+      // 키 안전화
+      const safeKey = (s) => String(s).replace(/[^\w\-:.]/g, '_').slice(0,100);
 
       const $ = (id) => document.getElementById(id);
       const setText = (ids, v) => ids.forEach(id => { const el = $(id); if (el) el.textContent = v; });
 
-      // 쿼리 문자열 유틸
       const qs = (obj) => Object.entries(obj)
         .map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
         .join("&");
@@ -1372,26 +1380,22 @@
         if (!res.ok) throw new Error(`counter ${res.status}`);
         return res.json();
       }
-      const ensure = (key) => api({ op: "ensure", key });
-      const hit    = (key) => api({ op: "hit",    key });
-      const get    = (key) => api({ op: "get",    key });
+
+      // ← 여기서부터 래퍼들만 safeKey로 감싸줌
+      const ensure = (key) => api({ op: "ensure", key: safeKey(key) });
+      const hit    = (key) => api({ op: "hit",    key: safeKey(key) });
+      const get    = (key) => api({ op: "get",    key: safeKey(key) });
 
       async function initCounters() {
         try {
-          // 키 생성 보장
           await Promise.all([ ensure("total"), ensure(TODAY_KEY) ]);
-
-          // ✅ 매 방문마다 카운트(원하면 이 두 줄만 호출)
           await Promise.all([ hit("total"), hit(TODAY_KEY) ]);
 
-          // 최신 값 조회
           const [totalRes, todayRes] = await Promise.all([ get("total"), get(TODAY_KEY) ]);
-          // 함수 응답이 {value: number} 형태라고 가정. 혹시 다른 키면 fallback
-          const totalVal = totalRes?.value ?? totalRes?.count ?? totalRes ?? 0;
-          const todayVal = todayRes?.value ?? todayRes?.count ?? todayRes ?? 0;
+          const toNum = (r) => Number(r?.value ?? r?.count ?? r ?? 0);
 
-          setText(["todayCount", "todayCountFooter"], todayVal);
-          setText(["totalCount", "totalCountFooter"], totalVal);
+          setText(["todayCount", "todayCountFooter"], toNum(todayRes));
+          setText(["totalCount", "totalCountFooter"], toNum(totalRes));
         } catch (e) {
           console.warn("Visitor counter init failed:", e);
         }
@@ -1404,6 +1408,7 @@
       }
     })();
     </script>
+
 
 </body>
 
