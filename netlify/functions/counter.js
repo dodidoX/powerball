@@ -1,6 +1,5 @@
 // netlify/functions/counter.js
-// 방문자 카운터 (Netlify Blobs 저장소 사용)
-const { getStore } = require('@netlify/blobs');
+const BASE = 'https://api.countapi.xyz';
 
 function respond(status, body) {
   return {
@@ -19,38 +18,26 @@ exports.handler = async (event) => {
     const url = new URL(event.rawUrl);
     const op  = url.searchParams.get('op') || 'get';
     const key = url.searchParams.get('key');
+    const ns  = process.env.COUNTAPI_NS || 'lottocreator-web';
+
     if (!key) return respond(400, { error: 'key required' });
 
-    // 프로젝트 내에서 고유하게 쓸 스토어 이름
-    const store = getStore('lottocreator-visitors');
-
-    // 값 조회 → { value: number }
-    const getVal = async () => {
-      const v = await store.get(key);                 // string | null
-      const n = Number(v);
-      return { value: Number.isFinite(n) ? n : 0 };
+    const call = async (path) => {
+      const res = await fetch(BASE + path, { method: 'GET', headers: { accept: 'application/json' } });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || res.statusText || 'CountAPI error');
+      return json;
     };
 
-    // 없으면 0으로 생성하고 반환
     if (op === 'ensure') {
-      const v = await store.get(key);
-      if (v === null) await store.set(key, '0');
-      return ok(await getVal());
+      try { return ok(await call(`/get/${ns}/${key}`)); }
+      catch { return ok(await call(`/create?namespace=${encodeURIComponent(ns)}&key=${encodeURIComponent(key)}&value=0`)); }
     }
-
-    // 1 증가 (낙관적 업데이트: 트래픽이 아주 크지 않으면 충분)
-    if (op === 'hit') {
-      const cur = await store.get(key);
-      const n = Number(cur);
-      const next = (Number.isFinite(n) ? n : 0) + 1;
-      await store.set(key, String(next));
-      return ok({ value: next });
-    }
-
-    if (op === 'get') return ok(await getVal());
+    if (op === 'hit')  return ok(await call(`/hit/${ns}/${key}`));
+    if (op === 'get')  return ok(await call(`/get/${ns}/${key}`));
 
     return respond(400, { error: 'bad op' });
   } catch (e) {
-    return respond(500, { error: String(e?.message || e) });
+    return respond(500, { error: String(e.message || e) });
   }
 };
