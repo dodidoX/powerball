@@ -1352,79 +1352,76 @@
     <script src="vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <script>
-  (function () {
-    // ★ 반드시 본인 프로젝트 고유한 네임스페이스로 바꾸세요(영문/숫자/대시 권장)
-    const NAMESPACE = "lottocreator-web";
-    const ENDPOINT  = "https://jolly-kashata-87f1dd.netlify.app/";
+    <script>
+    (function () {
+      // ★ 반드시 본인 프로젝트 고유한 네임스페이스로 바꾸세요(영문/숫자/대시 권장)
+      const NAMESPACE = "lottocreator-web";
+      const ENDPOINT  = "https://jolly-kashata-87f1dd.netlify.app/";
 
-    // 오늘 날짜 키 ex) day-2025-09-06
-    const todayStr = new Date().toISOString().slice(0,10);
-    const TODAY_KEY = `day-${todayStr}`;
+      // 오늘 날짜 키 ex) day-2025-09-06
+      const todayStr = new Date().toISOString().slice(0,10);
+      const TODAY_KEY = `day-${todayStr}`;
 
-    // 같은 브라우저에서 '하루에 1번만' 카운트하기 위한 플래그
-    const LOCAL_FLAG = `counted-${TODAY_KEY}`;
+      // 같은 브라우저에서 '하루에 1번만' 카운트하기 위한 플래그
+      const LOCAL_FLAG = `counted-${TODAY_KEY}`;
 
-    const $ = (id) => document.getElementById(id);
-    const setText = (idList, value) => idList.forEach(id => {
-      const el = $(id); if (el) el.textContent = value;
-    });
+      const $ = (id) => document.getElementById(id);
+      const setText = (idList, value) => idList.forEach(id => {
+        const el = $(id); if (el) el.textContent = value;
+      });
 
-    async function api(path) {
-      const res = await fetch(`${ENDPOINT}${path}`);
-      if (!res.ok) throw new Error(`CountAPI error: ${res.status}`);
-      return res.json();
-    }
-    async function ensure(key) {
-      // 없으면 0으로 생성
-      try { await api(`/get/${NAMESPACE}/${key}`); }
-      catch { await api(`/create?namespace=${encodeURIComponent(NAMESPACE)}&key=${encodeURIComponent(key)}&value=0`); }
-    }
-    async function hit(key) {
-      return api(`/hit/${NAMESPACE}/${key}`);
-    }
-    async function get(key) {
-      return api(`/get/${NAMESPACE}/${key}`);
-    }
-
-    async function initCounters() {
-      try {
-        // 키 보장
-        await Promise.all([ ensure("total"), ensure(TODAY_KEY) ]);
-
-        // 오늘 이 브라우저에서 처음 방문이면 1회만 증가
-        const firstToday = !localStorage.getItem(LOCAL_FLAG);
-        if (firstToday) {
-          await Promise.all([ hit("total"), hit(TODAY_KEY) ]);
-          localStorage.setItem(LOCAL_FLAG, "1");
-        }
-
-        // 최신값 가져와서 화면에 표기
-        const [{ value: totalVal }, { value: todayVal }] = await Promise.all([
-          get("total"),
-          get(TODAY_KEY)
-        ]);
-
-        // 원하는 위치에 동시 반영 (필요한 id만 남겨두세요)
-        setText(["todayCount", "todayCountFooter"], todayVal);
-        setText(["totalCount", "totalCountFooter"], totalVal);
-      } catch (e) {
-        // 실패해도 페이지 동작에 지장 없게 조용히 로그만
-        console.warn("Visitor counter init failed:", e);
+      async function api(path) {
+        const res = await fetch(`${ENDPOINT}${path}`);
+        if (!res.ok) throw new Error(`CountAPI error: ${res.status}`);
+        return res.json();
       }
-    }
+      async function ensure(key) {
+        // 없으면 0으로 생성
+        try { await api(`/get/${NAMESPACE}/${key}`); }
+        catch { await api(`/create?namespace=${encodeURIComponent(NAMESPACE)}&key=${encodeURIComponent(key)}&value=0`); }
+      }
+      async function hit(key) {
+        return api(`/hit/${NAMESPACE}/${key}`);
+      }
+      async function get(key) {
+        return api(`/get/${NAMESPACE}/${key}`);
+      }
 
-    // DOM 준비되면 실행
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initCounters);
-    } else {
-      initCounters();
-    }
-  })();
-  </script>
+      async function initCounters() {
+        try {
+          // 키 보장
+          await Promise.all([ ensure("total"), ensure(TODAY_KEY) ]);
 
+          // 오늘 이 브라우저에서 처음 방문이면 1회만 증가
+          const firstToday = !localStorage.getItem(LOCAL_FLAG);
+          if (firstToday) {
+            await Promise.all([ hit("total"), hit(TODAY_KEY) ]);
+            localStorage.setItem(LOCAL_FLAG, "1");
+          }
 
-    
+          // 최신값 가져와서 화면에 표기
+          const [{ value: totalVal }, { value: todayVal }] = await Promise.all([
+            get("total"),
+            get(TODAY_KEY)
+          ]);
+
+          // 원하는 위치에 동시 반영 (필요한 id만 남겨두세요)
+          setText(["todayCount", "todayCountFooter"], todayVal);
+          setText(["totalCount", "totalCountFooter"], totalVal);
+        } catch (e) {
+          // 실패해도 페이지 동작에 지장 없게 조용히 로그만
+          console.warn("Visitor counter init failed:", e);
+        }
+      }
+
+      // DOM 준비되면 실행
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initCounters);
+      } else {
+        initCounters();
+      }
+    })();
+    </script>
 </body>
 
 </html>
