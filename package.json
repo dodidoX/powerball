@@ -1,0 +1,6 @@
+{
+  "name": "lottocreator-web",
+  "private": true,
+  "version": "1.0.0",
+  "engines": { "node": "18.20.8" }
+}

@@ -1,56 +1,56 @@
-const BASE = 'https://api.countapi.xyz';
+// netlify/functions/counter.js
+// 방문자 카운터 (Netlify Blobs 저장소 사용)
+const { getStore } = require('@netlify/blobs');
 
-const respond = (status, body) => ({
-  statusCode: status,
-  headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  },
-  body: JSON.stringify(body),
-});
+function respond(status, body) {
+  return {
+    statusCode: status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+    body: JSON.stringify(body),
+  };
+}
 const ok = (b) => respond(200, b);
 
 exports.handler = async (event) => {
-  // CORS preflight가 오면 통과시켜 주기 (브라우저에 따라 필요할 수 있음)
-  if (event.httpMethod === 'OPTIONS') {
-    return respond(204, {});
-  }
-
   try {
-    const qs = event.queryStringParameters || {};
-    const op  = qs.op || 'get';
-    const key = qs.key;
-    const ns  = process.env.COUNTAPI_NS || 'lottocreator-web';
-
+    const url = new URL(event.rawUrl);
+    const op  = url.searchParams.get('op') || 'get';
+    const key = url.searchParams.get('key');
     if (!key) return respond(400, { error: 'key required' });
 
-    const call = async (path) => {
-      const res = await fetch(BASE + path, {
-        method: 'GET',
-        headers: { accept: 'application/json' }
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const msg = json?.error || res.statusText || 'CountAPI error';
-        throw new Error(msg);
-      }
-      return json;
+    // 프로젝트 내에서 고유하게 쓸 스토어 이름
+    const store = getStore('lottocreator-visitors');
+
+    // 값 조회 → { value: number }
+    const getVal = async () => {
+      const v = await store.get(key);                 // string | null
+      const n = Number(v);
+      return { value: Number.isFinite(n) ? n : 0 };
     };
 
+    // 없으면 0으로 생성하고 반환
     if (op === 'ensure') {
-      try {
-        return ok(await call(`/get/${ns}/${key}`));
-      } catch {
-        return ok(await call(`/create?namespace=${encodeURIComponent(ns)}&key=${encodeURIComponent(key)}&value=0`));
-      }
+      const v = await store.get(key);
+      if (v === null) await store.set(key, '0');
+      return ok(await getVal());
     }
-    if (op === 'hit') return ok(await call(`/hit/${ns}/${key}`));
-    if (op === 'get') return ok(await call(`/get/${ns}/${key}`));
+
+    // 1 증가 (낙관적 업데이트: 트래픽이 아주 크지 않으면 충분)
+    if (op === 'hit') {
+      const cur = await store.get(key);
+      const n = Number(cur);
+      const next = (Number.isFinite(n) ? n : 0) + 1;
+      await store.set(key, String(next));
+      return ok({ value: next });
+    }
+
+    if (op === 'get') return ok(await getVal());
 
     return respond(400, { error: 'bad op' });
   } catch (e) {
-    // Netlify Functions 로그에서 바로 보이도록
-    console.error('counter error:', e);
     return respond(500, { error: String(e?.message || e) });
   }
 };
