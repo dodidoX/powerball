@@ -11,16 +11,16 @@
 
     <title>Lotto Number Generator</title>
 
-    <!-- Custom fonts for this template-->
+
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
-    <!-- Custom styles for this template-->
+
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this page -->
+
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     
     <style>
@@ -69,7 +69,7 @@
     }
 
     .number-buttons button {
-    /* 버튼 디자인 관련 스타일 추가 */
+
     background-color: #000000; /* 배경색 */
     border: none; /* 테두리 없음 */
     color: white; /* 글자색 */
@@ -127,7 +127,7 @@
         width: 72px;              /* 고정 폭(원하면 조절) */
       }
 
-      /* 삭제 버튼 자체를 작게 */
+
       #historyTable .deleteBtn {
         padding: 2px 8px;
         font-size: 12px;
@@ -136,13 +136,13 @@
         border-radius: 4px;
       }
 
-      /* 헤더 2열(전체선택) 여유 폭 & 패딩 */
+
       #historyTable thead th:nth-child(2) {
         width: 56px;
         padding: 4px 6px;
       }
 
-      /* 클릭 커서 */
+
       #selectAllHistory { cursor: pointer; }
 
     </style>
@@ -152,13 +152,13 @@
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
+
     <div id="wrapper">
 
-        <!-- Sidebar -->
+
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <!-- Sidebar - Brand -->
+
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
@@ -166,19 +166,19 @@
                 <div class="sidebar-brand-text mx-3">로또 라이프 <sup></sup></div>
             </a>
 
-            <!-- Divider -->
+
             <hr class="sidebar-divider my-0">
 
 
-            <!-- Divider -->
+
             <hr class="sidebar-divider">
 
-            <!-- Heading -->
+
             <div class="sidebar-heading">
             
             </div>
 
-            <!-- Nav Item - Pages Collapse Menu -->
+
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
                     aria-expanded="true" aria-controls="collapseOne">
@@ -195,24 +195,24 @@
 
 
 
-            <!-- Divider -->
+
             <hr class="sidebar-divider d-none d-md-block">
 
-            <!-- Sidebar Toggler (Sidebar) -->
+
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
 
         </ul>
-        <!-- End of Sidebar -->
+    
 
-        <!-- Content Wrapper -->
+
         <div id="content-wrapper" class="d-flex flex-column min-vh-100">
 
-            <!-- Main Content -->
+
             <div id="content" class="flex-grow-1">
 
-                <!-- Topbar -->
+
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
 
@@ -223,19 +223,19 @@
                     </ul>
 
                 </nav>
-                <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
+
+
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
+
                     <h1 class="h3 mb-4 text-gray-800">번호 생성</h1>
 
                     <div class="row">
 
                         <div class="col-lg-6">
 
-                            <!-- Circle Buttons -->
+
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">로또 번호 생성기</h6>
@@ -269,7 +269,7 @@
                                       </p>
                                       <p>조건 6. '새로운 번호 생성하기' 버튼을 눌러주세요 </p>
                                       <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
-                                      <!-- <button type="button" onclick="function1(); function2()">버튼</button> -->
+
                                       
                                       </div>
 
@@ -278,7 +278,7 @@
                                 </div>
                             </div>
 
-                        </div> <!---->
+                        </div> 
 
                         <div class="col-lg-6">
 
@@ -382,17 +382,17 @@
 
 
                                   <script>
-                                  // ===== 유틸 =====
+
                                   function percentToFactor(input) {
                                   let s = (input || "").toString().trim();
                                   if (s.endsWith("%")) s = s.slice(0, -1);
                                   let n = parseFloat(s);
-                                  if (!Number.isFinite(n)) return 1;                // 입력 없으면 100%
-                                  n = Math.max(0, Math.min(700, n));               // 0%~700%로 클램프
-                                  return n / 100;                                    // 100% => 1.0배
+                                  if (!Number.isFinite(n)) return 1;              
+                                  n = Math.max(0, Math.min(700, n));            
+                                  return n / 100;                                  
                                 }
 
-                                // 입력값을 항상 "숫자%" 형태로 정리: "10" -> "10%", "300.5" -> "300.5%"
+
                                 function normalizePercentText(el) {
                                   let s = (el.value || "").toString().trim();
                                   if (s === "") { el.value = ""; return; }
@@ -400,7 +400,7 @@
                                   let n = parseFloat(s);
                                   if (!Number.isFinite(n)) n = 0;
                                   n = Math.max(0, Math.min(700, n));
-                                  // 소수 허용(원하면 Math.round(n)로 정수화 가능)
+
                                   el.value = n + "%";
                                 }
 
@@ -418,7 +418,7 @@
                                     ).sort((a,b)=>a-b);
                                   }
 
-                                  // --- 통계/라벨/추천: 백엔드와 동일 로직 ---
+
                                   function consecutiveLabel(nums) {
                                     let maxRun = 1, run = 1;
                                     for (let i = 0; i < nums.length - 1; i++) {
@@ -439,7 +439,7 @@
                                   function inRange(val, lo, hi) {
                                     if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
                                     return (val >= lo && val <= hi) ? "추천" : "";
-}
+                                  }
 
 
 
@@ -457,27 +457,27 @@
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
                                       columnDefs: [
-                                        // 숫자 정렬 필요한 열
+
                                         { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
 
-                                        // 정렬 비활성화: 선택체크박스, 비교결과 6칸, 삭제버튼
+
                                         { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
                                       ]
                                     });
                                     return histDT;
                                   }
 
-                                  // ===== 전역 참조(나중에 DOMContentLoaded에서 할당) =====
+
                                   let includedInput, excludedInput, weightedInput, weightValueInput;
                                   let sumMinInput, sumMaxInput, stdMinInput, stdMaxInput;
                                   let numberButtons, includeCheck, excludeCheck, weightedCheck, resetButton;
                                   let generatedTbl, generatedTbody, histTbl, histTbody, pickSelects;
                                   let histDT = null;
 
-                                  // ★ 연번 카운터(전역) — 행 삭제되어도 번호 재사용/재부여 안 함
+
                                   let historySeq = 1;
 
-                                  // ===== 버튼 페인팅 =====
+
                                   function paintButtons() {
                                     if (!numberButtons) return;
                                     const include = parseNumList(includedInput.value);
@@ -498,12 +498,12 @@
                                     });
                                   }
 
-                                  // ===== 버튼 모드 전환 =====
+
                                   function attachButtonHandlers(mode) {
                                     if (!numberButtons) return;
-                                    // 기존 리스너 제거를 위해 clone
+
                                     numberButtons.forEach(btn => { btn.replaceWith(btn.cloneNode(true)); });
-                                    // 다시 쿼리
+
                                     numberButtons = document.querySelectorAll(".number-button");
 
                                     numberButtons.forEach(btn => {
@@ -540,7 +540,7 @@
                                   }
 
 
-                                  // ===== DataTables 보조 =====
+
                                   function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
                                     const dt = ensureHistDT();
                                     const newRowData = [
@@ -559,7 +559,7 @@
                                     ];
                                     const row = dt.row.add(newRowData).draw(false).node();
 
-                                    // 개별 삭제 버튼: 스크롤 점프 방지
+
                                     $(row).find('button.deleteBtn').on('click', function(e){
                                       e.preventDefault();
                                       e.stopPropagation();
@@ -569,21 +569,17 @@
                                       if (dt.rows().count() === 0) {
                                         historySeq = 1;
                                       
-                                        // 헤더의 "전체선택" 체크박스 해제
+
                                         const selectAll = document.getElementById('selectAllHistory');
                                         if (selectAll) selectAll.checked = false;
 
-                                        // ✅ 정렬 및 검색(필터) 초기화
-                                        dt.search('');                 // 전역 검색어 초기화
-                                        dt.columns().every(function(){ // (혹시 모를) 컬럼 검색어 초기화
+
+                                        dt.search('');                
+                                        dt.columns().every(function(){ 
                                           this.search('');
                                         });
-                                        dt.order([]).draw(false);      // 정렬 초기화(아이콘도 원상복구)
+                                        dt.order([]).draw(false);      
 
-                                        // (선택) 혹시 정렬 아이콘이 남아있으면 수동으로 초기화
-                                        // $('#historyTable thead th')
-                                        //   .removeClass('sorting_asc sorting_desc')
-                                        //   .addClass('sorting');
                                       }
 
                                       window.scrollTo(0, y);
@@ -595,18 +591,18 @@
                                     const dt = ensureHistDT();
                                     dt.clear().draw(false);
 
-                                    // ✔ 전체 삭제 후에만 연번 초기화
+
                                     historySeq = 1;
 
-                                    // 헤더의 전체선택 체크박스도 해제
+
                                     const selectAll = document.getElementById('selectAllHistory');
                                     if (selectAll) selectAll.checked = false;
 
-                                    // ✔ 정렬/검색 초기화
+
                                     dt.order([]).search('').columns().search('').draw();
                                   }
 
-                                  // ===== 비교 기능 =====
+
                                   let isCompareFunctionOn = false;
                                   function toggleCompareFunction() {
                                     isCompareFunctionOn = !isCompareFunctionOn;
@@ -622,7 +618,7 @@
                                     }
                                   }
 
-                                  // 페이지 로드 시 버튼을 Off 상태로 표시
+
                                   document.addEventListener('DOMContentLoaded', () => {
                                     const btn = byId('toggleCompare');
                                     if (btn) {
@@ -657,7 +653,7 @@
                                     });
                                   }
 
-                                    // === (A) 번호 생성: 서버 호출 버전 ===
+
                                     async function generateNewNumbers() {
                                       // 1) 입력값 수집
                                       const include = parseNumList(byId("included").value);
@@ -685,7 +681,7 @@
                                           body: JSON.stringify({
                                             include, exclude, weighted,
                                             weightPercent,
-                                            count: 2,              // 한 번에 몇 조합 생성할지
+                                            count: 2,            
                                             sumMin, sumMax, stdMin, stdMax
                                           })
                                         });
@@ -701,21 +697,21 @@
                                         return;
                                       }
 
-                                      // 3) 생성 테이블 갱신 + 히스토리 추가
+
                                       if (!generatedTbody) return;
-                                      generatedTbody.innerHTML = ""; // 기존 생성표 비우기
+                                      generatedTbody.innerHTML = ""; 
 
                                       for (let i = 0; i < data.results.length; i++) {
-                                        const r = data.results[i];                    // { numbers: [...] } 만 존재
+                                        const r = data.results[i];                    
                                         const nums = r.numbers.slice().sort((a,b)=>a-b);
 
-                                        // ▼ 프론트에서 계산
+
                                         const cons = consecutiveLabel(nums);
-                                        const st   = statsOf(nums); // { sum, std, odd, even } with std rounded to 2 decimals
+                                        const st   = statsOf(nums); 
                                         const sumRec    = inRange(st.sum, sumMin, sumMax);
                                         const stddevRec = inRange(st.std, stdMin, stdMax);
 
-                                        // 생성표 갱신
+
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
@@ -730,12 +726,12 @@
                                         `;
                                         generatedTbody.appendChild(tr);
 
-                                        // 히스토리 갱신 (DataTables)
+
                                         updateHistory(
                                           nums,
                                           st.sum,
                                           cons,
-                                          st.std.toFixed(2), // 표시상 2자리 고정
+                                          st.std.toFixed(2), 
                                           st.odd,
                                           st.even,
                                           sumRec,
@@ -744,12 +740,12 @@
                                       }
 
 
-                                      // UI 보조
+
                                       paintButtons();
                                       compareInputWithTable();
                                     }
 
-                                  // 선택 저장: GeneratedNumbers의 현재 행들을 히스토리에 중복 없이 저장
+
                                   function saveCombinations(){
                                     if (!generatedTbody) return;
                                     const dt = ensureHistDT();
@@ -760,7 +756,7 @@
                                       if (tds.length < 14) return;
                                       const nums = Array.from({length:6}, (_,i)=> Number(tds[i+1].textContent));
                                       const key = nums.join(',');
-                                      if (existing.has(key)) return; // 중복 방지
+                                      if (existing.has(key)) return; 
                                       const cons = tds[7].textContent;
                                       const sum  = Number(tds[8].textContent);
                                       const std  = tds[9].textContent;
@@ -773,27 +769,27 @@
                                     });
                                   }
 
-                                  // ===== 초기화 =====
+
                                   document.addEventListener('DOMContentLoaded', () => {
-                                    // DOM 요소 할당 (이제 테이블/셀렉트가 이미 DOM에 존재함)
+
                                     includedInput = byId("included");
                                     excludedInput = byId("excluded");
                                     weightedInput = byId("weighted");
                                     weightValueInput = byId("weightValue");
 
-                                    // 가중치 입력: 포커스 시 % 제거, 블러 시 % 붙이기, 입력 중엔 숫자/소수점만 허용
+
                                     weightValueInput.addEventListener("focus", () => {
                                       weightValueInput.value = weightValueInput.value.replace(/\s*%$/, "");
                                     });
                                     weightValueInput.addEventListener("input", () => {
-                                      // 숫자, 소수점만 유지 (원하면 소수점 없이도 OK)
+
                                       weightValueInput.value = weightValueInput.value.replace(/[^\d.]/g, "");
                                     });
                                     weightValueInput.addEventListener("blur", () => {
                                       normalizePercentText(weightValueInput);
                                     });
 
-                                    // 초기 표시(페이지 첫 로드 때 값이 있으면 % 형태로 맞춤)
+
                                     normalizePercentText(weightValueInput);
 
 
@@ -815,7 +811,7 @@
 
                                     pickSelects = Array.from({length:6}, (_,i)=> byId(`number-input${i+1}`));
 
-                                    // 비교 select 옵션 채우기
+
                                     pickSelects.forEach(sel => {
                                       if (!sel) return;
                                       sel.innerHTML = "";
@@ -828,10 +824,10 @@
                                       sel.addEventListener('change', compareInputWithTable);
                                     });
 
-                                    // DataTables 준비
+
                                     ensureHistDT();
                                     
-                                    // ▼ [추가] 히스토리 전체 선택 토글
+
                                     const selectAll = byId('selectAllHistory');
                                     if (selectAll) {
                                       selectAll.addEventListener('change', () => {
@@ -844,22 +840,22 @@
                                       });
                                     }
 
-                                    // 헤더 셀 전체를 클릭해도 토글되도록(체크박스 외 영역 클릭도 허용)
+
                                     const thSelectCol = document.querySelector('#historyTable thead th:nth-child(2)');
                                     const selectAllEl = document.getElementById('selectAllHistory');
                                     if (thSelectCol && selectAllEl) {
                                       thSelectCol.style.cursor = 'pointer';
                                       thSelectCol.addEventListener('click', (e) => {
-                                        // 체크박스 자체 클릭이면 기본 동작, 빈 공간 클릭 시만 토글
+
                                         if (e.target !== selectAllEl) {
                                           selectAllEl.checked = !selectAllEl.checked;
-                                          // 기존 change 로직 재사용
+
                                           selectAllEl.dispatchEvent(new Event('change', { bubbles: true }));
                                         }
                                       });
                                     }
 
-                                    // 셀(2열) 아무 데나 클릭해도 해당 행 체크 토글
+
                                     const historyTableEl = document.getElementById('historyTable');
                                     if (historyTableEl) {
                                       historyTableEl.addEventListener('click', (e) => {
@@ -867,9 +863,9 @@
                                         if (!td) return;
 
                                         const isBodyCell = td.parentElement && td.parentElement.parentElement && td.parentElement.parentElement.tagName === 'TBODY';
-                                        if (!isBodyCell) return;         // 헤더는 제외 (헤더는 따로 처리)
+                                        if (!isBodyCell) return;       
 
-                                        // 두 번째 열(셀 인덱스 1)만 토글
+
                                         if (td.cellIndex === 1) {
                                           const cb = td.querySelector('.row-select');
                                           if (cb && e.target !== cb) {
@@ -879,7 +875,7 @@
                                       });
                                     }
 
-                                    // 버튼 모드 토글
+
                                     includeCheck.addEventListener("change", ()=>{
                                       if (includeCheck.checked) { excludeCheck.checked=false; weightedCheck.checked=false; attachButtonHandlers("include"); }
                                       else attachButtonHandlers(null);
@@ -893,7 +889,7 @@
                                       else attachButtonHandlers(null);
                                     });
 
-                                    // 입력→색칠
+
                                     [includedInput, excludedInput, weightedInput].forEach(inp => {
                                       inp.addEventListener("input", paintButtons);
                                     });
@@ -903,30 +899,30 @@
                                     });
                                       resetButton = byId("resetButton");
 
-                                    // ▼ 추가: 초기화 클릭 핸들러
+
                                     resetButton.addEventListener("click", () => {
-                                      // 입력값 초기화
+
                                       includedInput.value = "";
                                       excludedInput.value = "";
                                       weightedInput.value = "";
-                                      weightValueInput.value = "";  // 가중치 값도 초기화
+                                      weightValueInput.value = "";  
 
-                                      // 체크박스 해제 + 버튼 모드 해제
+
                                       includeCheck.checked = false;
                                       excludeCheck.checked = false;
                                       weightedCheck.checked = false;
                                       attachButtonHandlers(null);
 
-                                      // 색칠/비교 표시 초기화
+
                                       paintButtons();
                                       resetCompareIndicators();
                                       compareInputWithTable();
                                     });
 
-                                    // 초기 상태
+
                                     attachButtonHandlers(null);
                                     paintButtons();
-                                    // renderGeneratedRows(2); 
+
                                   });
                                   </script>
 
@@ -941,16 +937,16 @@
                                 const workbook = new ExcelJS.Workbook();
                                 const ws = workbook.addWorksheet('전체');
 
-                                // 포함할 컬럼 인덱스(2열 = 1 인덱스는 제거)
+
                                 const headerCells = table.tHead.rows[0].cells;
                                 const includeCols = [];
-                                const deleteColIndex = headerCells.length - 1; // = 21 (지금 구조 기준)
+                                const deleteColIndex = headerCells.length - 1;
                                 for (let c = 0; c < headerCells.length; c++) {
-                                  if (c === deleteColIndex) continue; // ✔ "삭제" 열 제거
+                                  if (c === deleteColIndex) continue; 
                                   includeCols.push(c);
                                 }
 
-                                // 헤더 작성
+
                                 const selVals = [];
                                 for (let k = 1; k <= 6; k++) {
                                   const sel = document.getElementById(`number-input${k}`);
@@ -958,9 +954,9 @@
                                 }
                                 includeCols.forEach((c, i) => {
                                   let label = headerCells[c].innerText.trim();
-                                  // 비교 열(15~20): 셀렉트 모든 옵션 텍스트 방지 → "비교n(선택값)"
+
                                   if (c >= 15 && c <= 20) {
-                                    const idx = c - 14; // 1~6
+                                    const idx = c - 14; 
                                     label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
                                   }
                                   else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
@@ -970,13 +966,13 @@
                                   ws.getCell(1, i + 1).value = label || '';
                                 });
 
-                                // 바디(모든 행) 작성
+
                                 let r = 2;
                                 dt.rows().every(function () {
                                   const cells = this.node().cells;
                                   includeCols.forEach((c, i) => {
                                     const excelCell = ws.getCell(r, i + 1);
-                                    // 버튼/체크박스/빈칸 처리
+
                                     const text = (cells[c].innerText || '').trim();
                                     if (text === '') {
                                       excelCell.value = null;
@@ -990,24 +986,24 @@
                                 });
 
 
-                                // 4) "선택" 열(엑셀 2번째 열) 숨김
+
                                 
                                 ws.getColumn(2).hidden = true;
 
-                                // 5) 테두리: 바깥쪽 외곽선 + 헤더 아랫줄 + A열/8열/15열 오른쪽 경계선
-                                const firstRow = 1;
-                                const lastRow  = r - 1;              // 마지막 데이터 행
-                                const firstCol = 1;
-                                const lastCol  = includeCols.length; // 마지막 데이터 열
 
-                                // 테두리 세터(덮어쓰지 않고 기존 보더와 병합)
+                                const firstRow = 1;
+                                const lastRow  = r - 1;              
+                                const firstCol = 1;
+                                const lastCol  = includeCols.length; 
+
+
                                 function setEdge(cell, edge, style = 'thin') {
                                   const b = cell.border || {};
                                   cell.border = { ...b, [edge]: { style } };
                                 }
 
                                 if (lastRow >= firstRow && lastCol >= firstCol) {
-                                  // 바깥쪽 외곽
+
                                   for (let c = firstCol; c <= lastCol; c++) {
                                     setEdge(ws.getCell(firstRow, c), 'top');
                                     setEdge(ws.getCell(lastRow,  c), 'bottom');
@@ -1018,17 +1014,17 @@
                                     setEdge(ws.getCell(rr, lastCol),  'right');
                                   }
 
-                                  // ── 추가 1) 헤더(1행) 아래쪽 구분선
+
                                   for (let c = firstCol; c <= lastCol; c++) {
-                                    setEdge(ws.getCell(1, c), 'bottom'); // 'medium'으로 바꾸면 더 진하게
+                                    setEdge(ws.getCell(1, c), 'bottom'); 
                                   }
 
-                                  // ── A열 오른쪽(B열 왼쪽) 경계선
+
                                   for (let rr = firstRow; rr <= lastRow; rr++) {
                                     setEdge(ws.getCell(rr, 1), 'right');
                                   }
 
-                                  // ── 8번째 열 오른쪽 경계선(여섯번째 번호 끝)
+
                                   const colRight8 = 8;
                                   if (colRight8 >= firstCol && colRight8 <= lastCol) {
                                     for (let rr = firstRow; rr <= lastRow; rr++) {
@@ -1036,7 +1032,7 @@
                                     }
                                   }
 
-                                  // ── 추가 2) 15번째 열 오른쪽 경계선(표준편차 기준 끝)
+
                                   const colRight15 = 15;
                                   if (colRight15 >= firstCol && colRight15 <= lastCol) {
                                     for (let rr = firstRow; rr <= lastRow; rr++) {
@@ -1060,7 +1056,7 @@
                                 const dt = ensureHistDT();
                                 const y = window.pageYOffset || document.documentElement.scrollTop;
 
-                                // ✔ 체크된 행만 한 번에 제거(반복 중 remove로 인한 스킵 방지)
+
                                 dt.rows(function (_idx, _data, node) {
                                   const cb = node.querySelector('.row-select');
                                   return cb && cb.checked;
@@ -1068,9 +1064,9 @@
 
                                 if (dt.rows().count() === 0) {
                                   historySeq = 1;
-                                  // ✔ 테이블이 비었으면 정렬/검색 초기화
+
                                   dt.order([]).search('').columns().search('').draw();
-                                  // 헤더 전체선택도 안전하게 해제
+
                                   const selectAll = document.getElementById('selectAllHistory');
                                   if (selectAll) selectAll.checked = false;
                                 }
@@ -1085,17 +1081,17 @@
                                 const workbook = new ExcelJS.Workbook();
                                 const ws = workbook.addWorksheet('선택');
 
-                                // 포함할 컬럼 인덱스(2열 = 1 인덱스는 제거)
+
                                 const headerCells = table.tHead.rows[0].cells;
                                 const includeCols = [];
-                                const deleteColIndex = headerCells.length - 1; // = 21 (지금 구조 기준)
+                                const deleteColIndex = headerCells.length - 1; 
                                 for (let c = 0; c < headerCells.length; c++) {
-                                  if (c === deleteColIndex) continue; // ✔ "삭제" 열 제거
+                                  if (c === deleteColIndex) continue; 
                                   includeCols.push(c);
                                 }
 
 
-                                // 헤더 작성
+
                                 const selVals = [];
                                 for (let k = 1; k <= 6; k++) {
                                   const sel = document.getElementById(`number-input${k}`);
@@ -1103,7 +1099,7 @@
                                 }
                                 includeCols.forEach((c, i) => {
                                   let label = headerCells[c].innerText.trim();
-                                  // 비교 열(15~20): 셀렉트 모든 옵션 텍스트 방지 → "비교n(선택값)"
+
                                   if (c >= 15 && c <= 20) {
                                     const idx = c - 14; // 1~6
                                     label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
@@ -1115,7 +1111,7 @@
                                   ws.getCell(1, i + 1).value = label || '';
                                 });
 
-                                // 선택된 행만 작성
+
                                 let r = 2;
                                 dt.rows(function (_idx, _data, node) {
                                   const cb = node.querySelector('.row-select');
@@ -1138,23 +1134,23 @@
 
                                 if (r === 2) { alert("선택된 행이 없습니다."); return; }
 
-                                // 4) "선택" 열(엑셀 2번째 열) 숨김
+
                                 ws.getColumn(2).hidden = true;
 
-                                // 5) 테두리: 바깥쪽 외곽선 + 헤더 아랫줄 + A열/8열/15열 오른쪽 경계선
-                                const firstRow = 1;
-                                const lastRow  = r - 1;              // 마지막 데이터 행
-                                const firstCol = 1;
-                                const lastCol  = includeCols.length; // 마지막 데이터 열
 
-                                // 테두리 세터(덮어쓰지 않고 기존 보더와 병합)
+                                const firstRow = 1;
+                                const lastRow  = r - 1;            
+                                const firstCol = 1;
+                                const lastCol  = includeCols.length; 
+
+
                                 function setEdge(cell, edge, style = 'thin') {
                                   const b = cell.border || {};
                                   cell.border = { ...b, [edge]: { style } };
                                 }
 
                                 if (lastRow >= firstRow && lastCol >= firstCol) {
-                                  // 바깥쪽 외곽
+
                                   for (let c = firstCol; c <= lastCol; c++) {
                                     setEdge(ws.getCell(firstRow, c), 'top');
                                     setEdge(ws.getCell(lastRow,  c), 'bottom');
@@ -1165,17 +1161,17 @@
                                     setEdge(ws.getCell(rr, lastCol),  'right');
                                   }
 
-                                  // ── 추가 1) 헤더(1행) 아래쪽 구분선
+
                                   for (let c = firstCol; c <= lastCol; c++) {
-                                    setEdge(ws.getCell(1, c), 'bottom'); // 'medium'으로 바꾸면 더 진하게
+                                    setEdge(ws.getCell(1, c), 'bottom'); 
                                   }
 
-                                  // ── A열 오른쪽(B열 왼쪽) 경계선
+
                                   for (let rr = firstRow; rr <= lastRow; rr++) {
                                     setEdge(ws.getCell(rr, 1), 'right');
                                   }
 
-                                  // ── 8번째 열 오른쪽 경계선(여섯번째 번호 끝)
+
                                   const colRight8 = 8;
                                   if (colRight8 >= firstCol && colRight8 <= lastCol) {
                                     for (let rr = firstRow; rr <= lastRow; rr++) {
@@ -1183,7 +1179,7 @@
                                     }
                                   }
 
-                                  // ── 추가 2) 15번째 열 오른쪽 경계선(표준편차 기준 끝)
+
                                   const colRight15 = 15;
                                   if (colRight15 >= firstCol && colRight15 <= lastCol) {
                                     for (let rr = firstRow; rr <= lastRow; rr++) {
@@ -1297,33 +1293,31 @@
 
 
             </div>
-            <!-- End of Main Content -->
 
-            <!-- Footer -->
+
+
             <footer class="sticky-footer bg-white mt-auto">
                 <div class="container py-2">
                     <div class="text-center"> 
-                        <span> https://blog.naver.com/lottocreator <br>
-                          Today <span id="todayCountFooter">-</span> /
-                          Total <span id="totalCountFooter">-</span>
+                        <span> https://blog.naver.com/lottocreator </span>
                         </span>
                     </div>
                 </div>
             </footer>
-            <!-- End of Footer -->
+
 
         </div>
-        <!-- End of Content Wrapper -->
+
 
     </div>
-    <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top Button-->
+
+
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
+
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -1352,76 +1346,9 @@
     <script src="vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-    <script>
-    (function () {
-      // ★ 반드시 본인 프로젝트 고유한 네임스페이스로 바꾸세요(영문/숫자/대시 권장)
-      const NAMESPACE = "lottocreator-web";
-      const ENDPOINT  = "https://api.countapi.xyz";
 
-      // 오늘 날짜 키 ex) day-2025-09-06
-      const todayStr = new Date().toISOString().slice(0,10);
-      const TODAY_KEY = `day-${todayStr}`;
+    
 
-      // 같은 브라우저에서 '하루에 1번만' 카운트하기 위한 플래그
-      const LOCAL_FLAG = `counted-${TODAY_KEY}`;
-
-      const $ = (id) => document.getElementById(id);
-      const setText = (idList, value) => idList.forEach(id => {
-        const el = $(id); if (el) el.textContent = value;
-      });
-
-      async function api(path) {
-        const res = await fetch(`${ENDPOINT}${path}`);
-        if (!res.ok) throw new Error(`CountAPI error: ${res.status}`);
-        return res.json();
-      }
-      async function ensure(key) {
-        // 없으면 0으로 생성
-        try { await api(`/get/${NAMESPACE}/${key}`); }
-        catch { await api(`/create?namespace=${encodeURIComponent(NAMESPACE)}&key=${encodeURIComponent(key)}&value=0`); }
-      }
-      async function hit(key) {
-        return api(`/hit/${NAMESPACE}/${key}`);
-      }
-      async function get(key) {
-        return api(`/get/${NAMESPACE}/${key}`);
-      }
-
-      async function initCounters() {
-        try {
-          // 키 보장
-          await Promise.all([ ensure("total"), ensure(TODAY_KEY) ]);
-
-          // 오늘 이 브라우저에서 처음 방문이면 1회만 증가
-          const firstToday = !localStorage.getItem(LOCAL_FLAG);
-          if (firstToday) {
-            await Promise.all([ hit("total"), hit(TODAY_KEY) ]);
-            localStorage.setItem(LOCAL_FLAG, "1");
-          }
-
-          // 최신값 가져와서 화면에 표기
-          const [{ value: totalVal }, { value: todayVal }] = await Promise.all([
-            get("total"),
-            get(TODAY_KEY)
-          ]);
-
-          // 원하는 위치에 동시 반영 (필요한 id만 남겨두세요)
-          setText(["todayCount", "todayCountFooter"], todayVal);
-          setText(["totalCount", "totalCountFooter"], totalVal);
-        } catch (e) {
-          // 실패해도 페이지 동작에 지장 없게 조용히 로그만
-          console.warn("Visitor counter init failed:", e);
-        }
-      }
-
-      // DOM 준비되면 실행
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initCounters);
-      } else {
-        initCounters();
-      }
-    })();
-    </script>
 </body>
 
 </html>
