@@ -164,69 +164,6 @@
     <div id="wrapper">
 
 
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">로또 라이프 <sup></sup></div>
-            </a>
-
-
-            <hr class="sidebar-divider my-0">
-
-
-
-            <hr class="sidebar-divider">
-
-
-            <div class="sidebar-heading">
-            
-            </div>
-
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
-                    aria-expanded="true" aria-controls="collapseOne">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>로또 번호 생성</span>
-                </a>
-                <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="numbers_generator.html">번호 생성</a>
-                    </div>
-                </div>
-            </li> 
-            
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>역대 로또 당첨번호</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                  <div class="bg-white py-2 collapse-inner rounded">
-                      <a class="collapse-item" href="tables.html">당첨 현황</a>
-                  </div>
-              </div>
-            </li>
-
-
-
-
-            <hr class="sidebar-divider d-none d-md-block">
-
-
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-
-        </ul>
-    
-
-
         <div id="content-wrapper" class="d-flex flex-column min-vh-100">
 
 
@@ -236,11 +173,26 @@
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
 
-                        <div class="topbar-divider d-none d-sm-block"></div>
+                  <!-- 왼쪽: 브랜드 -->
+                  <a class="navbar-brand font-weight-bold" href="index.html">로또 라이프</a>
 
+                  <!-- 오른쪽 정렬을 위한 공간 -->
+                  <ul class="navbar-nav ml-auto">
 
+                    <!-- 로또 번호 생성 (드롭다운) -->
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-cog mr-1"></i>
+                        메뉴
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
+                        <a class="dropdown-item" href="numbers_generator.html">번호 생성</a>
+                        <a class="dropdown-item" href="tables.html">당첨 현황</a>
+                      </div>
+                    </li>
 
-                    </ul>
+                  </ul>
 
                 </nav>
 
