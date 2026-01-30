@@ -56,7 +56,6 @@
     </style>
 
     <style>
-    /* 입력 테이블: 헤더/칸 폭을 고정해서 "딱 맞게" */
     #pickTable {
         width: 100%;
         table-layout: fixed;
@@ -82,6 +81,16 @@
         height: 34px;
         padding: 4px 6px;
         text-align: center;
+    }
+
+    .has-value{
+    color:#000;
+    font-weight:700;
+    }
+
+    .hit-red{
+    color:#e74a3b;
+    font-weight:700;
     }
     </style>
 
@@ -129,10 +138,10 @@
 
                 </nav>
 
-                <!-- Begin Page Content -->
+
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
+
                     <h1 class="h3 mb-2 text-gray-800">내 번호 역대 성적</h1>
                     <p class="mb-1">이곳에서는 내가 입력한 번호의 역대 로또 당첨 성적을 확인할 수 있습니다.
                         <a target="_blank" href="https://www.dhlottery.co.kr/lt645/result"> 공식 홈페이지</a>
@@ -167,10 +176,10 @@
                                 <div class="table-responsive">
                                 <table class="table table-bordered mb-0" id="compareTable">
                                     <colgroup>
-                                        <!-- 1~6 입력칸: 2자리 전용 -->
+
                                         <col style="width:36px"><col style="width:36px"><col style="width:36px">
                                         <col style="width:36px"><col style="width:36px"><col style="width:36px">
-                                        <!-- 결과칸(네가 원래 쓰던 폭 유지) -->
+
                                         <col style="width:70px">   <!-- 회차 -->
                                         <col style="width:120px">  <!-- 추첨일자 -->
                                         <col style="width:140px">  <!-- 1등 당첨금액 -->
@@ -180,14 +189,14 @@
                                         <col style="width:90px">   <!-- 5등 -->
                                     </colgroup>
                                     <thead>
-                                    <!-- 그룹 헤더 -->
+
                                     <tr class="group-head">
                                         <th colspan="6" class="group-left">번호 입력</th>
 
                                         <th colspan="7" class="group-right">분석 결과</th>
                                     </tr>
 
-                                    <!-- 컬럼 헤더 -->
+
                                     <tr class="col-head">
                                         <th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>5th</th><th>6th</th>
                                         <th>회차</th>
@@ -201,7 +210,7 @@
                                     </thead>
 
                                     <tbody id="compareBody">
-                                    <!-- JS로 행 생성 (예: 20줄) -->
+
                                     </tbody>
                                 </table>
                                 </div>
@@ -263,38 +272,29 @@
                         /* 금액 오른쪽 정렬 */
                         .text-right{ text-align:right; }
 
-                        /* hover */
+
                         #compareTable tbody tr:hover td{ filter:brightness(0.98); }
 
                         #compareTable th:nth-child(6),
                         #compareTable td:nth-child(6) {
-                        border-right: 1px solid #cfd8e3 !important; /* 원하는 색/굵기 */
+                        border-right: 1px solid #cfd8e3 !important; 
                         }
 
                      
 
-                        /* 선택 표시(나중에 드래그 삭제 기능용) */
+
                         #compareTable td.input-cell.selected{
                         outline:2px solid #4e73df;
                         outline-offset:-2px;
                         background:#eaf2ff !important;
                         }
 
-                        /* ==============================
-                        [FIX] compareTable 입력 6칸 폭 고정 (최종 강제)
-                        - 전역 .num-input / #pickTable .num-input 영향 차단
-                        ============================== */
 
- 
-
-                        /* 브라우저가 input 기본 최소폭 잡는 경우 방지 */
                         #compareTable input.num-input{
                         display: block !important;
                         }
 
 
-
-                        /* ✅ 1~6칸 입력칸 최종 고정 */
                         #compareTable thead tr.col-head th:nth-child(-n+6),
                         #compareTable tbody td:nth-child(-n+6){
                         padding:1px !important;
@@ -317,7 +317,7 @@
 
 
                         <script>
-                        // ===== 1) 행 생성 =====
+                        //
                         const ROWS = 10;
                         const tbody = document.getElementById("compareBody");
 
@@ -383,26 +383,21 @@
 
 
                         function normalizeNumberInput(el) {
-                        // 숫자만 남기기
+
                         let v = (el.value || "").replace(/[^\d]/g, "");
                         if (v === "") { el.value = ""; return; }
 
-                        // 앞의 0 제거: "01" -> "1", "00" -> ""(아래에서 0 처리) 
                         v = v.replace(/^0+/, "");
 
-                        // 숫자로 변환
                         const n = parseInt(v, 10);
 
-                        // 0 또는 NaN이면 비우기
                         if (!Number.isFinite(n) || n <= 0) { el.value = ""; return; }
 
-                        // 1~45 제한(원하면 알림/빨간 테두리도 가능)
                         if (n > 45) { el.value = "45"; return; }
 
                         el.value = String(n);
                         }
 
-                        // 모든 입력칸에 적용 (직접 타이핑/붙여넣기 후 자동 정리)
                         tbody.querySelectorAll(".num-input").forEach((input) => {
                         input.addEventListener("blur", () => normalizeNumberInput(input));
                         input.addEventListener("change", () => normalizeNumberInput(input));
@@ -428,12 +423,11 @@
                         const rows = [...tbody.querySelectorAll("tr")];
 
                         rows.forEach(tr => {
-                            // 1) 입력칸 초기화
+
                             tr.querySelectorAll(".num-input").forEach(inp => {
                             inp.value = "";
                             });
 
-                            // 2) 결과칸 초기화
                             const outTurn = tr.querySelector(".out-turn");
                             const outDate = tr.querySelector(".out-date");
                             const outJackpot = tr.querySelector(".out-jackpot");
@@ -450,12 +444,10 @@
                             if (outR4) outR4.textContent = "0번";
                             if (outR5) outR5.textContent = "0번";
 
-                            // (선택) 셀 선택 표시도 초기화(너가 selected 기능 쓰고 있으면)
                             tr.querySelectorAll("td.input-cell.selected").forEach(td => td.classList.remove("selected"));
                         });
                         }
 
-                        // 버튼 연결
                         document.getElementById("btnClearAll")?.addEventListener("click", () => {
                         clearCompareTable();
                         });
@@ -487,7 +479,6 @@
                         document.getElementById("titleSub").textContent =`(${lastDate} ${lastRound}까지 반영)`;
                         }
 
-                        // 페이지 로딩 시 1회 실행
                         document.addEventListener("DOMContentLoaded", updateAnalysisTitle);
 
                         </script>
@@ -498,7 +489,7 @@
 
                     const rowsPayload = trs.map(tr => {
                         const inputs = [...tr.querySelectorAll(".num-input")].map(i => i.value.trim());
-                        // 서버에서 validate 하므로 비어있어도 그대로 전송
+
                         return inputs;
                     });
 
@@ -511,7 +502,7 @@
                         });
                         data = await res.json();
                     } catch (e) {
-                        // 네트워크 에러
+
                         trs.forEach(tr => {
                         const out = tr.querySelector(".out-jackpot");
                         if (out) out.textContent = "서버 연결 오류";
@@ -519,7 +510,7 @@
                         return;
                     }
 
-                    // ✅ 제목 업데이트(최신 데이터 반영 범위)
+
                     if (data.meta && data.meta.round && data.meta.drawingdate) {
                         const el = document.getElementById("dataRangeText");
                         if (el) el.textContent = `(${data.meta.drawingdate} ${data.meta.round}회차까지 반영)`;
@@ -530,7 +521,7 @@
                         const tr = trs[idx];
                         if (!tr) return;
 
-                        // 기본값 초기화(선택)
+
                         tr.querySelector(".out-turn").textContent = "-";
                         tr.querySelector(".out-date").textContent = "-";
                         tr.querySelector(".out-jackpot").textContent = "-";
@@ -540,19 +531,38 @@
                         tr.querySelector(".out-r5").textContent = "0번";
 
                         if (!r || !r.ok) {
-                        // 서버가 내려준 메시지 표시
+
                         const msg = r?.message || "오류";
                         tr.querySelector(".out-jackpot").textContent = msg;
                         return;
                         }
 
-                        tr.querySelector(".out-turn").textContent = r.turn ?? "-";
-                        tr.querySelector(".out-date").textContent = r.date ?? "-";
-                        tr.querySelector(".out-jackpot").textContent = r.money ?? "-";
-                        tr.querySelector(".out-r2").textContent = `${r.r2 ?? 0}번`;
-                        tr.querySelector(".out-r3").textContent = `${r.r3 ?? 0}번`;
+                        // ---- 회차 / 날짜 / 금액 ----
+                        const turnEl = tr.querySelector(".out-turn");
+                        turnEl.textContent = r.turn ?? "-";
+                        if (r.turn && r.turn !== "-") turnEl.classList.add("has-value");
+
+                        const dateEl = tr.querySelector(".out-date");
+                        dateEl.textContent = r.date ?? "-";
+                        if (r.date && r.date !== "-") dateEl.classList.add("has-value");
+
+                        const moneyEl = tr.querySelector(".out-jackpot");
+                        moneyEl.textContent = r.money ?? "-";
+                        if (r.money && r.money !== "-") moneyEl.classList.add("has-value");
+
+                        // ---- 2등 / 3등 ----
+                        const r2El = tr.querySelector(".out-r2");
+                        r2El.textContent = `${r.r2 ?? 0}번`;
+                        if (r.r2 > 0) r2El.classList.add("hit-red");
+
+                        const r3El = tr.querySelector(".out-r3");
+                        r3El.textContent = `${r.r3 ?? 0}번`;
+                        if (r.r3 > 0) r3El.classList.add("hit-red");
+
+                        // ---- 4등 / 5등 ----
                         tr.querySelector(".out-r4").textContent = `${r.r4 ?? 0}번`;
                         tr.querySelector(".out-r5").textContent = `${r.r5 ?? 0}번`;
+
                     });
                     });
                     </script>
