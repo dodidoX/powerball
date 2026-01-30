@@ -294,7 +294,7 @@
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
                                       title="선택 후 가중치 설정 가능<br>ex1) 0% → 미출현<br>ex2) 100% → 미선택 번호와 동일 확률<br>ex3) 700% → 미선택 번호보다 700% 출현 확률 up"
                                     />
-                                    <label for="weightedCheck">가중치 설정(0%~700%)</label>
+                                    <label for="weightedCheck">가중치 설정(0%~1500%)</label>
                                   </p>
                                   <p>
                                     <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="7.0">
@@ -637,7 +637,7 @@
                                         if (s.endsWith("%")) s = s.slice(0, -1);
                                         const n = parseFloat(s);
                                         if (!Number.isFinite(n)) return 100;
-                                        return Math.max(0, Math.min(700, n));
+                                        return Math.max(0, Math.min(1500, n));
                                       })();
 
                                       const sumMin = parseFloat(byId("sum_range_min").value);
