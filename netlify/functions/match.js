@@ -137,7 +137,15 @@ exports.handler = async (event) => {
 
     // 원천 데이터 로드
     const jsonPath = path.join(__dirname, "data", "draws.json");
-    const draws = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+
+    console.log("jsonPath:", jsonPath);
+    console.log("exists:", fs.existsSync(jsonPath));
+
+    const raw = fs.readFileSync(jsonPath, "utf-8");
+    console.log("raw length:", raw.length);
+
+    const draws = JSON.parse(raw);
+    console.log("draws loaded, count:", draws.length);
 
     // 최신 회차/날짜(제목 표시용)
     const last = draws.reduce((acc, cur) => {
