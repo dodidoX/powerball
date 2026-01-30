@@ -428,6 +428,11 @@
                             inp.value = "";
                             });
 
+                            // 스타일 클래스 원복
+                            tr.querySelectorAll(".has-value, .hit-red").forEach(el => {
+                            el.classList.remove("has-value", "hit-red");
+                            });
+
                             const outTurn = tr.querySelector(".out-turn");
                             const outDate = tr.querySelector(".out-date");
                             const outJackpot = tr.querySelector(".out-jackpot");
@@ -521,6 +526,10 @@
                         const tr = trs[idx];
                         if (!tr) return;
 
+                        // 이전 스타일 원복
+                        tr.querySelectorAll(".has-value, .hit-red").forEach(el => {
+                        el.classList.remove("has-value", "hit-red");
+                        });
 
                         tr.querySelector(".out-turn").textContent = "-";
                         tr.querySelector(".out-date").textContent = "-";
