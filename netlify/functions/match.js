@@ -1,7 +1,17 @@
-//const fs = require("fs");
-//const path = require("path");
+const fs = require("fs");
+const path = require("path");
 
+// =========================
+// 1) 데이터 로드: handler 밖(전역)
+//    - require는 Netlify에서 번들에 포함되며, 웜 상태면 캐시됨
+// =========================
+const draws = require("./data/draws.json");
 
+// =========================
+// 2) 캐시(웜 인스턴스에서 재사용)
+// =========================
+let cached = null;
+// cached = { last, maps: { p1Lookup, p2Count, p3Count, p4Count, p5Count } }
 
 function toInt(n) {
   const x = Number(n);
@@ -9,9 +19,7 @@ function toInt(n) {
 }
 
 function validateInputs(inputs6) {
-  // inputs6: ["1","2","5","6","9","45"] or numbers
   const raw = inputs6.map(v => (v === "" || v == null ? "" : String(v).trim()));
-
   if (raw.some(v => v === "")) return { ok: false, message: "숫자를 더 입력하세요" };
 
   const nums = raw.map(v => toInt(v));
@@ -62,7 +70,6 @@ function sixC3(a,b,c,d,e,f){
   ];
 }
 
-
 function inc(map, key, delta=1){
   map.set(key, (map.get(key) || 0) + delta);
 }
@@ -78,7 +85,6 @@ function buildMaps(draws) {
     const prize1 = (row.prize1 || "").trim();
     if (!prize1) return;
 
-    // 1등 lookup
     if (!p1Lookup.has(prize1)) {
       p1Lookup.set(prize1, {
         round: `${row.round}회차`,
@@ -87,42 +93,31 @@ function buildMaps(draws) {
       });
     }
 
-    // 2등 6개
-    if (Array.isArray(row.prize2)) {
-      row.prize2.forEach(k => {
-        k = (k || "").trim();
-        if (k) inc(p2Count, k, 1);
-      });
-    }
-
-    // 3등 6개
-    if (Array.isArray(row.prize3)) {
-      row.prize3.forEach(k => {
-        k = (k || "").trim();
-        if (k) inc(p3Count, k, 1);
-      });
-    }
-
-    // 4등 15개
-    if (Array.isArray(row.prize4)) {
-      row.prize4.forEach(k => {
-        k = (k || "").trim();
-        if (k) inc(p4Count, k, 1);
-      });
-    }
-
-    // 5등 20개
-    if (Array.isArray(row.prize5)) {
-      row.prize5.forEach(k => {
-        k = (k || "").trim();
-        if (k) inc(p5Count, k, 1);
-      });
-    }
+    if (Array.isArray(row.prize2)) row.prize2.forEach(k => { k=(k||"").trim(); if (k) inc(p2Count, k, 1); });
+    if (Array.isArray(row.prize3)) row.prize3.forEach(k => { k=(k||"").trim(); if (k) inc(p3Count, k, 1); });
+    if (Array.isArray(row.prize4)) row.prize4.forEach(k => { k=(k||"").trim(); if (k) inc(p4Count, k, 1); });
+    if (Array.isArray(row.prize5)) row.prize5.forEach(k => { k=(k||"").trim(); if (k) inc(p5Count, k, 1); });
   });
 
   return { p1Lookup, p2Count, p3Count, p4Count, p5Count };
 }
 
+// =========================
+// 3) 캐시 생성 함수 (처음 한 번만 buildMaps)
+// =========================
+function getCached() {
+  if (cached) return cached;
+
+  const last = draws.reduce((acc, cur) => {
+    if (!acc) return cur;
+    return (Number(cur.round) > Number(acc.round)) ? cur : acc;
+  }, null);
+
+  const maps = buildMaps(draws);
+
+  cached = { last, maps };
+  return cached;
+}
 
 exports.handler = async (event) => {
   try {
@@ -130,47 +125,35 @@ exports.handler = async (event) => {
       return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const { rows } = JSON.parse(event.body || "{}"); // rows: [[n,n,n,n,n,n], ...]
+    const { rows } = JSON.parse(event.body || "{}");
     if (!Array.isArray(rows)) {
       return { statusCode: 400, body: JSON.stringify({ error: "rows must be an array" }) };
     }
 
-    // 원천 데이터 로드
-    const draws = require("./data/draws.json");
+    // ✅ 여기서 캐시 꺼내쓰기
+    const { last, maps } = getCached();
+    const { p1Lookup, p2Count, p3Count, p4Count, p5Count } = maps;
 
-    // 최신 회차/날짜(제목 표시용)
-    const last = draws.reduce((acc, cur) => {
-      if (!acc) return cur;
-      return (Number(cur.round) > Number(acc.round)) ? cur : acc;
-    }, null);
-
-    const { p1Lookup, p2Count, p3Count, p4Count, p5Count } = buildMaps(draws);
-
-    // 입력 rows 계산
     const results = rows.map((row6) => {
       const v = validateInputs(Array.isArray(row6) ? row6 : []);
       if (!v.ok) return { ok:false, message: v.message };
 
-      const nums = v.nums; // number[6] (오름차순 검증됨)
+      const nums = v.nums;
       const [C2,D2,E2,F2,G2,H2] = nums.map(String);
       const combo6 = `${C2}-${D2}-${E2}-${F2}-${G2}-${H2}`;
 
-      // 2등(6개 완전일치)
       const count2 = p2Count.get(combo6) || 0;
 
-      // 3등(6C5 6개 비교 합산)
       const combos5 = sixC5(C2,D2,E2,F2,G2,H2);
       let raw3 = 0;
       combos5.forEach(k => raw3 += (p3Count.get(k) || 0));
 
-      // 보정: 1등이면 -6, 2등이면 -count2
       const has1 = p1Lookup.has(combo6);
       let adjusted3 = raw3;
       if (has1) adjusted3 -= 6;
       if (count2 > 0) adjusted3 -= count2;
       if (adjusted3 < 0) adjusted3 = 0;
 
-      // 4등(6C4 15개 비교 합산)
       const combos4 = sixC4(C2,D2,E2,F2,G2,H2);
       let raw4 = 0;
       combos4.forEach(k => raw4 += (p4Count.get(k) || 0));
@@ -179,7 +162,6 @@ exports.handler = async (event) => {
       let adjusted4 = raw4 - (count1 * 15) - (count2 * 5) - (adjusted3 * 5);
       if (adjusted4 < 0) adjusted4 = 0;
 
-      // 5등(6C3 20개 비교 합산)
       const combos3 = sixC3(C2,D2,E2,F2,G2,H2);
       let raw5 = 0;
       combos3.forEach(k => raw5 += (p5Count.get(k) || 0));
