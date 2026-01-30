@@ -361,7 +361,7 @@
                                   if (s.endsWith("%")) s = s.slice(0, -1);
                                   let n = parseFloat(s);
                                   if (!Number.isFinite(n)) return 1;              
-                                  n = Math.max(0, Math.min(700, n));            
+                                  n = Math.max(0, Math.min(1500, n));            
                                   return n / 100;                                  
                                 }
 
@@ -372,7 +372,7 @@
                                   if (s.endsWith("%")) s = s.slice(0, -1);
                                   let n = parseFloat(s);
                                   if (!Number.isFinite(n)) n = 0;
-                                  n = Math.max(0, Math.min(700, n));
+                                  n = Math.max(0, Math.min(1500, n));
 
                                   el.value = n + "%";
                                 }
