@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5RZ8RQX8B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-K5RZ8RQX8B');
+  </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Lotto Number Generator</title>
+
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
+    <style>
+    .option-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 5px 0 0 20px;
+    }
+
+    #historyTable td,
+    #historyTable th {
+        height: 6px;
+        min-height: 5px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f8f8;
+    }    
+
+    </style>
+
+    <style>
+    .tooltip-leftalign .tooltip-inner { text-align: left; }
+    </style>
+
+    <style>
+    /* 입력 테이블: 헤더/칸 폭을 고정해서 "딱 맞게" */
+    #pickTable {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+    #pickTable th,
+    #pickTable td {
+        padding: 6px 6px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #pickTable thead th {
+        font-weight: 700;
+        background: #f2f2f2;
+        white-space: nowrap;
+    }
+
+    #pickTable .num-input {
+        width: 100%;
+        box-sizing: border-box;
+        height: 34px;
+        padding: 4px 6px;
+        text-align: center;
+    }
+    </style>
+
+
+
+</head>
+
+<body id="page-top">
+
+
+    <div id="wrapper">
+    
+
+
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
+
+
+            <div id="content" class="flex-grow-1">
+
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                  <!-- 왼쪽: 브랜드 -->
+                  <a class="navbar-brand font-weight-bold" href="index.html">로또 라이프</a>
+
+                  <!-- 오른쪽 정렬을 위한 공간 -->
+                  <ul class="navbar-nav ml-auto">
+
+                    <!-- 로또 번호 생성 (드롭다운) -->
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-cog mr-1"></i>
+                        메뉴
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
+                        <a class="dropdown-item" href="numbers_generator.html">번호 생성</a>
+                        <a class="dropdown-item" href="tables.html">당첨 현황</a>
+                        <a class="dropdown-item" href="match.html">내 번호 성적</a>
+                      </div>
+                    </li>
+
+                  </ul>
+
+                </nav>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">내 번호 역대 성적</h1>
+                    <p class="mb-1">이곳에서는 내가 입력한 번호의 역대 로또 당첨 성적을 확인할 수 있습니다.
+                        <a target="_blank" href="https://www.dhlottery.co.kr/lt645/result"> 공식 홈페이지</a>
+                    </p>
+                    <span class="text-danger fw-bold">
+                      ※ 본 자료는 참고를 목적으로 제공되며, <span style="text-decoration: underline;">실제 당첨 결과는 반드시 공식 매체에서 확인하세요.</span>
+                    </span>
+
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                로또 번호 분석
+                                <span id="dataRangeText" class="data-range"></span>
+                                </h6>
+                                <style>
+                                .data-range{
+                                    color:#000;
+                                    font-weight:400;
+                                    margin-left:6px;
+                                    font-size: 0.95em;
+                                }
+                                </style>
+                                <div class="d-flex gap-2">
+                                <button class="btn btn-primary btn-sm" id="btnAnalyzeAll">분석하기</button>
+                                <button class="btn btn-outline-danger btn-sm" id="btnClearAll">기록 삭제</button>
+                                <!--<button class="btn btn-outline-secondary btn-sm" onclick="exportTableToExcel('다운로드.xlsx')">내 컴퓨터에 저장</button>-->
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                <table class="table table-bordered mb-0" id="compareTable">
+                                    <colgroup>
+                                        <!-- 1~6 입력칸: 2자리 전용 -->
+                                        <col style="width:36px"><col style="width:36px"><col style="width:36px">
+                                        <col style="width:36px"><col style="width:36px"><col style="width:36px">
+                                        <!-- 결과칸(네가 원래 쓰던 폭 유지) -->
+                                        <col style="width:70px">   <!-- 회차 -->
+                                        <col style="width:120px">  <!-- 추첨일자 -->
+                                        <col style="width:140px">  <!-- 1등 당첨금액 -->
+                                        <col style="width:90px">   <!-- 2등 -->
+                                        <col style="width:90px">   <!-- 3등 -->
+                                        <col style="width:90px">   <!-- 4등 -->
+                                        <col style="width:90px">   <!-- 5등 -->
+                                    </colgroup>
+                                    <thead>
+                                    <!-- 그룹 헤더 -->
+                                    <tr class="group-head">
+                                        <th colspan="6" class="group-left">번호 입력</th>
+
+                                        <th colspan="7" class="group-right">분석 결과</th>
+                                    </tr>
+
+                                    <!-- 컬럼 헤더 -->
+                                    <tr class="col-head">
+                                        <th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>5th</th><th>6th</th>
+                                        <th>회차</th>
+                                        <th>추첨일자</th>
+                                        <th>1등 당첨금액</th>
+                                        <th>2등 당첨횟수</th>
+                                        <th>3등 당첨횟수</th>
+                                        <th>4등 당첨횟수</th>
+                                        <th>5등 당첨횟수</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody id="compareBody">
+                                    <!-- JS로 행 생성 (예: 20줄) -->
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <style>
+                        #compareTable{
+                        width:100%;
+                        table-layout:fixed;
+                        border-collapse:collapse;
+                        }
+
+                        #compareTable th,#compareTable td{
+                        padding:6px 6px;
+                        text-align:center;
+                        vertical-align:middle;
+                        white-space:nowrap;
+                        }
+
+                        /* ===== 헤더 ===== */
+                        #compareTable thead .group-head th{
+                        font-weight:800;
+                        font-size:14px;
+                        border-bottom-width:2px;
+                        }
+                        #compareTable thead .group-left{ background:#eef6ff; }
+                        #compareTable thead .group-right{ background:#f2fff1; }
+
+                        #compareTable thead .col-head th{
+                        background:#f7f7f7;
+                        font-weight:700;
+                        }
+
+                        /* ===== 바디 영역 색 ===== */
+                        #compareTable tbody td.input-cell{ background:#fbfdff; }
+                        #compareTable tbody td.result-cell{ background:#fbfffb; }
+
+
+                        /* ===== 결과 7칸 폭 ===== */
+                        #compareTable th:nth-child(8),
+                        #compareTable td:nth-child(8){ width:70px; }    /* 회차 */
+
+                        #compareTable th:nth-child(9),
+                        #compareTable td:nth-child(9){ width:120px; }   /* 추첨일자 */
+
+                        #compareTable th:nth-child(10),
+                        #compareTable td:nth-child(10){ width:140px; }  /* 1등금액 */
+
+                        #compareTable th:nth-child(11),
+                        #compareTable td:nth-child(11),
+                        #compareTable th:nth-child(12),
+                        #compareTable td:nth-child(12),
+                        #compareTable th:nth-child(13),
+                        #compareTable td:nth-child(13),
+                        #compareTable th:nth-child(14),
+                        #compareTable td:nth-child(14){ width:90px; }   /* 2~5등 */
+
+                        /* 금액 오른쪽 정렬 */
+                        .text-right{ text-align:right; }
+
+                        /* hover */
+                        #compareTable tbody tr:hover td{ filter:brightness(0.98); }
+
+                        #compareTable th:nth-child(6),
+                        #compareTable td:nth-child(6) {
+                        border-right: 1px solid #cfd8e3 !important; /* 원하는 색/굵기 */
+                        }
+
+                     
+
+                        /* 선택 표시(나중에 드래그 삭제 기능용) */
+                        #compareTable td.input-cell.selected{
+                        outline:2px solid #4e73df;
+                        outline-offset:-2px;
+                        background:#eaf2ff !important;
+                        }
+
+                        /* ==============================
+                        [FIX] compareTable 입력 6칸 폭 고정 (최종 강제)
+                        - 전역 .num-input / #pickTable .num-input 영향 차단
+                        ============================== */
+
+ 
+
+                        /* 브라우저가 input 기본 최소폭 잡는 경우 방지 */
+                        #compareTable input.num-input{
+                        display: block !important;
+                        }
+
+
+
+                        /* ✅ 1~6칸 입력칸 최종 고정 */
+                        #compareTable thead tr.col-head th:nth-child(-n+6),
+                        #compareTable tbody td:nth-child(-n+6){
+                        padding:1px !important;
+                        }
+
+                        #compareTable tbody td:nth-child(-n+6) input.num-input{
+                        display:block !important;
+                        width:100% !important;
+                        min-width:0 !important;
+                        box-sizing:border-box !important;
+                        padding:0 !important;
+                        height:26px !important;
+                        line-height:26px !important;
+                        box-shadow:none !important;
+                        font-variant-numeric:tabular-nums;
+                        text-align:center;
+                        }
+
+                        </style>
+
+
+                        <script>
+                        // ===== 1) 행 생성 =====
+                        const ROWS = 10;
+                        const tbody = document.getElementById("compareBody");
+
+                        function makeRow() {
+                            return `
+                            <tr>
+                                <td class="input-cell"><input class="num-input" inputmode="numeric" maxlength="2"></td>
+                                <td class="input-cell"><input class="num-input" inputmode="numeric" maxlength="2"></td>
+                                <td class="input-cell"><input class="num-input" inputmode="numeric" maxlength="2"></td>
+                                <td class="input-cell"><input class="num-input" inputmode="numeric" maxlength="2"></td>
+                                <td class="input-cell"><input class="num-input" inputmode="numeric" maxlength="2"></td>
+                                <td class="input-cell"><input class="num-input" inputmode="numeric" maxlength="2"></td>
+
+                                <td class="result-cell out out-turn">-</td>
+                                <td class="result-cell out out-date">-</td>
+                                <td class="result-cell out out-jackpot text-right">-</td>
+                                <td class="result-cell out out-r2">0번</td>
+                                <td class="result-cell out out-r3">0번</td>
+                                <td class="result-cell out out-r4">0번</td>
+                                <td class="result-cell out out-r5">0번</td>
+                            </tr>
+                            `;
+                        }
+
+                        tbody.innerHTML = Array.from({ length: ROWS }, () => makeRow()).join("");
+
+                        // ===== 2) 엑셀 복붙(여러 행/열) 지원 =====
+                        function parseClipboard(text) {
+                            const lines = text.trim().split(/\r?\n/);
+                            return lines.map(line =>
+                            line.split(/\t|,|\s+/).map(v => v.trim()).filter(Boolean)
+                            );
+                        }
+
+                        tbody.querySelectorAll(".num-input").forEach((input) => {
+                            input.addEventListener("paste", (e) => {
+                            e.preventDefault();
+                            const grid = parseClipboard(e.clipboardData.getData("text"));
+
+                            const td = input.closest("td");
+                            const tr = input.closest("tr");
+                            const trs = Array.from(tbody.querySelectorAll("tr"));
+
+                            const rowIndex = trs.indexOf(tr);
+                            const colIndex = Array.from(tr.querySelectorAll(".num-input")).indexOf(input); // 0~5
+
+                            for (let r = 0; r < grid.length; r++) {
+                                const targetTr = trs[rowIndex + r];
+                                if (!targetTr) break;
+
+                                const rowInputs = Array.from(targetTr.querySelectorAll(".num-input"));
+                                for (let c = 0; c < grid[r].length; c++) {
+                                const targetInput = rowInputs[colIndex + c];
+                                if (!targetInput) break;
+                                targetInput.value = grid[r][c];
+                                
+                                normalizeNumberInput(targetInput);
+                                }
+                            }
+                            });
+                        });
+
+
+
+                        function normalizeNumberInput(el) {
+                        // 숫자만 남기기
+                        let v = (el.value || "").replace(/[^\d]/g, "");
+                        if (v === "") { el.value = ""; return; }
+
+                        // 앞의 0 제거: "01" -> "1", "00" -> ""(아래에서 0 처리) 
+                        v = v.replace(/^0+/, "");
+
+                        // 숫자로 변환
+                        const n = parseInt(v, 10);
+
+                        // 0 또는 NaN이면 비우기
+                        if (!Number.isFinite(n) || n <= 0) { el.value = ""; return; }
+
+                        // 1~45 제한(원하면 알림/빨간 테두리도 가능)
+                        if (n > 45) { el.value = "45"; return; }
+
+                        el.value = String(n);
+                        }
+
+                        // 모든 입력칸에 적용 (직접 타이핑/붙여넣기 후 자동 정리)
+                        tbody.querySelectorAll(".num-input").forEach((input) => {
+                        input.addEventListener("blur", () => normalizeNumberInput(input));
+                        input.addEventListener("change", () => normalizeNumberInput(input));
+                        });
+
+
+                        let isSelecting = false;
+
+                        function clearSelection() {
+                        tbody.querySelectorAll("td.input-cell.selected").forEach(td => td.classList.remove("selected"));
+                        }
+
+                        function setSelected(td, selected) {
+                        if (!td || !td.classList.contains("input-cell")) return;
+                        if (selected) td.classList.add("selected");
+                        else td.classList.remove("selected");
+                        }
+
+                        function clearCompareTable() {
+                        const tbody = document.getElementById("compareBody");
+                        if (!tbody) return;
+
+                        const rows = [...tbody.querySelectorAll("tr")];
+
+                        rows.forEach(tr => {
+                            // 1) 입력칸 초기화
+                            tr.querySelectorAll(".num-input").forEach(inp => {
+                            inp.value = "";
+                            });
+
+                            // 2) 결과칸 초기화
+                            const outTurn = tr.querySelector(".out-turn");
+                            const outDate = tr.querySelector(".out-date");
+                            const outJackpot = tr.querySelector(".out-jackpot");
+                            const outR2 = tr.querySelector(".out-r2");
+                            const outR3 = tr.querySelector(".out-r3");
+                            const outR4 = tr.querySelector(".out-r4");
+                            const outR5 = tr.querySelector(".out-r5");
+
+                            if (outTurn) outTurn.textContent = "-";
+                            if (outDate) outDate.textContent = "-";
+                            if (outJackpot) outJackpot.textContent = "-";
+                            if (outR2) outR2.textContent = "0번";
+                            if (outR3) outR3.textContent = "0번";
+                            if (outR4) outR4.textContent = "0번";
+                            if (outR5) outR5.textContent = "0번";
+
+                            // (선택) 셀 선택 표시도 초기화(너가 selected 기능 쓰고 있으면)
+                            tr.querySelectorAll("td.input-cell.selected").forEach(td => td.classList.remove("selected"));
+                        });
+                        }
+
+                        // 버튼 연결
+                        document.getElementById("btnClearAll")?.addEventListener("click", () => {
+                        clearCompareTable();
+                        });
+
+                        function updateAnalysisTitle() {
+                        const matchTable = document.querySelector("#matchtable");
+                        if (!matchTable) return;
+
+                        const ths = [...matchTable.querySelectorAll("thead th")];
+
+                        const idxRound = ths.findIndex(th => th.classList.contains("round"));
+                        const idxDate  = ths.findIndex(th => th.classList.contains("drawingdate"));
+
+                        if (idxRound < 0 || idxDate < 0) return;
+
+                        const rows = [...matchTable.querySelectorAll("tbody tr")];
+                        if (rows.length === 0) return;
+
+                        // ✅ 마지막 행
+                        const lastRow = rows[rows.length - 1];
+                        const tds = lastRow.children;
+
+                        const lastRound = (tds[idxRound]?.textContent || "").trim();
+                        const lastDate  = (tds[idxDate]?.textContent || "").trim();
+
+                        if (!lastRound || !lastDate) return;
+
+                        const titleEl = document.getElementById("analysisTitle");
+                        document.getElementById("titleSub").textContent =`(${lastDate} ${lastRound}까지 반영)`;
+                        }
+
+                        // 페이지 로딩 시 1회 실행
+                        document.addEventListener("DOMContentLoaded", updateAnalysisTitle);
+
+                        </script>
+
+                    <script>
+                    document.getElementById("btnAnalyzeAll").addEventListener("click", async () => {
+                    const trs = [...document.querySelectorAll("#compareBody tr")];
+
+                    const rowsPayload = trs.map(tr => {
+                        const inputs = [...tr.querySelectorAll(".num-input")].map(i => i.value.trim());
+                        // 서버에서 validate 하므로 비어있어도 그대로 전송
+                        return inputs;
+                    });
+
+                    let data;
+                    try {
+                        const res = await fetch("/.netlify/functions/match", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ rows: rowsPayload })
+                        });
+                        data = await res.json();
+                    } catch (e) {
+                        // 네트워크 에러
+                        trs.forEach(tr => {
+                        const out = tr.querySelector(".out-jackpot");
+                        if (out) out.textContent = "서버 연결 오류";
+                        });
+                        return;
+                    }
+
+                    // ✅ 제목 업데이트(최신 데이터 반영 범위)
+                    if (data.meta && data.meta.round && data.meta.drawingdate) {
+                        const el = document.getElementById("dataRangeText");
+                        if (el) el.textContent = `(${data.meta.drawingdate} ${data.meta.round}회차까지 반영)`;
+                    }
+
+                    const results = data.results || [];
+                    results.forEach((r, idx) => {
+                        const tr = trs[idx];
+                        if (!tr) return;
+
+                        // 기본값 초기화(선택)
+                        tr.querySelector(".out-turn").textContent = "-";
+                        tr.querySelector(".out-date").textContent = "-";
+                        tr.querySelector(".out-jackpot").textContent = "-";
+                        tr.querySelector(".out-r2").textContent = "0번";
+                        tr.querySelector(".out-r3").textContent = "0번";
+                        tr.querySelector(".out-r4").textContent = "0번";
+                        tr.querySelector(".out-r5").textContent = "0번";
+
+                        if (!r || !r.ok) {
+                        // 서버가 내려준 메시지 표시
+                        const msg = r?.message || "오류";
+                        tr.querySelector(".out-jackpot").textContent = msg;
+                        return;
+                        }
+
+                        tr.querySelector(".out-turn").textContent = r.turn ?? "-";
+                        tr.querySelector(".out-date").textContent = r.date ?? "-";
+                        tr.querySelector(".out-jackpot").textContent = r.money ?? "-";
+                        tr.querySelector(".out-r2").textContent = `${r.r2 ?? 0}번`;
+                        tr.querySelector(".out-r3").textContent = `${r.r3 ?? 0}번`;
+                        tr.querySelector(".out-r4").textContent = `${r.r4 ?? 0}번`;
+                        tr.querySelector(".out-r5").textContent = `${r.r5 ?? 0}번`;
+                    });
+                    });
+                    </script>
+
+                      
+                    
+                </div>
+            </div>
+
+
+
+            <footer class="sticky-footer bg-white mt-auto">
+                <div class="container py-2">
+                    <div class="text-center"> 
+                        <span> https://blog.naver.com/lottocreator </span>
+                        </span>
+                    </div>
+                </div>
+            </footer>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- ExcelJS 라이브러리-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/demo/datatables-demo.js"></script>
+
+
+</body>
+
+</html>
