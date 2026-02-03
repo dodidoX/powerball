@@ -516,10 +516,7 @@
                     }
 
 
-                    if (data.meta && data.meta.round && data.meta.drawingdate) {
-                        const el = document.getElementById("dataRangeText");
-                        if (el) el.textContent = `(${data.meta.drawingdate} ${data.meta.round}회차까지 반영)`;
-                    }
+                    if (data.meta) renderHeaderMeta(data.meta);
 
                     const results = data.results || [];
                     results.forEach((r, idx) => {
@@ -573,6 +570,46 @@
                         tr.querySelector(".out-r5").textContent = `${r.r5 ?? 0}번`;
 
                     });
+                    });
+                    </script>
+                    
+                    
+                    <script>
+                    // 최신 날짜 반영
+                    function formatKoreanDate(iso) {
+                    // "2026-01-31" -> "2026.01.31."
+                    if (!iso) return "";
+                    const s = String(iso).trim();
+                    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                    if (!m) return s; // 다른 형태면 그대로
+                    return `${m[1]}.${m[2]}.${m[3]}.`;
+                    }
+
+                    function renderHeaderMeta(meta) {
+                    const el = document.getElementById("dataRangeText");
+                    if (!el) return;
+
+                    if (!meta || !meta.round || !meta.drawingdate) {
+                        el.textContent = "";
+                        return;
+                    }
+
+                    const r = meta.round;
+                    const d = formatKoreanDate(meta.drawingdate);
+                    el.textContent = `[${r}회차(${d})까지 데이터 반영]`;
+                    }
+                    </script>
+                    <script>
+                    document.addEventListener("DOMContentLoaded", async () => {
+                    try {
+                        const res = await fetch("/.netlify/functions/meta", { method: "GET" });
+                        const data = await res.json();
+                        renderHeaderMeta(data.meta);
+                    } catch (e) {
+                        // 실패해도 페이지는 정상 동작해야 하니까 조용히 무시
+                        // 필요하면 콘솔 로그:
+                        // console.error("meta load failed", e);
+                    }
                     });
                     </script>
 
