@@ -1388,11 +1388,10 @@
                                         numbers.push(parseInt(rowData[i].textContent));
                                     }
 
-                                    // 보너스 포함이면 td index 8(보너스)도 추가
+                                    // 보너스 포함 td index 8 추가
                                     if (includeBonus) {
                                         const bonusTd = row.querySelector("td.bonus");
                                         if (bonusTd) numbers.push(parseInt(bonusTd.textContent));
-                                        // (또는 rowData[8] 사용해도 되지만 class로 찾는 게 더 안전)
                                     }
                                     }
                                 }
@@ -1417,7 +1416,7 @@
                                 });
                                 }
                                 
-                                  function calculateStats(numbers) { //출현 빈도 계산 후 stats에 저장
+                                  function calculateStats(numbers) {
                                     const counts = Array(45).fill(0);
                                 
                                     for (const number of numbers) {
@@ -1441,7 +1440,6 @@
                                     const tbody = document.createElement("tbody");
                                     const headerRow = document.createElement("tr");
 
-                                    // ✅ 헤더 5개
                                     const headers = [
                                         ["번호", ""],
                                         ["출현 횟수", "보너스 미포함"],
@@ -1453,10 +1451,10 @@
                                         headers.forEach(([line1, line2]) => {
                                         const th = document.createElement("th");
 
-                                        // 첫 줄 (기본 크기)
+
                                         th.appendChild(document.createTextNode(line1));
 
-                                        // 두 번째 줄 (small 태그)
+
                                         if (line2) {
                                             th.appendChild(document.createElement("br"));
 
@@ -1471,15 +1469,12 @@
                                     thead.appendChild(headerRow);
                                     table.appendChild(thead);
 
-                                    // stats는 calculateStats에서 "count desc"로 이미 정렬된 상태
                                     const rankedNoBonus = addRanks(statsNoBonus);
                                     const rankedWithBonus = addRanks(statsWithBonus);
 
-                                    // ✅ 번호별로 쉽게 합치기 위해 Map 생성
                                     const mapNoBonus = new Map(rankedNoBonus.map((s) => [s.number, s]));
                                     const mapWithBonus = new Map(rankedWithBonus.map((s) => [s.number, s]));
 
-                                    // ✅ 행은 1~45 번호 순으로 출력(원하면 다른 기준으로 바꿀 수 있음)
                                     for (let num = 1; num <= 45; num++) {
                                         const a = mapNoBonus.get(num) || { count: 0, rank: "-" };
                                         const b = mapWithBonus.get(num) || { count: 0, rank: "-" };
@@ -1488,12 +1483,11 @@
 
                                         const tdNum = document.createElement("td");
 
-                                        // 동그라미(공) 요소
+                                        // 동그라미(공)
                                         const ball = document.createElement("span");
                                         ball.classList.add("num-ball");
                                         ball.textContent = num;
 
-                                        // ✅ 구간별 배경색 지정
                                         if (num <= 10) ball.style.backgroundColor = "#f1c40f";       // 노란색
                                         else if (num <= 20) ball.style.backgroundColor = "#3498db";  // 파란색
                                         else if (num <= 30) ball.style.backgroundColor = "#e74c3c";  // 빨간색
@@ -1588,7 +1582,6 @@
                             const roundRangeEndSelect = document.getElementById("round_range_end");
                             const calculateStatsButton = document.getElementById("calculateStatsButton");
                         
-                            // 회차 선택지 생성
                             for (let i = 1; i < sourceTable.rows.length; i++) {
                                 const option = document.createElement("option");
                                 option.value = i;
@@ -1603,11 +1596,8 @@
                             roundRangeEndSelect.value = initialRangeEnd;
                         
 
-                        
-                            // 최초 실행
                             updateStats(initialRangeStart, initialRangeEnd);
                         
-                            // 조회하기 버튼 클릭 이벤트 리스너
                             calculateStatsButton.addEventListener("click", function () {
                                 const rangeStart = parseInt(roundRangeStartSelect.value);
                                 const rangeEnd = parseInt(roundRangeEndSelect.value);
@@ -1615,12 +1605,10 @@
                             });
                         
                             function updateStats(rangeStart, rangeEnd) {
-                                // 기존 테이블 인스턴스 삭제
                                 if ($.fn.DataTable.isDataTable('#stats2')) {
                                     $('#stats2').DataTable().clear().destroy();
                                 }
                         
-                                // 기존 통계 삭제
                                 const targetTableBody = targetTable.getElementsByTagName("tbody")[0] || targetTable.createTBody();
                                 while (targetTableBody.rows.length > 0) {
                                     targetTableBody.deleteRow(0);
@@ -1718,16 +1706,14 @@
                             border-collapse: collapse;
                             }
 
-                            /* 헤더 + 바디 셀 공통 */
                             #statsTable th,
                             #statsTable td {
-                            border: 1px solid #e5e7eb;   /* 연한 회색 (너무 진하지 않음) */
+                            border: 1px solid #e5e7eb;  
                             padding: 8px 10px;
                             }
 
-                            /* 헤더 영역 살짝 강조 */
                             #statsTable thead th {
-                            background-color: #f8f9fc;   /* sb-admin 계열과 잘 어울림 */
+                            background-color: #f8f9fc;  
                             font-weight: 600;
                             }
                         </style>
