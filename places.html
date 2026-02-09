@@ -4899,83 +4899,102 @@
                                 <script>
                                 document.addEventListener("DOMContentLoaded", function () {
 
-                                  /* 모바일 여부 */
                                   const isMobile = window.matchMedia("(max-width: 576px)").matches;
 
-                                  /* ===========================
-                                    DataTables 초기화 (1번만)
-                                    =========================== */
+                                  // DataTables 초기화 (1번만)
                                   let dt;
-
                                   if ($.fn.DataTable.isDataTable('#dataTable')) {
-                                    dt = $('#dataTable').DataTable(); // 이미 있으면 재사용
+                                    dt = $('#dataTable').DataTable();
                                   } else {
                                     dt = $('#dataTable').DataTable({
                                       paging: true,
                                       pageLength: 25,
+
+                                      // ✅ 서치바 복구
                                       searching: true,
+
                                       info: false,
                                       autoWidth: false,
                                       order: []
+                                      // dom 기본값이 검색창 포함이라 따로 dom 지정 안 해도 보입니다.
+                                      // 만약 커스텀 dom을 쓰고 있다면: dom: 'lfrtip' 형태로 'f'가 포함돼야 검색창이 나와요.
                                     });
                                   }
 
+                                  // 초기 레이아웃 보정
                                   dt.columns.adjust();
 
-                                  /* ===========================
-                                    📱 모바일 전용 폰트 자동 축소
-                                    =========================== */
+                                  // ===========================
+                                  // 📱 모바일 전용: "칸 밖으로 튀어나오면" 실제 폭 기준으로 폰트 축소
+                                  //  - 말줄임(...) 없이 1줄 유지
+                                  // ===========================
                                   if (!isMobile) return;
 
-                                  const SHOP_THRESHOLD = 12;
-                                  const ADDR_THRESHOLD = 30;
-                                  const BASE_REM = 0.78;
-                                  const MIN_REM  = 0.56;
+                                  // 기본/최소 폰트 (필요시 조절)
+                                  const BASE_REM = 0.78;    // 기본 td 폰트
+                                  const MIN_REM  = 0.52;    // 여기 더 낮추면 더 작아짐(너무 작으면 가독성 떨어짐)
 
-                                  function calcRem(len, threshold) {
-                                    if (len <= threshold) return BASE_REM;
-                                    return Math.max(MIN_REM, BASE_REM * (threshold / len));
+                                  // 어떤 열을 줄일지 (0-based)
+                                  // 2열(상호명)=1, 3열(주소)=2  (+ 원하면 나머지도 추가 가능)
+                                  const TARGET_COLS = [1, 2];
+
+                                  function remToPx(rem) {
+                                    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
                                   }
 
-                                  function applyAutoFontSizing() {
-                                    $('#dataTable tbody tr').each(function () {
-                                      const tds = this.children;
-                                      if (!tds || tds.length < 3) return;
+                                  function fitTextToCell(td) {
+                                    if (!td) return;
 
-                                      const tdShop = tds[1];
-                                      const tdAddr = tds[2];
+                                    // 1) 일단 기본으로 리셋
+                                    td.style.fontSize = BASE_REM + "rem";
 
-                                      const shopLen = tdShop.textContent.trim().length;
-                                      const addrLen = tdAddr.textContent.trim().length;
+                                    // 2) 셀 폭보다 내용이 크면 줄이기
+                                    // scrollWidth > clientWidth 이면 넘치는 상태
+                                    const minPx = remToPx(MIN_REM);
 
-                                      tdShop.style.fontSize = "";
-                                      tdAddr.style.fontSize = "";
+                                    let curPx = parseFloat(getComputedStyle(td).fontSize);
 
-                                      if (shopLen > SHOP_THRESHOLD) {
-                                        tdShop.style.fontSize = calcRem(shopLen, SHOP_THRESHOLD) + "rem";
-                                      }
-                                      if (addrLen > ADDR_THRESHOLD) {
-                                        tdAddr.style.fontSize = calcRem(addrLen, ADDR_THRESHOLD) + "rem";
-                                      }
+                                    // 안전장치: 너무 많이 반복하지 않게
+                                    let guard = 0;
+
+                                    while (td.scrollWidth > td.clientWidth && curPx > minPx && guard < 40) {
+                                      curPx -= 0.5;                 // 0.5px씩 줄임 (부드럽게)
+                                      td.style.fontSize = curPx + "px";
+                                      guard++;
+                                    }
+                                  }
+
+                                  function applyAutoFit() {
+                                    // DataTables가 그려준 현재 페이지의 행만 대상으로 처리
+                                    const rows = document.querySelectorAll("#dataTable tbody tr");
+                                    rows.forEach(tr => {
+                                      const tds = tr.children;
+                                      if (!tds) return;
+                                      TARGET_COLS.forEach(c => fitTextToCell(tds[c]));
                                     });
+
+                                    // 컬럼 폭 다시 맞춤
+                                    dt.columns.adjust();
                                   }
 
-                                  /* 최초 1회 */
-                                  applyAutoFontSizing();
+                                  // 최초 1회 (DataTables 렌더 후 적용되게 한 프레임 늦춰서)
+                                  requestAnimationFrame(applyAutoFit);
 
-                                  /* 페이지 변경 / 정렬 시 재적용 */
-                                  dt.on('draw', applyAutoFontSizing);
+                                  // 페이지 변경/정렬/검색 등으로 다시 그려질 때마다 재적용
+                                  dt.on('draw', function () {
+                                    requestAnimationFrame(applyAutoFit);
+                                  });
 
-                                  /* 회전 / 리사이즈 대응 */
-                                  window.addEventListener('resize', () => {
+                                  // 회전/리사이즈 대응
+                                  window.addEventListener('resize', function () {
                                     if (window.matchMedia("(max-width: 576px)").matches) {
-                                      applyAutoFontSizing();
-                                      dt.columns.adjust(); // ← 이 줄이 “그 부분”
+                                      requestAnimationFrame(applyAutoFit);
                                     }
                                   });
 
                                 });
                                 </script>
+
 
                                 <style>
                                 /* =========================================================
@@ -5014,7 +5033,7 @@
                                   #dataTable thead th,
                                   #dataTable tbody td{
                                     white-space: nowrap !important; /* 1줄 */
-                                    overflow: visible !important;   /* 잘림 방지 */
+                                    overflow: hidden !important;   /* 잘림 방지 */
                                     text-overflow: clip !important; /* … 금지 */
                                     word-break: keep-all;           /* 한글 단어 쪼개기 방지 */
                                     line-height: 1.1;
