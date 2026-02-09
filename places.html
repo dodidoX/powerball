@@ -4885,74 +4885,103 @@
                                     </tbody>
                                 </table>
                                 <style>
+                                /* ===============================
+                                  공통 (PC + Mobile)
+                                  =============================== */
+
+                                /* 회차(1열), 추첨일(2열) → 항상 1줄 */
+                                #dataTable th:nth-child(1),
+                                #dataTable td:nth-child(1),
+                                #dataTable th:nth-child(2),
+                                #dataTable td:nth-child(2) {
+                                  white-space: nowrap;
+                                }
+
+                                /* ===============================
+                                  모바일 전용
+                                  =============================== */
                                 @media (max-width: 576px) {
 
-                                  /* 헤더/셀 크기 줄이기 */
-                                  #dataTable thead th{
+                                  /* 헤더 */
+                                  #dataTable thead th {
                                     font-size: 0.72rem;
                                     padding: 6px 6px;
                                     line-height: 1.1;
-                                    white-space: nowrap;   /* 헤더도 1줄 */
-                                  }
-                                  #dataTable td{
-                                    font-size: 0.78rem;
-                                    padding: 6px 6px;
-                                    white-space: nowrap;   /* 데이터도 1줄 */
-                                  }
-
-                                  /* 격자선/정렬(선택) */
-                                  #dataTable th, #dataTable td{
+                                    white-space: nowrap;     /* 헤더 1줄 */
                                     vertical-align: middle;
                                   }
-                                  /* 2열(상호명)만 말줄임 유지 */
-                                  #dataTable th:nth-child(2), #dataTable td:nth-child(2){
-                                    max-width: 120px;
+
+                                  /* 바디 셀 */
+                                  #dataTable td {
+                                    font-size: 0.78rem;
+                                    padding: 6px 6px;
+                                    vertical-align: middle;
+                                  }
+
+                                  /* 2열(최신 상호명) : 1줄 + 말줄임 */
+                                  #dataTable th:nth-child(2),
+                                  #dataTable td:nth-child(2) {
+                                    max-width: 140px;        /* 필요 시 120~170 */
                                     overflow: hidden;
                                     text-overflow: ellipsis;
                                     white-space: nowrap;
                                   }
 
-                                  /* 3열(주소) : 풀네임, 줄바꿈 무제한 */
-                                  #dataTable th:nth-child(3), #dataTable td:nth-child(3){
-                                    max-width: 220px;     /* 필요 시 조절 */
-                                    white-space: normal;  /* ✅ 줄바꿈 허용 */
-                                    overflow: visible;    /* ✅ 잘림 방지 */
+                                  /* 3열(최종 주소) : 풀네임 + 줄바꿈 허용 */
+                                  #dataTable th:nth-child(3),
+                                  #dataTable td:nth-child(3) {
+                                    max-width: 220px;        /* 필요 시 180~260 */
+                                    white-space: normal;     /* ✅ 줄바꿈 허용 */
+                                    overflow: visible;       /* 잘림 방지 */
                                     text-overflow: clip;
+                                    line-height: 1.15;
+                                  }
+
+                                  /* 숫자열 폭 최소화 */
+                                  #dataTable th:nth-child(1),
+                                  #dataTable td:nth-child(1) { width: 42px; }
+
+                                  #dataTable th:nth-child(4),
+                                  #dataTable td:nth-child(4) { width: 64px; }
+
+                                  #dataTable th:nth-child(5),
+                                  #dataTable td:nth-child(5),
+                                  #dataTable th:nth-child(6),
+                                  #dataTable td:nth-child(6),
+                                  #dataTable th:nth-child(7),
+                                  #dataTable td:nth-child(7) {
+                                    width: 52px;
+                                    text-align: center;
                                   }
                                 }
                                 </style>
-                                <style>
-                                @media (max-width: 576px) {
 
-                                  /* 2열(최신 상호명), 3열(최종 주소) */
-                                  #dataTable th:nth-child(2), #dataTable td:nth-child(2),
-                                  #dataTable th:nth-child(3), #dataTable td:nth-child(3){
-                                    max-width: 140px;          /* 필요하면 120~170 사이로 조절 */
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;
-                                    white-space: nowrap;
-                                  }
-
-                                  /* 숫자열은 폭을 더 줄여서 전체 폭 확보 */
-                                  #dataTable th:nth-child(1), #dataTable td:nth-child(1){ width: 42px; }
-                                  #dataTable th:nth-child(4), #dataTable td:nth-child(4){ width: 64px; }
-                                  #dataTable th:nth-child(5), #dataTable td:nth-child(5),
-                                  #dataTable th:nth-child(6), #dataTable td:nth-child(6),
-                                  #dataTable th:nth-child(7), #dataTable td:nth-child(7){ width: 52px; text-align:center; }
-                                }
-                                </style>
                                 <script>
                                 document.addEventListener("DOMContentLoaded", function () {
-                                  // 2열(상호명), 3열(주소) td에 title을 자동 부여
+
+                                  /* 모바일 여부 감지 */
+                                  const isMobile = window.matchMedia("(max-width: 576px)").matches;
+
+                                  /* DataTables 초기화 */
+                                  $('#dataTable').DataTable({
+                                    paging: true,
+                                    pageLength: 25,
+                                    searching: false,
+                                    info: false,
+                                    autoWidth: false,
+                                    order: []
+                                  });
+
+                                  /* 상호명(2열), 주소(3열) → title 자동 부여 (PC hover용) */
                                   document.querySelectorAll("#dataTable tbody tr").forEach(tr => {
-                                    [1, 2].forEach(idx => { // 0-based: 1=2열, 2=3열
+                                    [1, 2].forEach(idx => {   // 0-based index
                                       const td = tr.children[idx];
-                                      if (td) td.setAttribute("title", td.textContent.trim());
+                                      if (td) td.title = td.textContent.trim();
                                     });
                                   });
+
                                 });
                                 </script>
-
                                         
                             </div>
                             <!-- <button onclick="exportTableToExcel('다운로드.xlsx')">내 컴퓨터에 저장</button> -->
