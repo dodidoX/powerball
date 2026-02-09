@@ -9,7 +9,7 @@ $(document).ready(function () {
   const table = $("#dataTable").DataTable({
     paging: true,
     pageLength: 25,
-    searching: false,
+    searching: true,
     info: false,
     autoWidth: false,
     columnDefs: [
