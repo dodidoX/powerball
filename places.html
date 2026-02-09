@@ -4904,6 +4904,21 @@
                                   #dataTable th, #dataTable td{
                                     vertical-align: middle;
                                   }
+                                  /* 2열(상호명)만 말줄임 유지 */
+                                  #dataTable th:nth-child(2), #dataTable td:nth-child(2){
+                                    max-width: 120px;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;
+                                  }
+
+                                  /* 3열(주소) : 풀네임, 줄바꿈 무제한 */
+                                  #dataTable th:nth-child(3), #dataTable td:nth-child(3){
+                                    max-width: 220px;     /* 필요 시 조절 */
+                                    white-space: normal;  /* ✅ 줄바꿈 허용 */
+                                    overflow: visible;    /* ✅ 잘림 방지 */
+                                    text-overflow: clip;
+                                  }
                                 }
                                 </style>
                                 <style>
