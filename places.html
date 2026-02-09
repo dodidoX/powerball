@@ -4885,96 +4885,46 @@
                                     </tbody>
                                 </table>
                                 <style>
-                                /* 공통: 회차/추첨일 1줄 */
-                                #dataTable th:nth-child(1),
-                                #dataTable td:nth-child(1),
-                                #dataTable th:nth-child(2),
-                                #dataTable td:nth-child(2){
-                                  white-space: nowrap;
-                                }
+                                /* =========================================================
+                                  모바일: 축약(…) 없이 원문 그대로 + 무조건 1줄 + 가로 스크롤
+                                  ========================================================= */
+                                @media (max-width: 576px) {
 
-                                @media (max-width: 576px){
+                                  /* table-responsive에서 가로 스크롤 */
+                                  .table-responsive{
+                                    overflow-x: auto;
+                                    -webkit-overflow-scrolling: touch;
+                                  }
 
-                                  /* ✅ 핵심: 모바일에서는 고정 레이아웃으로 '폭 배분'을 강제 */
+                                  /* 표 자체를 화면보다 넓게 만들어 스크롤 전제 */
                                   #dataTable{
-                                    table-layout: fixed;
-                                    width: 100%;
+                                    width: 100% !important;
+                                    min-width: 1100px;      /* ✅ 필요시 900~1400 조절 */
+                                    table-layout: auto;      /* 내용 길이에 따라 자연 확장 */
                                   }
 
-                                  /* 헤더/셀 기본(최대한 1줄) */
-                                  #dataTable thead th{
-                                    font-size: 0.68rem;      /* 전체 헤더 더 작게 */
-                                    padding: 6px 6px;
+                                  /* ✅ 헤더/데이터: 줄바꿈 금지 + 축약 금지 */
+                                  #dataTable thead th,
+                                  #dataTable tbody td{
+                                    white-space: nowrap !important;  /* 무조건 1줄 */
+                                    overflow: visible !important;    /* 잘림 금지 */
+                                    text-overflow: clip !important;  /* … 금지 */
+                                    word-break: keep-all;            /* 한글 단어 쪼개기 방지 */
+                                    vertical-align: middle;
                                     line-height: 1.1;
-                                    white-space: nowrap;     /* ✅ 0번: 최대한 1줄 */
-                                    overflow: hidden;
-                                    text-overflow: ellipsis; /* 헤더도 길면 ... */
-                                    vertical-align: middle;
                                   }
-                                  #dataTable td{
+
+                                  /* 폰트/패딩 (모바일에서 작게) */
+                                  #dataTable thead th{
+                                    font-size: 0.72rem;
+                                    padding: 6px 8px;
+                                  }
+                                  #dataTable tbody td{
                                     font-size: 0.78rem;
-                                    padding: 6px 6px;
-                                    white-space: nowrap;     /* ✅ 0번: 데이터는 1줄 기본 */
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;
-                                    vertical-align: middle;
-
+                                    padding: 6px 8px;
                                   }
-
-                                  /* ✅ 폭 배분 (주소가 가장 넓게) */
-                                  #dataTable th:nth-child(1), #dataTable td:nth-child(1){ width: 12%; } /* 순위 */
-                                  #dataTable th:nth-child(2), #dataTable td:nth-child(2){ width: 22%; } /* 최신 상호명(줄여도 됨) */
-                                  #dataTable th:nth-child(3), #dataTable td:nth-child(3){ width: 38%; } /* ✅ 최종 주소(가장 넓게) */
-                                  #dataTable th:nth-child(4), #dataTable td:nth-child(4){ width: 10%; text-align:center; } /* 1등횟수(3자리) */
-                                  #dataTable th:nth-child(5), #dataTable td:nth-child(5),
-                                  #dataTable th:nth-child(6), #dataTable td:nth-child(6),
-                                  #dataTable th:nth-child(7), #dataTable td:nth-child(7){ width: 6%; text-align:center; } /* 자동/반자동/수동 */
-
-                                  /* ✅ 3열(최종 주소)만 "풀네임" 우선: 줄바꿈 허용(원하면 2줄 제한도 가능) */
-                                  #dataTable td:nth-child(3){
-                                    white-space: normal;    /* 주소는 줄바꿈 허용 */
-                                    overflow: visible;
-                                    text-overflow: clip;
-                                    line-height: 1.15;
-                                  }
-
-                                  /* ✅ 1등 당첨횟수 헤더는 글자만 더 작게 해서 폭 양보 */
-                                  #dataTable thead th:nth-child(4){
-                                    font-size: 0.62rem;     /* 헤더 글자만 축소 */
-                                    letter-spacing: -0.02em;
-                                  }
-                                  
                                 }
-
                                 </style>
-
-
-                                <script>
-                                document.addEventListener("DOMContentLoaded", function () {
-
-                                  /* 모바일 여부 감지 */
-                                  const isMobile = window.matchMedia("(max-width: 576px)").matches;
-
-                                  /* DataTables 초기화 */
-                                  $('#dataTable').DataTable({
-                                    paging: true,
-                                    pageLength: 25,
-                                    searching: false,
-                                    info: false,
-                                    autoWidth: false,
-                                    order: []
-                                  });
-
-                                  /* 상호명(2열), 주소(3열) → title 자동 부여 (PC hover용) */
-                                  document.querySelectorAll("#dataTable tbody tr").forEach(tr => {
-                                    [1, 2].forEach(idx => {   // 0-based index
-                                      const td = tr.children[idx];
-                                      if (td) td.title = td.textContent.trim();
-                                    });
-                                  });
-
-                                });
-                                </script>
                                         
                             </div>
                             <!-- <button onclick="exportTableToExcel('다운로드.xlsx')">내 컴퓨터에 저장</button> -->
@@ -5017,11 +4967,95 @@
     <script src="js/sb-admin-2.min.js"></script>
 
     <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
-    $(function () {
-        $('#dataTable').DataTable();
+    document.addEventListener("DOMContentLoaded", function () {
+
+      /* 모바일 여부 */
+      const isMobile = window.matchMedia("(max-width: 576px)").matches;
+
+      /* ---------------------------
+        DataTables 초기화
+        --------------------------- */
+      let dt;
+
+      if ($.fn.DataTable.isDataTable('#dataTable')) {
+        // 이미 초기화돼 있으면 재사용
+        dt = $('#dataTable').DataTable();
+      } else {
+        dt = $('#dataTable').DataTable({
+          paging: true,
+          pageLength: 25,
+          searching: false,
+          info: false,
+          autoWidth: false,
+          order: []
+        });
+      }
+
+      /* ---------------------------
+        모바일 전용: 글자 수 연동 폰트 축소
+        - 2열(최신 상호명) 12글자 초과
+        - 3열(최종 주소)   30글자 초과
+        --------------------------- */
+      if (!isMobile) return;
+
+      const SHOP_THRESHOLD = 12;  // 최신 상호명
+      const ADDR_THRESHOLD = 30;  // 최종 주소
+
+      const BASE_REM = 0.78;      // 기본 글자 크기 (td 기본과 맞춤)
+      const MIN_REM  = 0.56;      // 최소 글자 크기 (너무 작아지면 여기 조절)
+
+      function calcRem(len, threshold) {
+        if (len <= threshold) return BASE_REM;
+
+        // len이 길수록 비율이 작아짐 (부드럽게 감소)
+        const ratio = threshold / len;
+        const v = BASE_REM * ratio;
+
+        return Math.max(MIN_REM, v);
+      }
+
+      function applyAutoFontSizing() {
+        $('#dataTable tbody tr').each(function () {
+          const tds = this.children;
+          if (!tds || tds.length < 3) return;
+
+          const tdShop = tds[1]; // 2열
+          const tdAddr = tds[2]; // 3열
+
+          const shopText = (tdShop.textContent || "").trim();
+          const addrText = (tdAddr.textContent || "").trim();
+
+          // ✅ 반복 적용 대비: 항상 리셋 후 계산
+          tdShop.style.fontSize = "";
+          tdAddr.style.fontSize = "";
+
+          const shopLen = shopText.length;
+          const addrLen = addrText.length;
+
+          if (shopLen > SHOP_THRESHOLD) {
+            tdShop.style.fontSize = calcRem(shopLen, SHOP_THRESHOLD) + "rem";
+          }
+          if (addrLen > ADDR_THRESHOLD) {
+            tdAddr.style.fontSize = calcRem(addrLen, ADDR_THRESHOLD) + "rem";
+          }
+        });
+      }
+
+      // 최초 1회 적용
+      applyAutoFontSizing();
+
+      // ✅ DataTables가 페이지 이동/정렬 등으로 DOM을 다시 그릴 때마다 재적용
+      dt.on('draw', applyAutoFontSizing);
+
+      // ✅ 화면 회전/리사이즈 대응 (선택)
+      window.addEventListener('resize', function () {
+        if (window.matchMedia("(max-width: 576px)").matches) {
+          applyAutoFontSizing();
+        }
+      });
     });
     </script>
 
