@@ -1497,22 +1497,6 @@
                                     link.click();
                                 }
                                 </script>
-                                <script>
-                                document.addEventListener("DOMContentLoaded", function () {
-                                const isMobile = window.matchMedia("(max-width: 576px)").matches;
-
-                                $("#dataTable").DataTable({
-                                    paging: true,
-                                    pageLength: 25,
-                                    searching: false,
-                                    info: false,
-                                    autoWidth: false,
-                                    columnDefs: isMobile ? [
-                                    { targets: [10,11,12,13,14,15,16,17,18], visible: false }
-                                    ] : []
-                                });
-                                });
-                                </script>
 
                                 <style>
                                     @media (max-width: 576px) {
