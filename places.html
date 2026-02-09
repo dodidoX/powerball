@@ -4885,76 +4885,69 @@
                                     </tbody>
                                 </table>
                                 <style>
-                                /* ===============================
-                                  공통 (PC + Mobile)
-                                  =============================== */
-
-                                /* 회차(1열), 추첨일(2열) → 항상 1줄 */
+                                /* 공통: 회차/추첨일 1줄 */
                                 #dataTable th:nth-child(1),
                                 #dataTable td:nth-child(1),
                                 #dataTable th:nth-child(2),
-                                #dataTable td:nth-child(2) {
+                                #dataTable td:nth-child(2){
                                   white-space: nowrap;
                                 }
 
-                                /* ===============================
-                                  모바일 전용
-                                  =============================== */
-                                @media (max-width: 576px) {
+                                @media (max-width: 576px){
 
-                                  /* 헤더 */
-                                  #dataTable thead th {
-                                    font-size: 0.72rem;
+                                  /* ✅ 핵심: 모바일에서는 고정 레이아웃으로 '폭 배분'을 강제 */
+                                  #dataTable{
+                                    table-layout: fixed;
+                                    width: 100%;
+                                  }
+
+                                  /* 헤더/셀 기본(최대한 1줄) */
+                                  #dataTable thead th{
+                                    font-size: 0.68rem;      /* 전체 헤더 더 작게 */
                                     padding: 6px 6px;
                                     line-height: 1.1;
-                                    white-space: nowrap;     /* 헤더 1줄 */
+                                    white-space: nowrap;     /* ✅ 0번: 최대한 1줄 */
+                                    overflow: hidden;
+                                    text-overflow: ellipsis; /* 헤더도 길면 ... */
                                     vertical-align: middle;
                                   }
-
-                                  /* 바디 셀 */
-                                  #dataTable td {
+                                  #dataTable td{
                                     font-size: 0.78rem;
                                     padding: 6px 6px;
-                                    vertical-align: middle;
-                                  }
-
-                                  /* 2열(최신 상호명) : 1줄 + 말줄임 */
-                                  #dataTable th:nth-child(2),
-                                  #dataTable td:nth-child(2) {
-                                    max-width: 140px;        /* 필요 시 120~170 */
+                                    white-space: nowrap;     /* ✅ 0번: 데이터는 1줄 기본 */
                                     overflow: hidden;
                                     text-overflow: ellipsis;
-                                    white-space: nowrap;
+                                    vertical-align: middle;
+
                                   }
 
-                                  /* 3열(최종 주소) : 풀네임 + 줄바꿈 허용 */
-                                  #dataTable th:nth-child(3),
-                                  #dataTable td:nth-child(3) {
-                                    max-width: 220px;        /* 필요 시 180~260 */
-                                    white-space: normal;     /* ✅ 줄바꿈 허용 */
-                                    overflow: visible;       /* 잘림 방지 */
+                                  /* ✅ 폭 배분 (주소가 가장 넓게) */
+                                  #dataTable th:nth-child(1), #dataTable td:nth-child(1){ width: 12%; } /* 순위 */
+                                  #dataTable th:nth-child(2), #dataTable td:nth-child(2){ width: 22%; } /* 최신 상호명(줄여도 됨) */
+                                  #dataTable th:nth-child(3), #dataTable td:nth-child(3){ width: 38%; } /* ✅ 최종 주소(가장 넓게) */
+                                  #dataTable th:nth-child(4), #dataTable td:nth-child(4){ width: 10%; text-align:center; } /* 1등횟수(3자리) */
+                                  #dataTable th:nth-child(5), #dataTable td:nth-child(5),
+                                  #dataTable th:nth-child(6), #dataTable td:nth-child(6),
+                                  #dataTable th:nth-child(7), #dataTable td:nth-child(7){ width: 6%; text-align:center; } /* 자동/반자동/수동 */
+
+                                  /* ✅ 3열(최종 주소)만 "풀네임" 우선: 줄바꿈 허용(원하면 2줄 제한도 가능) */
+                                  #dataTable td:nth-child(3){
+                                    white-space: normal;    /* 주소는 줄바꿈 허용 */
+                                    overflow: visible;
                                     text-overflow: clip;
                                     line-height: 1.15;
                                   }
 
-                                  /* 숫자열 폭 최소화 */
-                                  #dataTable th:nth-child(1),
-                                  #dataTable td:nth-child(1) { width: 42px; }
-
-                                  #dataTable th:nth-child(4),
-                                  #dataTable td:nth-child(4) { width: 64px; }
-
-                                  #dataTable th:nth-child(5),
-                                  #dataTable td:nth-child(5),
-                                  #dataTable th:nth-child(6),
-                                  #dataTable td:nth-child(6),
-                                  #dataTable th:nth-child(7),
-                                  #dataTable td:nth-child(7) {
-                                    width: 52px;
-                                    text-align: center;
+                                  /* ✅ 1등 당첨횟수 헤더는 글자만 더 작게 해서 폭 양보 */
+                                  #dataTable thead th:nth-child(4){
+                                    font-size: 0.62rem;     /* 헤더 글자만 축소 */
+                                    letter-spacing: -0.02em;
                                   }
+                                  
                                 }
+
                                 </style>
+
 
                                 <script>
                                 document.addEventListener("DOMContentLoaded", function () {
