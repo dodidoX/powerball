@@ -4910,32 +4910,21 @@
                                       paging: true,
                                       pageLength: 25,
 
-                                      // ✅ 서치바 복구
                                       searching: true,
 
                                       info: false,
                                       autoWidth: false,
                                       order: []
-                                      // dom 기본값이 검색창 포함이라 따로 dom 지정 안 해도 보입니다.
-                                      // 만약 커스텀 dom을 쓰고 있다면: dom: 'lfrtip' 형태로 'f'가 포함돼야 검색창이 나와요.
                                     });
                                   }
 
-                                  // 초기 레이아웃 보정
                                   dt.columns.adjust();
 
-                                  // ===========================
-                                  // 📱 모바일 전용: "칸 밖으로 튀어나오면" 실제 폭 기준으로 폰트 축소
-                                  //  - 말줄임(...) 없이 1줄 유지
-                                  // ===========================
                                   if (!isMobile) return;
 
-                                  // 기본/최소 폰트 (필요시 조절)
                                   const BASE_REM = 0.78;    // 기본 td 폰트
-                                  const MIN_REM  = 0.52;    // 여기 더 낮추면 더 작아짐(너무 작으면 가독성 떨어짐)
+                                  const MIN_REM  = 0.52;    // 너무 작으면 가독성 떨어짐
 
-                                  // 어떤 열을 줄일지 (0-based)
-                                  // 2열(상호명)=1, 3열(주소)=2  (+ 원하면 나머지도 추가 가능)
                                   const TARGET_COLS = [1, 2];
 
                                   function remToPx(rem) {
@@ -4945,16 +4934,12 @@
                                   function fitTextToCell(td) {
                                     if (!td) return;
 
-                                    // 1) 일단 기본으로 리셋
                                     td.style.fontSize = BASE_REM + "rem";
 
-                                    // 2) 셀 폭보다 내용이 크면 줄이기
-                                    // scrollWidth > clientWidth 이면 넘치는 상태
                                     const minPx = remToPx(MIN_REM);
 
                                     let curPx = parseFloat(getComputedStyle(td).fontSize);
 
-                                    // 안전장치: 너무 많이 반복하지 않게
                                     let guard = 0;
 
                                     while (td.scrollWidth > td.clientWidth && curPx > minPx && guard < 40) {
@@ -4965,7 +4950,6 @@
                                   }
 
                                   function applyAutoFit() {
-                                    // DataTables가 그려준 현재 페이지의 행만 대상으로 처리
                                     const rows = document.querySelectorAll("#dataTable tbody tr");
                                     rows.forEach(tr => {
                                       const tds = tr.children;
@@ -4973,14 +4957,11 @@
                                       TARGET_COLS.forEach(c => fitTextToCell(tds[c]));
                                     });
 
-                                    // 컬럼 폭 다시 맞춤
                                     dt.columns.adjust();
                                   }
 
-                                  // 최초 1회 (DataTables 렌더 후 적용되게 한 프레임 늦춰서)
                                   requestAnimationFrame(applyAutoFit);
 
-                                  // 페이지 변경/정렬/검색 등으로 다시 그려질 때마다 재적용
                                   dt.on('draw', function () {
                                     requestAnimationFrame(applyAutoFit);
                                   });
@@ -4997,13 +4978,6 @@
 
 
                                 <style>
-                                /* =========================================================
-                                  (모바일 전용) 판매점 테이블: 1줄 유지 + 원문 그대로 + 가로 스크롤
-                                  - 주소(3열)가 가장 넓게
-                                  - 상호(2열)는 상대적으로 좁게
-                                  - 1등 당첨횟수(4열)는 3자리 기준으로 좁게
-                                  ⚠️ col 폭 지정은 <colgroup><col class="...">가 있어야 동작합니다.
-                                  ========================================================= */
 
                                 @media (max-width: 576px){
 
@@ -5013,38 +4987,36 @@
                                     -webkit-overflow-scrolling: touch;
                                   }
 
-                                  /* 표는 스크롤 전제: colgroup 폭을 강제로 적용 */
+                                  /* colgroup 폭 강제 적용 */
                                   #dataTable{
                                     width: 100% !important;
-                                    table-layout: fixed;   /* ✅ colgroup width 강제 */
-                                    min-width: 620px;      /* ✅ 너무 넓게 잡지 않기 (필요 시 580~760 조절) */
+                                    table-layout: fixed;   /* colgroup width 강제 */
+                                    min-width: 620px;      /* 580~760 조절 */
                                   }
 
                                   /* colgroup 폭: 주소가 가장 넓게 */
                                   #dataTable col.c-rank   { width: 44px; }
-                                  #dataTable col.c-shop   { width: 120px; }  /* 상호명은 줄어도 됨 */
-                                  #dataTable col.c-addr   { width: 260px; }  /* ✅ 주소 최우선 */
-                                  #dataTable col.c-win    { width: 64px;  }  /* 3자리(최대 105 등)면 충분 */
+                                  #dataTable col.c-shop   { width: 120px; }  /* 상호명 */
+                                  #dataTable col.c-addr   { width: 260px; }  /* 주소 */
+                                  #dataTable col.c-win    { width: 64px;  }  /* 3자리 */
                                   #dataTable col.c-auto,
                                   #dataTable col.c-semi,
                                   #dataTable col.c-manual { width: 54px;  }
 
-                                  /* ✅ 헤더/데이터: 무조건 1줄 + 축약(…) 금지 */
                                   #dataTable thead th,
                                   #dataTable tbody td{
-                                    white-space: nowrap !important; /* 1줄 */
-                                    overflow: hidden !important;   /* 잘림 방지 */
-                                    text-overflow: clip !important; /* … 금지 */
-                                    word-break: keep-all;           /* 한글 단어 쪼개기 방지 */
+                                    white-space: nowrap !important; 
+                                    overflow: hidden !important;   
+                                    text-overflow: clip !important; 
+                                    word-break: keep-all;          
                                     line-height: 1.1;
                                     vertical-align: middle;
                                   }
 
-                                  /* 모바일에서 글자/패딩 줄이기 */
                                   #dataTable thead th{
                                     font-size: 0.72rem;
                                     padding: 6px 8px;
-                                    padding-right: 6px;   /* 정렬 아이콘 때문에 과도한 폭 증가 완화 */
+                                    padding-right: 6px;  
                                   }
 
                                   #dataTable tbody td{

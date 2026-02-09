@@ -1501,17 +1501,16 @@
                                 }
                                 </script>
                                 <style>
-                                /* 회차(1열), 추첨일(2열) → 항상 1줄 */
                                 #dataTable th:nth-child(1),
                                 #dataTable td:nth-child(1),
                                 #dataTable th:nth-child(2),
                                 #dataTable td:nth-child(2) {
-                                white-space: nowrap;     /* 줄바꿈 금지 */
+                                white-space: nowrap;    
                                 }
 
                                 @media (max-width: 576px) {
 
-                                /* 헤더 */
+
                                 #dataTable thead th{
                                     font-size: 0.72rem;
                                     padding: 6px 6px;
@@ -1521,29 +1520,29 @@
                                     overflow: hidden;
                                 }
 
-                                /* 바디 셀 */
+
                                 #dataTable td{
                                     font-size: 0.78rem;
                                     padding: 6px 6px;
                                 }
 
-                                /* 1st~6th + 보너스 숫자 컬럼 폭 고정 */
+
                                 #dataTable th:nth-child(n+3):nth-child(-n+9),
                                 #dataTable td:nth-child(n+3):nth-child(-n+9){
                                     width: 42px;
                                     min-width: 42px;
                                     text-align: center;
                                 }
-                                /* 회차(1열), 추첨일(2열) → 무조건 1줄 */
+
                                 #dataTable th:nth-child(1),
                                 #dataTable td:nth-child(1),
                                 #dataTable th:nth-child(2),
                                 #dataTable td:nth-child(2),
                                 #dataTable th:nth-child(10),
                                 #dataTable td:nth-child(10) {
-                                    font-size: 0.68rem;     /* 강제로 작게 */
-                                    white-space: nowrap;   /* 줄바꿈 금지 */
-                                    padding: 4px 4px;      /* 높이도 최소화 */
+                                    font-size: 0.68rem;     
+                                    white-space: nowrap;  
+                                    padding: 4px 4px;    
                                 }
 
                                 #dataTable thead th:nth-child(1),

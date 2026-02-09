@@ -607,9 +607,7 @@
                         const data = await res.json();
                         renderHeaderMeta(data.meta);
                     } catch (e) {
-                        // 실패해도 페이지는 정상 동작해야 하니까 조용히 무시
-                        // 필요하면 콘솔 로그:
-                        // console.error("meta load failed", e);
+
                     }
                     });
                     </script>

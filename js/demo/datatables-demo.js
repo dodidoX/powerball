@@ -2,7 +2,7 @@
 $(document).ready(function () {
 
   if (!$("#dataTable").length) return;
-  if ($.fn.DataTable.isDataTable("#dataTable")) return; // ✅ 중복 초기화 방지
+  if ($.fn.DataTable.isDataTable("#dataTable")) return; // 중복 초기화 방지
 
   const isMobile = window.matchMedia("(max-width: 576px)").matches;
 
@@ -19,12 +19,12 @@ $(document).ready(function () {
           const raw = (data ?? "").toString().replace(/,/g, "");
           const v = parseInt(raw, 10);
 
-          // ✅ 정렬/필터링/타입판정은 "숫자 원값" 반환 (정렬 깨짐 방지)
+          // 정렬/필터링/타입판정은 "숫자 원값" 반환 (정렬 깨짐 방지)
           if (type === "sort" || type === "type" || type === "filter") {
             return isNaN(v) ? 0 : v;
           }
 
-          // ✅ 화면 표시(display)만 보기 좋게
+          // 화면 표시(display)만 보기 좋게
           if (!isNaN(v)) {
             if (isMobile) return (v / 1e8).toFixed(1) + "억";
             return v.toLocaleString("ko-KR");
