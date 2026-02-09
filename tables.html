@@ -195,7 +195,10 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                
+                            <button id="toggleExtraCols"
+                                    class="btn btn-sm btn-outline-secondary d-sm-none mb-3">
+                            상세 열 펼치기
+                            </button>
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
@@ -1499,19 +1502,35 @@
                                 </script>
 
                                 <style>
-                                    @media (max-width: 576px) {
-                                        #dataTable thead th{
-                                            font-size: 0.72rem;
-                                            padding: 6px 6px;
-                                            line-height: 1.1;
-                                            white-space: normal;
-                                        }
-                                        #dataTable td{
-                                            font-size: 0.78rem;
-                                            padding: 6px 6px;
-                                        }
-                                        }
-                                </style>              
+                                @media (max-width: 576px) {
+
+                                /* 헤더 */
+                                #dataTable thead th{
+                                    font-size: 0.72rem;
+                                    padding: 6px 6px;
+                                    line-height: 1.1;
+                                    white-space: normal;
+                                    max-height: 48px;
+                                    overflow: hidden;
+                                }
+
+                                /* 바디 셀 */
+                                #dataTable td{
+                                    font-size: 0.78rem;
+                                    padding: 6px 6px;
+                                }
+
+                                /* 1st~6th + 보너스 숫자 컬럼 폭 고정 */
+                                #dataTable th:nth-child(n+3):nth-child(-n+9),
+                                #dataTable td:nth-child(n+3):nth-child(-n+9){
+                                    width: 42px;
+                                    min-width: 42px;
+                                    text-align: center;
+                                }
+
+                                }
+                                </style>
+   
                             </div>
                             <button onclick="exportTableToExcel('다운로드.xlsx')">내 컴퓨터에 저장</button>
                         </div>
