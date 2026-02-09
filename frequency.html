@@ -1520,12 +1520,13 @@
                                     table.appendChild(tbody);
                                     statsContainer.appendChild(table);
 
-                                    // DataTable 재생성
                                     $("#statsTable").DataTable({
-                                        paging: false,
-                                        searching: false,
-                                        info: false,
-                                        order: [] // 기본 정렬 끔(원하면 정렬 지정 가능)
+                                    paging: false,
+                                    searching: false,
+                                    info: false,
+                                    order: [],
+                                    autoWidth: false,
+                                    responsive: true
                                     });
                                     }
 
@@ -1715,6 +1716,40 @@
                             #statsTable thead th {
                             background-color: #f8f9fc;  
                             font-weight: 600;
+                            }
+
+                            /* 테이블 폭 */
+                            #statsTable {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            table-layout: fixed;          /* 핵심: 컬럼 폭을 화면 기준으로 재분배 */
+                            }
+
+                            /* 셀 내용 긴 경우 */
+                            #statsTable th,
+                            #statsTable td {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            }
+
+                            /*모바일에서 글자/패딩 줄이기 */
+                            @media (max-width: 576px) {
+                            #statsTable th,
+                            #statsTable td {
+                                padding: 6px 6px !important;
+                                font-size: 0.85rem;
+                            }
+
+                            #statsTable th small {
+                                font-size: 0.75em;
+                            }
+
+                            /* 번호 공 크기 축소 */
+                            #statsTable .num-ball {
+                                width: 30px;
+                                height: 30px;
+                                font-size: 0.9rem;
+                            }
                             }
                         </style>
 
