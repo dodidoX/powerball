@@ -1500,8 +1500,15 @@
                                     link.click();
                                 }
                                 </script>
-
                                 <style>
+                                /* 회차(1열), 추첨일(2열) → 항상 1줄 */
+                                #dataTable th:nth-child(1),
+                                #dataTable td:nth-child(1),
+                                #dataTable th:nth-child(2),
+                                #dataTable td:nth-child(2) {
+                                white-space: nowrap;     /* 줄바꿈 금지 */
+                                }
+
                                 @media (max-width: 576px) {
 
                                 /* 헤더 */
@@ -1537,6 +1544,13 @@
                                     font-size: 0.68rem;     /* 강제로 작게 */
                                     white-space: nowrap;   /* 줄바꿈 금지 */
                                     padding: 4px 4px;      /* 높이도 최소화 */
+                                }
+
+                                #dataTable thead th:nth-child(1),
+                                #dataTable thead th:nth-child(2),
+                                #dataTable thead th:nth-child(10){
+                                    max-height: none;
+                                    overflow: visible;
                                 }
 
                                 }
