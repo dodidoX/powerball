@@ -1483,7 +1483,7 @@
                                 
                                     // 열 너비를 설정
                                     columnWidths.forEach((width, index) => {
-                                        worksheet.getColumn(index + 1).width = width + 5;  // +2는 약간의 여유 공간을 추가하기 위함
+                                        worksheet.getColumn(index + 1).width = width + 5;  // +2 -> 약간의 여유 공간 추가
                                     });
                                 
                                     // B2 셀을 기준으로 행과 열을 고정
@@ -1526,6 +1526,15 @@
                                     width: 42px;
                                     min-width: 42px;
                                     text-align: center;
+                                }
+                                /* 회차(1열), 추첨일(2열) → 무조건 1줄 */
+                                #dataTable th:nth-child(1),
+                                #dataTable td:nth-child(1),
+                                #dataTable th:nth-child(2),
+                                #dataTable td:nth-child(2) {
+                                    font-size: 0.68rem;     /* 강제로 작게 */
+                                    white-space: nowrap;   /* 줄바꿈 금지 */
+                                    padding: 4px 4px;      /* 높이도 최소화 */
                                 }
 
                                 }
