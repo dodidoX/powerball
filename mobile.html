@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5RZ8RQX8B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-K5RZ8RQX8B');
+  </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Lotto Number Generator</title>
+
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    
+    <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      margin: 20px 0;
+      border: 1px solid black;
+      border-collapse: collapse;
+      height: 27px
+    }
+
+
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+      height: 42px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f8f8;
+    }
+
+    tr:hover {
+      background-color: #e6e6e6;
+    }
+
+    #combination-label1, #combination-label2 {
+      font-weight: bold;
+    }
+
+    .number-buttons {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .numpadding {
+      padding: 0 20px;
+    }
+
+    .number-buttons button {
+
+    background-color: #000000; /* 배경색 */
+    border: none; /* 테두리 없음 */
+    color: white; /* 글자색 */
+    text-align: center; /* 텍스트 정렬 */
+    text-decoration: none; /* 텍스트 장식 없음 */
+    display: inline-block; /* 인라인 블록 표시 */
+    font-size: 16px; /* 글꼴 크기 */
+    margin: 1px 1px; /* 마진 설정 */
+    cursor: pointer; /* 커서를 포인터로 변경 */
+    border-radius: 4px; /* 모서리 둥글게 */
+    padding: 8px 16px; /* 패딩 설정 */
+    }
+
+    .option-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 5px 0 0 20px;
+    }
+
+    #historyTable td,
+    #historyTable th {
+      height: 6px; /* 행 높이 설정 */
+      min-height: 5px; /* 최소 높이 설정 */
+    }
+    </style>
+    <style>
+      #toggleCompare {
+          transition: all 0.3s; /* 부드러운 전환 효과 */
+          padding: 10px 20px;
+          border: none;
+          cursor: pointer;
+          outline: none;
+          border-radius: 5px;
+      }
+  
+      #toggleCompare.on {
+          background-color: #4CAF50; /* 눌러진 상태의 배경색 */
+          color: white; /* 눌러진 상태의 글자색 */
+          box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5); /* 움푹 파인 효과 */
+      }
+  
+      #toggleCompare.off {
+          color: black; /* 튀어나온 상태의 글자색 */
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 튀어나온 효과 */
+          transform: translateY(-2px); /* 버튼을 약간 위로 올림 */
+      }
+
+      .tooltip-leftalign .tooltip-inner { text-align: left; }
+
+      #historyTable th:last-child,
+      #historyTable td:last-child {
+        padding: 4px 6px;         /* 세로 패딩 축소 */
+        white-space: nowrap;      /* 줄바꿈 방지 */
+        width: 72px;              /* 고정 폭(원하면 조절) */
+      }
+
+
+      #historyTable .deleteBtn {
+        padding: 2px 8px;
+        font-size: 12px;
+        line-height: 1.1;
+        height: 24px;             /* 한 줄 높이 고정 느낌 */
+        border-radius: 4px;
+      }
+
+
+      #historyTable thead th:nth-child(2) {
+        width: 56px;
+        padding: 4px 6px;
+      }
+      #selectAllHistory { cursor: pointer; }
+
+    </style>
+  
+    <style>
+    @media (max-width: 576px) {
+
+      /* 카드 여백/헤더 크기 줄이기 */
+      .card-header.py-3 { padding: 10px 12px !important; }
+      .card-body { padding: 12px !important; }
+
+      /* h6(카드 타이틀) 크기 줄이기 */
+      .card-header h6.m-0 {
+        font-size: 15px !important;
+        line-height: 1.2 !important;
+      }
+
+      /* 생성기 내부의 큰 h1 제거/축소 */
+      .generator h1 {
+        font-size: 18px !important;
+        margin: 0 0 10px 0 !important;
+      }
+
+      /* 조건 텍스트 줄바꿈/간격 압축 */
+      .generator p {
+        margin: 8px 0 !important;
+        font-size: 13px !important;
+        line-height: 1.35 !important;
+      }
+
+      /* 생성기 input은 폭 100% + 높이 줄임 */
+      .generator input[type="text"] {
+        width: 100% !important;
+        height: 34px !important;
+        padding: 6px 10px !important;
+        margin-top: 6px !important;
+        font-size: 14px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* sum/stddev 범위 입력은 2칸을 한 줄로 */
+      .generator .range-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .generator .range-row input {
+        width: 100% !important;
+      }
+
+      /* 생성 버튼은 크게, 폭 100% */
+      .generator button {
+        width: 100% !important;
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+        margin-top: 8px !important;
+      }
+    }
+    </style>
+    <style>
+    @media (max-width: 576px) {
+
+      /* 옵션바: flex → grid로 바꿔서 overflow 제거 */
+      .option-container {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px 10px !important;
+        padding: 10px 12px !important;
+        align-items: center !important;
+      }
+
+      /* 옵션바 내부 p 마진 제거 */
+      .option-container p { margin: 0 !important; }
+
+      /* 체크박스+라벨을 한 덩어리로 정리 */
+      .option-container label {
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0 !important;
+        white-space: normal !important; /* 줄바꿈 허용 */
+      }
+
+      /* 가중치 입력칸: 화면 밖으로 안 나가게 */
+      #weightValue {
+        width: 100% !important;
+        height: 34px !important;
+        padding: 6px 10px !important;
+        font-size: 14px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* 초기화 버튼: 글자 2줄 대신 1줄 + 폭 100% */
+      #resetButton {
+        width: 100% !important;
+        padding: 8px 10px !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+      }
+
+      /* 숫자 버튼 영역 패딩 축소 */
+      .numpadding { padding: 0 12px !important; }
+
+      /* 숫자 버튼 grid: 7열 → 5열(모바일) */
+      .number-buttons {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 6px !important;
+      }
+
+      /* 버튼 크기: 누르기 쉽게 */
+      .number-buttons button {
+        padding: 10px 0 !important;
+        font-size: 14px !important;
+        border-radius: 8px !important;
+      }
+    }   
+    </style>
+    <style>
+    .number-buttons .number-button{
+      border: 1px solid gray;
+      color: #fff;
+      border-radius: 4px;
+    }
+    @media (max-width:576px){
+      .number-buttons .number-button{
+        border-radius: 8px;
+      }
+    }
+
+    @media (max-width:576px){
+      .option-container p{
+        display:flex;
+        align-items:center;
+        gap:6px;
+      }
+    }
+    </style>
+</head>
+
+<body id="page-top">
+
+
+    <div id="wrapper">
+
+
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
+
+
+            <div id="content" class="flex-grow-1">
+
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                  <!-- 왼쪽: 브랜드 -->
+                  <a class="navbar-brand font-weight-bold" href="index.html">로또 라이프</a>
+
+                  <!-- 오른쪽 정렬을 위한 공간 -->
+                  <ul class="navbar-nav ml-auto">
+
+                    <!-- 로또 번호 생성 (드롭다운) -->
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-cog mr-1"></i>
+                        메뉴
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
+                        <a class="dropdown-item" href="numbers_generator.html">번호 생성</a>
+                        <a class="dropdown-item" href="tables.html">역대 당첨 현황</a>
+                        <a class="dropdown-item" href="match.html">내 번호 성적</a>
+                        <a class="dropdown-item" href="frequency.html">번호 출현 현황</a>
+                        <a class="dropdown-item" href="places.html">1등 당첨점</a>
+                      </div>
+                    </li>
+
+                  </ul>
+
+                </nav>
+
+
+
+                <div class="container-fluid">
+
+
+                    <h1 class="h3 mb-4 text-gray-800"></h1>
+
+                    <div class="row">
+
+                        <div class="col-12 col-lg-6 order-1 order-lg-1">
+
+                            <div class="card shadow mb-4" id="genCard">
+                              <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                                  data-toggle="collapse" data-target="#genCollapse"
+                                  aria-expanded="false" aria-controls="genCollapse"
+                                  style="cursor:pointer;">
+                                <h6 class="m-0 font-weight-bold text-primary">로또 번호 생성기</h6>
+                                <span class="text-muted small">열기/닫기</span>
+                              </div>
+                              <div id="genCollapse" class="collapse">
+                                <div class="card-body">
+
+                                    <div class="container">
+                                      <div class="generator">
+                                      <h1>로또 번호 생성기</h1>
+                                      <p>
+                                        조건 1. 포함할 숫자를 입력하세요. ex) 1, 17, 35
+                                        <input type="text" id="included" value="">
+                                      </p>
+                                      <p>
+                                        조건 2. 제외할 숫자를 입력하세요. ex) 8, 23, 39
+                                        <input type="text" id="excluded" value="">
+                                      </p>
+                                      <p>
+                                        조건 3. 가중치를 설정할 숫자를 입력하세요. ex) 5, 43
+                                        <input type="text" id="weighted" value="">
+                                      </p>
+                                      <div class="gen-row">
+                                      <div class="gen-label">조건 4. 원하는 총합 범위를 입력하세요 ex) 96 ~ 175</div>
+                                        <div class="range-row">
+                                          <input type="text" id="sum_range_min" value="">
+                                          <span>~</span>
+                                          <input type="text" id="sum_range_max" value="">
+                                        </div>
+                                      </div>
+                                      <p>
+                                        조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 14.5
+                                        <div class="range-row">
+                                          <input type="text" id="stddev_range_min" value="">
+                                          <span>~</span>
+                                          <input type="text" id="stddev_range_max" value="">
+                                        </div>
+                                      </p>
+                                      <p>조건 6. '새로운 번호 생성하기' 버튼을 눌러주세요 </p>
+                                      <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+
+                                      
+                                      </div>
+
+                                    </div>
+                                  </div>
+                              </div>
+                            </div>
+
+                        </div> 
+
+                        <div class="col-12 col-lg-6 order-2 order-lg-2">
+
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6>
+                                </div>
+                                <div class="selection option-container"> 
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="includeCheck"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="1. 숫자 6개 이하 선택 시 무조건 출현<br>2. 숫자 7개 이상 선택 시 선택된 번호에서만 출현"
+                                    />
+                                    <label for="includeCheck">숫자 포함</label>
+                                  </p>
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="excludeCheck"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="선택 시 출현 번호에서 무조건 제외(최대 39개 선택 가능)"
+                                    />
+                                    <label for="excludeCheck">숫자 제외</label>
+                                  </p>
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="weightedCheck"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="선택 후 가중치 설정 가능<br>ex1) 0% → 미출현<br>ex2) 100% → 미선택 번호와 동일 확률<br>ex3) 700% → 미선택 번호보다 700% 출현 확률 up"
+                                    />
+                                    <label for="weightedCheck">가중치 설정(0%~1500%)</label>
+                                  </p>
+                                  <p>
+                                    <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
+                                  </p>
+                                  <p>
+                                    <button id="resetButton">숫자 초기화</button>
+                                  </p>
+                                </div>
+                                <div class="numpadding">
+                                  <div class="number-buttons">
+                                    <button class="number-button">1</button>
+                                    <button class="number-button">2</button>
+                                    <button class="number-button">3</button>
+                                    <button class="number-button">4</button>
+                                    <button class="number-button">5</button>
+                                    <button class="number-button">6</button>
+                                    <button class="number-button">7</button>
+                                    <button class="number-button">8</button>
+                                    <button class="number-button">9</button>
+                                    <button class="number-button">10</button>
+                                    <button class="number-button">11</button>
+                                    <button class="number-button">12</button>
+                                    <button class="number-button">13</button>
+                                    <button class="number-button">14</button>
+                                    <button class="number-button">15</button>
+                                    <button class="number-button">16</button>
+                                    <button class="number-button">17</button>
+                                    <button class="number-button">18</button>
+                                    <button class="number-button">19</button>
+                                    <button class="number-button">20</button>
+                                    <button class="number-button">21</button>
+                                    <button class="number-button">22</button>
+                                    <button class="number-button">23</button>
+                                    <button class="number-button">24</button>
+                                    <button class="number-button">25</button>
+                                    <button class="number-button">26</button>
+                                    <button class="number-button">27</button>
+                                    <button class="number-button">28</button>
+                                    <button class="number-button">29</button>
+                                    <button class="number-button">30</button>
+                                    <button class="number-button">31</button>
+                                    <button class="number-button">32</button>
+                                    <button class="number-button">33</button>
+                                    <button class="number-button">34</button>
+                                    <button class="number-button">35</button>
+                                    <button class="number-button">36</button>
+                                    <button class="number-button">37</button>
+                                    <button class="number-button">38</button>
+                                    <button class="number-button">39</button>
+                                    <button class="number-button">40</button>
+                                    <button class="number-button">41</button>
+                                    <button class="number-button">42</button>
+                                    <button class="number-button">43</button>
+                                    <button class="number-button">44</button>
+                                    <button class="number-button">45</button>
+                                  </div>
+                                </div>
+
+
+                                  <script>
+
+                                  function percentToFactor(input) {
+                                  let s = (input || "").toString().trim();
+                                  if (s.endsWith("%")) s = s.slice(0, -1);
+                                  let n = parseFloat(s);
+                                  if (!Number.isFinite(n)) return 1;              
+                                  n = Math.max(0, Math.min(1500, n));            
+                                  return n / 100;                                  
+                                }
+
+
+                                function normalizePercentText(el) {
+                                  let s = (el.value || "").toString().trim();
+                                  if (s === "") { el.value = ""; return; }
+                                  if (s.endsWith("%")) s = s.slice(0, -1);
+                                  let n = parseFloat(s);
+                                  if (!Number.isFinite(n)) n = 0;
+                                  n = Math.max(0, Math.min(1500, n));
+
+                                  el.value = n + "%";
+                                }
+
+                                  const NUM_MIN = 1, NUM_MAX = 45;
+                                  function parseNumList(str) {
+                                    if (!str) return [];
+                                    return Array.from(
+                                      new Set(
+                                        str.split(",")
+                                          .map(s => s.trim())
+                                          .filter(s => s !== "")
+                                          .map(n => Number(n))
+                                          .filter(n => Number.isInteger(n) && n >= NUM_MIN && n <= NUM_MAX)
+                                      )
+                                    ).sort((a,b)=>a-b);
+                                  }
+
+
+                                  function consecutiveLabel(nums) {
+                                    let maxRun = 1, run = 1;
+                                    for (let i = 0; i < nums.length - 1; i++) {
+                                      if (nums[i] + 1 === nums[i + 1]) { run++; maxRun = Math.max(maxRun, run); }
+                                      else run = 1;
+                                    }
+                                    return maxRun >= 3 ? `${maxRun}연번` : "";
+                                  }
+                                  function statsOf(nums) {
+                                    const sum = nums.reduce((a, b) => a + b, 0);
+                                    const mean = sum / nums.length;
+                                    const variance = nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / nums.length;
+                                    const std = Math.sqrt(variance);
+                                    const odd = nums.filter(n => n % 2 === 1).length;
+                                    const even = nums.length - odd;
+                                    return { sum, std: Number(std.toFixed(2)), odd, even };
+                                  }
+                                  function inRange(val, lo, hi) {
+                                    if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
+                                    return (val >= lo && val <= hi) ? "추천" : "";
+                                  }
+
+
+
+                                  function byId(id){ return document.getElementById(id); }
+
+                                  function ensureHistDT() {
+                                    if ($.fn.DataTable.isDataTable('#historyTable')) return histDT;
+
+                                    histDT = $('#historyTable').DataTable({
+                                      destroy: true,
+                                      searching: false,
+                                      info: true,
+                                      language: { emptyTable: "생성된 번호가 없습니다." },
+                                      order: [],
+                                      aLengthMenu: [[-1], ["All"]],
+                                      iDisplayLength: -1,
+                                      columnDefs: [
+
+                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
+
+
+                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
+                                      ]
+                                    });
+                                    return histDT;
+                                  }
+
+
+                                  let includedInput, excludedInput, weightedInput, weightValueInput;
+                                  let sumMinInput, sumMaxInput, stdMinInput, stdMaxInput;
+                                  let numberButtons, includeCheck, excludeCheck, weightedCheck, resetButton;
+                                  let generatedTbl, generatedTbody, histTbl, histTbody, pickSelects;
+                                  let histDT = null;
+
+
+                                  let historySeq = 1;
+
+
+                                  function paintButtons() {
+                                    if (!numberButtons) return;
+                                    const include = parseNumList(includedInput.value);
+                                    const exclude = parseNumList(excludedInput.value);
+                                    const weight  = parseNumList(weightedInput.value);
+
+                                    numberButtons.forEach((btn, idx) => {
+                                      const number = idx + 1;
+                                      let bg = "black";
+                                      if (include.includes(number)) bg = "green";
+                                      else if (weight.includes(number)) bg = "blue";
+                                      else if (exclude.includes(number)) bg = "red";
+                                      btn.style.backgroundColor = bg;
+                                      btn.style.borderColor = "gray";
+                                    });
+                                  }
+
+
+                                  function attachButtonHandlers(mode) {
+                                    if (!numberButtons) return;
+
+                                    numberButtons.forEach(btn => { btn.replaceWith(btn.cloneNode(true)); });
+
+                                    numberButtons = document.querySelectorAll(".number-button");
+
+                                    numberButtons.forEach(btn => {
+                                      btn.addEventListener("click", () => {
+                                        const n = Number(btn.textContent);
+                                        const inc = parseNumList(includedInput.value);
+                                        const exc = parseNumList(excludedInput.value);
+                                        const wgt = parseNumList(weightedInput.value);
+
+                                        function toggle(list, setterInput) {
+                                          const set = new Set(list);
+                                          if (set.has(n)) set.delete(n); else set.add(n);
+                                          setterInput.value = Array.from(set).sort((a,b)=>a-b).join(", ");
+                                        }
+
+                                        if (mode === "include") {
+                                          excludedInput.value = exc.filter(x => x !== n).join(", ");
+                                          weightedInput.value = wgt.filter(x => x !== n).join(", ");
+                                          toggle(inc, includedInput);
+                                        } else if (mode === "exclude") {
+                                          includedInput.value = inc.filter(x => x !== n).join(", ");
+                                          weightedInput.value = wgt.filter(x => x !== n).join(", ");
+                                          toggle(exc, excludedInput);
+                                        } else if (mode === "weight") {
+                                          includedInput.value = inc.filter(x => x !== n).join(", ");
+                                          excludedInput.value = exc.filter(x => x !== n).join(", ");
+                                          toggle(wgt, weightedInput);
+                                        }
+
+                                        paintButtons();
+                                        compareInputWithTable();
+                                      });
+                                    });
+                                  }
+
+
+
+                                  function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
+                                    const dt = ensureHistDT();
+                                    const newRowData = [
+                                      historySeq++,                                       // No.
+                                      '<input type="checkbox" class="row-select">',       // 체크박스
+                                      ...numbers,                                         // 6개 번호(2~7)
+                                      consecutive,                                        // 8
+                                      sum,                                                // 9
+                                      stddev,                                             // 10
+                                      oddCount,                                           // 11
+                                      evenCount,                                          // 12
+                                      sumRec,                                             // 13
+                                      stddevRec,                                          // 14
+                                      '', '', '', '', '', '',                             // 15~20: 비교 결과 "O" 들어갈 자리
+                                      '<button class="deleteBtn" type="button">삭제</button>', // 21
+                                    ];
+                                    const row = dt.row.add(newRowData).draw(false).node();
+
+
+                                    $(row).find('button.deleteBtn').on('click', function(e){
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      const y = window.pageYOffset || document.documentElement.scrollTop;
+                                      dt.row($(this).closest('tr')).remove().draw(false);
+
+                                      if (dt.rows().count() === 0) {
+                                        historySeq = 1;
+                                      
+
+                                        const selectAll = document.getElementById('selectAllHistory');
+                                        if (selectAll) selectAll.checked = false;
+
+
+                                        dt.search('');                
+                                        dt.columns().every(function(){ 
+                                          this.search('');
+                                        });
+                                        dt.order([]).draw(false);      
+
+                                      }
+
+                                      window.scrollTo(0, y);
+                                      compareInputWithTable();
+                                    });
+                                  }
+
+                                  function deleteHistory() {
+                                    const dt = ensureHistDT();
+                                    dt.clear().draw(false);
+
+
+                                    historySeq = 1;
+
+
+                                    const selectAll = document.getElementById('selectAllHistory');
+                                    if (selectAll) selectAll.checked = false;
+
+
+                                    dt.order([]).search('').columns().search('').draw();
+                                  }
+
+
+                                  let isCompareFunctionOn = false;
+                                  function toggleCompareFunction() {
+                                    isCompareFunctionOn = !isCompareFunctionOn;
+                                    const btn = byId('toggleCompare');
+                                    if (isCompareFunctionOn) {
+                                      btn.innerText = "비교 기능 On";
+                                      btn.classList.remove('off'); btn.classList.add('on');
+                                      compareInputWithTable();
+                                    } else {
+                                      btn.innerText = "비교 기능 Off";
+                                      btn.classList.remove('on'); btn.classList.add('off');
+                                      resetCompareIndicators();
+                                    }
+                                  }
+
+
+
+                                  function resetCompareIndicators() {
+                                    const dt = ensureHistDT();
+                                    dt.rows().every(function(){
+                                      const row = this.node();
+                                      for (let j=15; j<=20; j++) row.children[j].innerText = "";
+                                    });
+                                  }
+                                  function compareInputWithTable() {
+                                    if (!isCompareFunctionOn) return;
+                                    const dt = ensureHistDT();
+                                    const picks = pickSelects.map(sel => Number(sel.value));
+                                    dt.rows().every(function() {
+                                      const row = this.node();
+                                      const cells = row.getElementsByTagName('td');
+                                      const rowNums = Array.from({ length: 6 }, (_, i) => Number(cells[2 + i].innerText));
+                                      picks.forEach((pick, idx) => {
+                                        const col = 15 + idx; // 비교결과 열은 15~20
+                                        cells[col].innerText = rowNums.includes(pick) ? "O" : "";
+                                      });
+                                    });
+                                  }
+
+
+                                    async function generateNewNumbers() {
+                                      // 1) 입력값 수집
+                                      const include = parseNumList(byId("included").value);
+                                      const exclude = parseNumList(byId("excluded").value);
+                                      const weighted = parseNumList(byId("weighted").value);
+                                      const weightPercent = (function () {
+                                        let s = (byId("weightValue").value || "").trim();
+                                        if (s.endsWith("%")) s = s.slice(0, -1);
+                                        const n = parseFloat(s);
+                                        if (!Number.isFinite(n)) return 100;
+                                        return Math.max(0, Math.min(1500, n));
+                                      })();
+
+                                      const sumMin = parseFloat(byId("sum_range_min").value);
+                                      const sumMax = parseFloat(byId("sum_range_max").value);
+                                      const stdMin = parseFloat(byId("stddev_range_min").value);
+                                      const stdMax = parseFloat(byId("stddev_range_max").value);
+
+                                      // 2) 서버 호출
+                                      let res;
+                                      try {
+                                        res = await fetch("/api/generate", {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({
+                                            include, exclude, weighted,
+                                            weightPercent,
+                                            count: 5,            
+                                            sumMin, sumMax, stdMin, stdMax
+                                          })
+                                        });
+                                      } catch (e) {
+                                        alert("서버 연결 실패: " + e);
+                                        return;
+                                      }
+
+                                      let data;
+                                      try { data = await res.json(); } catch { data = {}; }
+                                      if (!res.ok || !data.ok) {
+                                        alert("생성 실패: " + (data.error || res.status));
+                                        return;
+                                      }
+
+
+                                      if (!generatedTbody) return;
+                                      generatedTbody.innerHTML = ""; 
+
+                                      for (let i = 0; i < data.results.length; i++) {
+                                        const r = data.results[i];                    
+                                        const nums = r.numbers.slice().sort((a,b)=>a-b);
+
+
+                                        const cons = consecutiveLabel(nums);
+                                        const st   = statsOf(nums); 
+                                        const sumRec    = inRange(st.sum, sumMin, sumMax);
+                                        const stddevRec = inRange(st.std, stdMin, stdMax);
+
+
+                                        const tr = document.createElement("tr");
+                                        tr.innerHTML = `
+                                          <td>조합 ${i + 1}</td>
+                                          ${nums.map(n => `<td>${n}</td>`).join("")}
+                                          <td>${cons}</td>
+                                          <td>${st.sum}</td>
+                                          <td>${st.std.toFixed(2)}</td>
+                                          <td>${st.odd}</td>
+                                          <td>${st.even}</td>
+                                          <td>${sumRec}</td>
+                                          <td>${stddevRec}</td>
+                                        `;
+                                        generatedTbody.appendChild(tr);
+
+
+                                        updateHistory(
+                                          nums,
+                                          st.sum,
+                                          cons,
+                                          st.std.toFixed(2), 
+                                          st.odd,
+                                          st.even,
+                                          sumRec,
+                                          stddevRec
+                                        );
+                                      }
+
+
+
+                                      paintButtons();
+                                      compareInputWithTable();
+                                    }
+
+
+                                  function saveCombinations(){
+                                    if (!generatedTbody) return;
+                                    const dt = ensureHistDT();
+                                    const existing = new Set(dt.rows().data().toArray()
+                                      .map(r => r.slice(0,6).join(',')));
+                                    generatedTbody.querySelectorAll('tr').forEach(tr => {
+                                      const tds = tr.querySelectorAll('td');
+                                      if (tds.length < 14) return;
+                                      const nums = Array.from({length:6}, (_,i)=> Number(tds[i+1].textContent));
+                                      const key = nums.join(',');
+                                      if (existing.has(key)) return; 
+                                      const cons = tds[7].textContent;
+                                      const sum  = Number(tds[8].textContent);
+                                      const std  = tds[9].textContent;
+                                      const odd  = Number(tds[10].textContent);
+                                      const even = Number(tds[11].textContent);
+                                      const sumRec = tds[12].textContent;
+                                      const stdRec = tds[13].textContent;
+                                      updateHistory(nums, sum, cons, std, odd, even, sumRec, stdRec);
+                                      existing.add(key);
+                                    });
+                                  }
+
+
+                                  document.addEventListener('DOMContentLoaded', () => {
+
+                                    // ✅ 모바일이면 "로또 번호 생성기" 기본 접힘 / PC면 펼침(원하면)
+                                    const isMobile = window.matchMedia("(max-width: 576px)").matches;
+                                    const gen = document.getElementById('genCollapse');
+                                    if (gen) {
+                                      if (isMobile) gen.classList.remove('show'); // 모바일 기본 접힘
+                                      else gen.classList.add('show');             // PC 기본 펼침(원하면)
+                                    }
+
+                                    includedInput = byId("included");
+                                    excludedInput = byId("excluded");
+                                    weightedInput = byId("weighted");
+                                    weightValueInput = byId("weightValue");
+
+
+                                    weightValueInput.addEventListener("focus", () => {
+                                      weightValueInput.value = weightValueInput.value.replace(/\s*%$/, "");
+                                    });
+                                    weightValueInput.addEventListener("input", () => {
+
+                                      weightValueInput.value = weightValueInput.value.replace(/[^\d.]/g, "");
+                                    });
+                                    weightValueInput.addEventListener("blur", () => {
+                                      normalizePercentText(weightValueInput);
+                                    });
+
+
+                                    normalizePercentText(weightValueInput);
+
+
+                                    sumMinInput = byId("sum_range_min");
+                                    sumMaxInput = byId("sum_range_max");
+                                    stdMinInput = byId("stddev_range_min");
+                                    stdMaxInput = byId("stddev_range_max");
+
+                                    numberButtons = document.querySelectorAll(".number-button");
+                                    includeCheck = byId("includeCheck");
+                                    excludeCheck = byId("excludeCheck");
+                                    weightedCheck = byId("weightedCheck");
+                                    resetButton = byId("resetButton");
+
+                                    generatedTbl = byId("GeneratedNumbers");
+                                    generatedTbody = generatedTbl ? generatedTbl.querySelector("tbody") : null;
+                                    histTbl = byId("historyTable");
+                                    histTbody = byId("historyBody");
+
+                                    pickSelects = Array.from({length:6}, (_,i)=> byId(`number-input${i+1}`));
+
+
+                                    pickSelects.forEach(sel => {
+                                      if (!sel) return;
+                                      sel.innerHTML = "";
+                                      for (let i=NUM_MIN; i<=NUM_MAX; i++){
+                                        const op = document.createElement("option");
+                                        op.value = i; op.textContent = i;
+                                        sel.appendChild(op);
+                                      }
+                                      sel.addEventListener('input', compareInputWithTable);
+                                      sel.addEventListener('change', compareInputWithTable);
+                                    });
+
+
+                                    ensureHistDT();
+                                    
+
+                                    const selectAll = byId('selectAllHistory');
+                                    if (selectAll) {
+                                      selectAll.addEventListener('change', () => {
+                                        const dt = ensureHistDT();
+                                        dt.rows().every(function () {
+                                          const row = this.node();
+                                          const cb = row.querySelector('.row-select');
+                                          if (cb) cb.checked = selectAll.checked;
+                                        });
+                                      });
+                                    }
+
+
+                                    const thSelectCol = document.querySelector('#historyTable thead th:nth-child(2)');
+                                    const selectAllEl = document.getElementById('selectAllHistory');
+                                    if (thSelectCol && selectAllEl) {
+                                      thSelectCol.style.cursor = 'pointer';
+                                      thSelectCol.addEventListener('click', (e) => {
+
+                                        if (e.target !== selectAllEl) {
+                                          selectAllEl.checked = !selectAllEl.checked;
+
+                                          selectAllEl.dispatchEvent(new Event('change', { bubbles: true }));
+                                        }
+                                      });
+                                    }
+
+
+                                    const historyTableEl = document.getElementById('historyTable');
+                                    if (historyTableEl) {
+                                      historyTableEl.addEventListener('click', (e) => {
+                                        const td = e.target.closest('td');
+                                        if (!td) return;
+
+                                        const isBodyCell = td.parentElement && td.parentElement.parentElement && td.parentElement.parentElement.tagName === 'TBODY';
+                                        if (!isBodyCell) return;       
+
+
+                                        if (td.cellIndex === 1) {
+                                          const cb = td.querySelector('.row-select');
+                                          if (cb && e.target !== cb) {
+                                            cb.checked = !cb.checked;
+                                          }
+                                        }
+                                      });
+                                    }
+
+
+                                    includeCheck.addEventListener("change", ()=>{
+                                      if (includeCheck.checked) { excludeCheck.checked=false; weightedCheck.checked=false; attachButtonHandlers("include"); }
+                                      else attachButtonHandlers(null);
+                                    });
+                                    excludeCheck.addEventListener("change", ()=>{
+                                      if (excludeCheck.checked) { includeCheck.checked=false; weightedCheck.checked=false; attachButtonHandlers("exclude"); }
+                                      else attachButtonHandlers(null);
+                                    });
+                                    weightedCheck.addEventListener("change", ()=>{
+                                      if (weightedCheck.checked) { includeCheck.checked=false; excludeCheck.checked=false; attachButtonHandlers("weight"); }
+                                      else attachButtonHandlers(null);
+                                    });
+
+
+                                    [includedInput, excludedInput, weightedInput].forEach(inp => {
+                                      inp.addEventListener("input", paintButtons);
+                                    });
+                                    excludedInput.addEventListener("input", () => {
+                                      const exc = parseNumList(excludedInput.value);
+                                      if (exc.length >= 40) alert("너무 많은 번호를 입력하였습니다.");
+                                    });
+                                      resetButton = byId("resetButton");
+
+
+                                    resetButton.addEventListener("click", () => {
+
+                                      includedInput.value = "";
+                                      excludedInput.value = "";
+                                      weightedInput.value = "";
+                                      weightValueInput.value = "";  
+
+
+                                      includeCheck.checked = false;
+                                      excludeCheck.checked = false;
+                                      weightedCheck.checked = false;
+                                      attachButtonHandlers(null);
+
+
+                                      paintButtons();
+                                      resetCompareIndicators();
+                                      compareInputWithTable();
+                                    });
+
+
+                                    attachButtonHandlers(null);
+                                    paintButtons();
+
+                                    const btn = byId('toggleCompare');
+                                    if (btn) {
+                                      btn.innerText = "비교 기능 Off";
+                                      btn.classList.remove('on');
+                                      btn.classList.add('off');
+                                    }
+
+                                    if (window.jQuery && $.fn.tooltip) {
+                                      $('[data-toggle="tooltip"]').tooltip({ html: true, container: 'body', trigger: 'hover'});
+                                    }
+
+                                  });
+                                  </script>
+
+                                <script></script>
+
+                            </div>
+
+                            <script>
+                              async function exportTableToExcel(filename) {
+                                const dt = ensureHistDT();
+                                const table = document.getElementById('historyTable');
+                                const workbook = new ExcelJS.Workbook();
+                                const ws = workbook.addWorksheet('전체');
+
+
+                                const headerCells = table.tHead.rows[0].cells;
+                                const includeCols = [];
+                                const deleteColIndex = headerCells.length - 1;
+                                for (let c = 0; c < headerCells.length; c++) {
+                                  if (c === deleteColIndex) continue; 
+                                  includeCols.push(c);
+                                }
+
+
+                                const selVals = [];
+                                for (let k = 1; k <= 6; k++) {
+                                  const sel = document.getElementById(`number-input${k}`);
+                                  selVals[k] = sel ? sel.value : '';
+                                }
+                                includeCols.forEach((c, i) => {
+                                  let label = headerCells[c].innerText.trim();
+
+                                  if (c >= 15 && c <= 20) {
+                                    const idx = c - 14; 
+                                    label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
+                                  }
+                                  else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
+                                    label = '선택';
+                                  }
+
+                                  ws.getCell(1, i + 1).value = label || '';
+                                });
+
+
+                                let r = 2;
+                                dt.rows().every(function () {
+                                  const cells = this.node().cells;
+                                  includeCols.forEach((c, i) => {
+                                    const excelCell = ws.getCell(r, i + 1);
+
+                                    const text = (cells[c].innerText || '').trim();
+                                    if (text === '') {
+                                      excelCell.value = null;
+                                    } else if (!isNaN(text)) {
+                                      excelCell.value = parseFloat(text);
+                                    } else {
+                                      excelCell.value = text;
+                                    }
+                                  });
+                                  r++;
+                                });
+
+
+
+                                
+                                ws.getColumn(2).hidden = true;
+
+
+                                const firstRow = 1;
+                                const lastRow  = r - 1;              
+                                const firstCol = 1;
+                                const lastCol  = includeCols.length; 
+
+
+                                function setEdge(cell, edge, style = 'thin') {
+                                  const b = cell.border || {};
+                                  cell.border = { ...b, [edge]: { style } };
+                                }
+
+                                if (lastRow >= firstRow && lastCol >= firstCol) {
+
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(firstRow, c), 'top');
+                                    setEdge(ws.getCell(lastRow,  c), 'bottom');
+                                  }
+
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, firstCol), 'left');
+                                    setEdge(ws.getCell(rr, lastCol),  'right');
+                                  }
+
+
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(1, c), 'bottom'); 
+                                  }
+
+
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, 1), 'right');
+                                  }
+
+
+                                  const colRight8 = 8;
+                                  if (colRight8 >= firstCol && colRight8 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight8), 'right');
+                                    }
+                                  }
+
+
+                                  const colRight15 = 15;
+                                  if (colRight15 >= firstCol && colRight15 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight15), 'right');
+                                    }
+                                  }
+                                }
+
+                                ws.views = [{ state: 'frozen', ySplit: 1, topLeftCell: 'A2', activeCell: 'A2' }];
+
+                                const buffer = await workbook.xlsx.writeBuffer();
+                                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(blob);
+                                link.download = filename;
+                                link.click();
+                              }
+
+
+                              function deleteSelectedRows() {
+                                const dt = ensureHistDT();
+                                const y = window.pageYOffset || document.documentElement.scrollTop;
+
+
+                                dt.rows(function (_idx, _data, node) {
+                                  const cb = node.querySelector('.row-select');
+                                  return cb && cb.checked;
+                                }).remove().draw(false);
+
+                                if (dt.rows().count() === 0) {
+                                  historySeq = 1;
+
+                                  dt.order([]).search('').columns().search('').draw();
+
+                                  const selectAll = document.getElementById('selectAllHistory');
+                                  if (selectAll) selectAll.checked = false;
+                                }
+
+                                window.scrollTo(0, y);
+                                compareInputWithTable();
+                              }
+
+                              async function exportSelectedToExcel(filename) {
+                                const dt = ensureHistDT();
+                                const table = document.getElementById('historyTable');
+                                const workbook = new ExcelJS.Workbook();
+                                const ws = workbook.addWorksheet('선택');
+
+
+                                const headerCells = table.tHead.rows[0].cells;
+                                const includeCols = [];
+                                const deleteColIndex = headerCells.length - 1; 
+                                for (let c = 0; c < headerCells.length; c++) {
+                                  if (c === deleteColIndex) continue; 
+                                  includeCols.push(c);
+                                }
+
+
+
+                                const selVals = [];
+                                for (let k = 1; k <= 6; k++) {
+                                  const sel = document.getElementById(`number-input${k}`);
+                                  selVals[k] = sel ? sel.value : '';
+                                }
+                                includeCols.forEach((c, i) => {
+                                  let label = headerCells[c].innerText.trim();
+
+                                  if (c >= 15 && c <= 20) {
+                                    const idx = c - 14; // 1~6
+                                    label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
+                                  }
+                                  else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
+                                    label = '선택';
+                                  }
+
+                                  ws.getCell(1, i + 1).value = label || '';
+                                });
+
+
+                                let r = 2;
+                                dt.rows(function (_idx, _data, node) {
+                                  const cb = node.querySelector('.row-select');
+                                  return cb && cb.checked;
+                                }).every(function () {
+                                  const cells = this.node().cells;
+                                  includeCols.forEach((c, i) => {
+                                    const excelCell = ws.getCell(r, i + 1);
+                                    const text = (cells[c].innerText || '').trim();
+                                    if (text === '') {
+                                      excelCell.value = null;
+                                    } else if (!isNaN(text)) {
+                                      excelCell.value = parseFloat(text);
+                                    } else {
+                                      excelCell.value = text;
+                                    }
+                                  });
+                                  r++;
+                                });
+
+                                if (r === 2) { alert("선택된 행이 없습니다."); return; }
+
+
+                                ws.getColumn(2).hidden = true;
+
+
+                                const firstRow = 1;
+                                const lastRow  = r - 1;            
+                                const firstCol = 1;
+                                const lastCol  = includeCols.length; 
+
+
+                                function setEdge(cell, edge, style = 'thin') {
+                                  const b = cell.border || {};
+                                  cell.border = { ...b, [edge]: { style } };
+                                }
+
+                                if (lastRow >= firstRow && lastCol >= firstCol) {
+
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(firstRow, c), 'top');
+                                    setEdge(ws.getCell(lastRow,  c), 'bottom');
+                                  }
+
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, firstCol), 'left');
+                                    setEdge(ws.getCell(rr, lastCol),  'right');
+                                  }
+
+
+                                  for (let c = firstCol; c <= lastCol; c++) {
+                                    setEdge(ws.getCell(1, c), 'bottom'); 
+                                  }
+
+
+                                  for (let rr = firstRow; rr <= lastRow; rr++) {
+                                    setEdge(ws.getCell(rr, 1), 'right');
+                                  }
+
+
+                                  const colRight8 = 8;
+                                  if (colRight8 >= firstCol && colRight8 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight8), 'right');
+                                    }
+                                  }
+
+
+                                  const colRight15 = 15;
+                                  if (colRight15 >= firstCol && colRight15 <= lastCol) {
+                                    for (let rr = firstRow; rr <= lastRow; rr++) {
+                                      setEdge(ws.getCell(rr, colRight15), 'right');
+                                    }
+                                  }
+                                }
+
+                                ws.views = [{ state: 'frozen', ySplit: 1, topLeftCell: 'A2', activeCell: 'A2' }];
+
+                                const buffer = await workbook.xlsx.writeBuffer();
+                                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(blob);
+                                link.download = filename;
+                                link.click();
+                              }
+
+
+                            </script>
+                        </div>
+                          <div class="col-12">
+                            <div class="card shadow mb-4">
+                              <div class="generation card-body">
+                                <table id="GeneratedNumbers">
+                                  <thead>
+                                    <tr>
+                                      <th>추첨 조합</th>
+                                      <th>첫번째</th>
+                                      <th>두번째</th>
+                                      <th>세번째</th>
+                                      <th>네번째</th>
+                                      <th>다섯번째</th>
+                                      <th>여섯번째</th>
+                                      <th>연번</th>
+                                      <th>총합</th>
+                                      <th>표준편차</th>
+                                      <th>홀수</th>
+                                      <th>짝수</th>
+                                      <th>총합 기준</th>
+                                      <th>표준편차 기준</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody></tbody>
+                                </table>
+
+
+                                <p>update history</p>
+                                <button
+                                  id="toggleCompare"
+                                  class="on"
+                                  onclick="toggleCompareFunction()"
+                                  data-toggle="tooltip"
+                                  data-placement="top"
+                                  data-html="true"
+                                  data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                  title="모든 번호를 다 생성한 이후<br>딱 1번만 켜시는걸 추천드립니다">
+                                  비교 기능 On
+                                </button>
+                                <script>
+
+                                </script>
+
+
+                                <table id="historyTable">
+                                  <thead>
+                                    <tr>
+                                      <th id="noHeader"
+                                          data-toggle="tooltip"
+                                          data-placement="top"
+                                          title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
+                                          No. </th>
+                                      <th><input type="checkbox" id="selectAllHistory"></th>
+                                      <th>첫번째</th>
+                                      <th>두번째</th>
+                                      <th>세번째</th>
+                                      <th>네번째</th>
+                                      <th>다섯번째</th>
+                                      <th>여섯번째</th>
+                                      <th>연번</th>
+                                      <th>총합</th>
+                                      <th>표준편차</th>
+                                      <th>홀수</th>
+                                      <th>짝수</th>
+                                      <th>총합 기준</th>
+                                      <th>표준편차 기준</th>
+                                      <th><select id="number-input1" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input2" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input3" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input4" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input5" placeholder="1~45 입력"></select></th>
+                                      <th><select id="number-input6" placeholder="1~45 입력"></select></th>
+                                      <th>삭제</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody id="historyBody">
+                                  </tbody>
+                                </table>
+
+
+                                <button onclick="deleteSelectedRows()" style="margin-top: 5px;">선택 삭제</button>
+                                <button onclick="deleteHistory()" style="margin-top: 5px;">전체 삭제</button>
+                                <button onclick="exportSelectedToExcel('선택_다운로드.xlsx')" style="margin-top: 5px;">선택 저장</button>
+                                <button onclick="exportTableToExcel('다운로드.xlsx')">전체 저장</button>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <footer class="sticky-footer bg-white mt-auto">
+                <div class="container py-2">
+                    <div class="text-center"> 
+                        <span> https://blog.naver.com/lottocreator </span>
+                        </span>
+                    </div>
+                </div>
+            </footer>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+
+    
+
+</body>
+
+</html>
