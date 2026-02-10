@@ -133,83 +133,149 @@
     #historyTable { margin: 12px 0; }
 
     /* =========================
-    4) GeneratedNumbers (핵심!)
-    - 기본: compact + fixed + ellipsis
-    - show-extra: auto + max-content + ellipsis 해제 + 가로스크롤
+      4) GeneratedNumbers (핵심!)
+      - 기본(닫힘): compact + fixed + ellipsis
+      - show-extra(열림): auto + max-content + 가로스크롤
+      - 공통 목표:
+        1) 1~6 번호열(2~7)이 최우선(항상 충분히 넓게)
+        2) 조합/연번/총합/표준편차는 후순위(상대적으로 좁게)
+        3) show-extra의 gen-extra(11~14)는 더 후순위(좁게)
     ========================= */
-  .gen-table-wrap{
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
 
-  #GeneratedNumbers{
-    table-layout: fixed;   /* 닫힘: 폭 안정 */
-    width: 100%;
-    margin: 0;
-  }
+    /* 가로 스크롤 래퍼 */
+    .gen-table-wrap{
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-  #GeneratedNumbers th,
-  #GeneratedNumbers td{
-    padding: 2px 4px !important;
-    height: 26px !important;
-    line-height: 1.1 !important;
-    font-size: 12px !important;
-    white-space: nowrap;
-    overflow: hidden;          /* 닫힘: ... 처리 */
-    text-overflow: ellipsis;   /* 닫힘: ... 처리 */
-  }
+    /* 기본(닫힘) */
+    #GeneratedNumbers{
+      table-layout: fixed;
+      width: 100%;
+      margin: 0;
+    }
 
-  #GeneratedNumbers thead th{
-    height: 24px !important;
-    font-size: 11px !important;
-  }
+    /* 셀 공통 스타일(닫힘 기본: ... 처리) */
+    #GeneratedNumbers th,
+    #GeneratedNumbers td{
+      padding: 2px 4px !important;
+      height: 26px !important;
+      line-height: 1.1 !important;
+      font-size: 12px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  /* 주요 열 폭(닫힘 상태 기준) */
-  #GeneratedNumbers th:first-child,
-  #GeneratedNumbers td:first-child{ width: 64px; }
+    #GeneratedNumbers thead th{
+      height: 24px !important;
+      font-size: 11px !important;
+    }
 
-  #GeneratedNumbers th:nth-child(8),
-  #GeneratedNumbers td:nth-child(8){ width: 48px; }
+    /* ✅ 1~6 번호열(2~7): 항상 우선(PC/모바일 공통 기본값) */
+    #GeneratedNumbers th:nth-child(2),
+    #GeneratedNumbers td:nth-child(2),
+    #GeneratedNumbers th:nth-child(3),
+    #GeneratedNumbers td:nth-child(3),
+    #GeneratedNumbers th:nth-child(4),
+    #GeneratedNumbers td:nth-child(4),
+    #GeneratedNumbers th:nth-child(5),
+    #GeneratedNumbers td:nth-child(5),
+    #GeneratedNumbers th:nth-child(6),
+    #GeneratedNumbers td:nth-child(6),
+    #GeneratedNumbers th:nth-child(7),
+    #GeneratedNumbers td:nth-child(7){
+      width: 44px;        /* PC 기본 */
+      min-width: 44px;
+    }
 
-  #GeneratedNumbers th:nth-child(9),
-  #GeneratedNumbers td:nth-child(9){ width: 52px; }
+    /* 후순위(닫힘 상태에서 좁게) */
+    #GeneratedNumbers th:first-child,
+    #GeneratedNumbers td:first-child{
+      width: 64px;
+      min-width: 64px;
+    }
 
-  #GeneratedNumbers th:nth-child(10),
-  #GeneratedNumbers td:nth-child(10){ width: 64px; }
+    #GeneratedNumbers th:nth-child(8),
+    #GeneratedNumbers td:nth-child(8){
+      width: 48px;
+      min-width: 48px;
+    }
 
-  /* 추가열은 기본 숨김 */
-  #GeneratedNumbers .gen-extra{ display: none; }
+    #GeneratedNumbers th:nth-child(9),
+    #GeneratedNumbers td:nth-child(9){
+      width: 52px;
+      min-width: 52px;
+    }
 
-  /* ✅ 열림(show-extra): 테이블이 내용만큼 넓어지고, 셀 잘림(...) 해제 */
-  #GeneratedNumbers.show-extra{
-    table-layout: auto;
-    width: max-content;   /* 내용만큼 넓어짐 */
-    min-width: 100%;
-  }
+    #GeneratedNumbers th:nth-child(10),
+    #GeneratedNumbers td:nth-child(10){
+      width: 64px;
+      min-width: 64px;
+    }
 
-  #GeneratedNumbers.show-extra .gen-extra{
-    display: table-cell;
-  }
+    /* 추가열은 기본 숨김 */
+    #GeneratedNumbers .gen-extra{ display: none; }
 
-  /* ✅ 열림(show-extra)일 때는 ... 규칙 해제해서 “펼쳐진 느낌” 확실히 */
-  #GeneratedNumbers.show-extra th,
-  #GeneratedNumbers.show-extra td{
-    overflow: visible;
-    text-overflow: clip;
-  }
+    /* ✅ 열림(show-extra): 테이블이 내용만큼 넓어짐 + 스크롤 */
+    #GeneratedNumbers.show-extra{
+      table-layout: auto;
+      width: max-content;
+      min-width: 100%;
+    }
 
-  /* (선택) 열림 상태에서 gen-extra 열 최소폭을 살짝 줘서 더 보기 좋게 */
-  #GeneratedNumbers.show-extra th.gen-extra,
-  #GeneratedNumbers.show-extra td.gen-extra{
-    min-width: 70px;
-  }
+    /* 열림: 추가열 표시 */
+    #GeneratedNumbers.show-extra .gen-extra{
+      display: table-cell;
+    }
 
+    /* 열림: ellipsis 해제(펼쳐진 느낌) */
+    #GeneratedNumbers.show-extra th,
+    #GeneratedNumbers.show-extra td{
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    /* ✅ show-extra에서도 1~6 번호열(2~7)은 “항상” 폭 우선 */
+    #GeneratedNumbers.show-extra th:nth-child(2),
+    #GeneratedNumbers.show-extra td:nth-child(2),
+    #GeneratedNumbers.show-extra th:nth-child(3),
+    #GeneratedNumbers.show-extra td:nth-child(3),
+    #GeneratedNumbers.show-extra th:nth-child(4),
+    #GeneratedNumbers.show-extra td:nth-child(4),
+    #GeneratedNumbers.show-extra th:nth-child(5),
+    #GeneratedNumbers.show-extra td:nth-child(5),
+    #GeneratedNumbers.show-extra th:nth-child(6),
+    #GeneratedNumbers.show-extra td:nth-child(6),
+    #GeneratedNumbers.show-extra th:nth-child(7),
+    #GeneratedNumbers.show-extra td:nth-child(7){
+      width: 44px;
+      min-width: 44px;
+    }
+
+    /* ✅ show-extra의 gen-extra(11~14) 열은 후순위: “좁게” 고정 (PC/모바일 공통) */
+    #GeneratedNumbers.show-extra th:nth-child(11),
+    #GeneratedNumbers.show-extra td:nth-child(11),
+    #GeneratedNumbers.show-extra th:nth-child(12),
+    #GeneratedNumbers.show-extra td:nth-child(12){
+      width: 44px;      /* 홀/짝 */
+      min-width: 44px;
+    }
+
+    #GeneratedNumbers.show-extra th:nth-child(13),
+    #GeneratedNumbers.show-extra td:nth-child(13),
+    #GeneratedNumbers.show-extra th:nth-child(14),
+    #GeneratedNumbers.show-extra td:nth-child(14){
+      width: 52px;      /* 총합 기준/표준편차 기준 */
+      min-width: 52px;
+    }
 
     /* =========================
       5) Mobile
-      ========================= */
+    ========================= */
     @media (max-width: 576px) {
+
       .card-header.py-3 { padding: 10px 12px !important; }
       .card-body { padding: 12px !important; }
 
@@ -266,6 +332,7 @@
         margin-bottom: 0 !important;
         white-space: normal !important;
       }
+
       #weightValue {
         width: 100% !important;
         height: 34px !important;
@@ -291,7 +358,7 @@
         padding: 10px 0;
       }
 
-      /* GeneratedNumbers 모바일 높이 조금 더 압축 */
+      /* GeneratedNumbers 모바일: 높이/폰트만 더 압축 */
       #GeneratedNumbers th,
       #GeneratedNumbers td {
         height: 22px !important;
@@ -299,17 +366,8 @@
         padding: 1px 3px !important;
       }
       #GeneratedNumbers thead th { font-size: 10px !important; }
-      #GeneratedNumbers th:first-child,
-      #GeneratedNumbers td:first-child { width: 54px; }
-    }
 
-    /* ✅ Mobile에서 숫자(1~6) 열이 가장 중요: 폭 우선 배정 */
-    @media (max-width: 576px) {
-
-      /* 기본은 fixed 유지(닫힘 상태에서 카드 폭에 맞추기) */
-      #GeneratedNumbers { table-layout: fixed; }
-
-      /* 1) 중요: 2~7열(첫번째~여섯번째) 폭을 넓게 고정 */
+      /* ✅ 모바일에서 폭 재배치: 숫자열(2~7) 최우선, 나머지는 더 좁게 */
       #GeneratedNumbers th:nth-child(2),
       #GeneratedNumbers td:nth-child(2),
       #GeneratedNumbers th:nth-child(3),
@@ -322,36 +380,35 @@
       #GeneratedNumbers td:nth-child(6),
       #GeneratedNumbers th:nth-child(7),
       #GeneratedNumbers td:nth-child(7){
-        width: 40px !important;   /* 숫자 2자리(1~45) 안정적으로 보이는 폭 */
+        width: 40px !important;
         min-width: 40px !important;
       }
 
-      /* 2) 덜 중요: 조합/연번/총합/표준편차는 더 좁게 */
       #GeneratedNumbers th:first-child,
       #GeneratedNumbers td:first-child{
-        width: 40px !important;   /* "조합 1"도 대충 보이게만 */
+        width: 40px !important;
         min-width: 40px !important;
       }
 
       #GeneratedNumbers th:nth-child(8),
       #GeneratedNumbers td:nth-child(8){
-        width: 34px !important;   /* 연번 */
+        width: 34px !important;
         min-width: 34px !important;
       }
 
       #GeneratedNumbers th:nth-child(9),
       #GeneratedNumbers td:nth-child(9){
-        width: 40px !important;   /* 총합(3자리) */
+        width: 40px !important;
         min-width: 40px !important;
       }
 
       #GeneratedNumbers th:nth-child(10),
       #GeneratedNumbers td:nth-child(10){
-        width: 42px !important;   /* 표준편차(예: 11.23) */
+        width: 42px !important;
         min-width: 42px !important;
       }
 
-      /* 3) ✅ show-extra 열림 상태에서도 숫자열 폭은 유지 (가변 억제) */
+      /* show-extra에서도 동일하게 숫자열 폭 유지 */
       #GeneratedNumbers.show-extra th:nth-child(2),
       #GeneratedNumbers.show-extra td:nth-child(2),
       #GeneratedNumbers.show-extra th:nth-child(3),
@@ -368,7 +425,6 @@
         min-width: 40px !important;
       }
     }
-
 
   </style>
 </head>
@@ -1429,6 +1485,7 @@
                                     추가 정보 열기
                                   </button>
                                 </div>
+                                <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
                                 <div class="gen-table-wrap">
                                   <table id="GeneratedNumbers">
                                     <thead>
