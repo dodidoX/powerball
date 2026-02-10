@@ -32,22 +32,19 @@
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     
     <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: Arial, sans-serif;
+    table { 
+      width: 100%; 
+      border-collapse:
+      collapse; font-family: 
+      Arial, sans-serif; 
       margin: 20px 0;
       border: 1px solid black;
-      border-collapse: collapse;
-      height: 27px
     }
 
-
-    th, td {
-      border: 1px solid #ccc;
-      text-align: center;
-      padding: 8px;
-      height: 42px;
+    th, td { 
+      border: 1px solid #ccc; 
+      text-align: center; 
+      padding: 6px; 
     }
 
     th {
@@ -284,6 +281,72 @@
         gap:6px;
       }
     }
+    </style>
+    <style>
+    /* =========================
+      GeneratedNumbers: Compact
+      ========================= */
+    #GeneratedNumbers {
+      table-layout: fixed;          /* 열 폭 안정화 */
+      width: 100%;
+    }
+
+    #GeneratedNumbers th:nth-child(8),
+    #GeneratedNumbers td:nth-child(8) { width: 48px; }   /* 연번 */
+    #GeneratedNumbers th:nth-child(9),
+    #GeneratedNumbers td:nth-child(9) { width: 52px; }   /* 총합 */
+    #GeneratedNumbers th:nth-child(10),
+    #GeneratedNumbers td:nth-child(10){ width: 64px; }   /* 표준편차 */
+
+
+    #GeneratedNumbers th,
+    #GeneratedNumbers td {
+      padding: 2px 4px !important;  /* 높이 줄이는 핵심 */
+      height: 26px !important;      /* 한 줄 높이 */
+      line-height: 1.1 !important;
+      font-size: 12px !important;   /* 글자 작게 */
+      white-space: nowrap;          /* 줄바꿈 금지 */
+      overflow: hidden;             /* 넘치면 숨김 */
+      text-overflow: ellipsis;      /* ... */
+    }
+
+    /* 헤더는 더 얇게 */
+    #GeneratedNumbers thead th {
+      height: 24px !important;
+      padding: 2px 4px !important;
+      font-size: 11px !important;
+    }
+
+    /* "추첨 조합" 열(1번째 열) 폭/한줄 고정 */
+    #GeneratedNumbers th:first-child,
+    #GeneratedNumbers td:first-child {
+      width: 64px;                  /* 조합1~조합99 정도 커버 */
+      text-align: center;
+      white-space: nowrap !important;
+    }
+
+    /* 모바일에서는 더 작게 */
+    @media (max-width: 576px) {
+      #GeneratedNumbers th,
+      #GeneratedNumbers td {
+        height: 22px !important;
+        font-size: 11px !important;
+        padding: 1px 3px !important;
+      }
+      #GeneratedNumbers thead th {
+        font-size: 10px !important;
+      }
+      #GeneratedNumbers th:first-child,
+      #GeneratedNumbers td:first-child {
+        width: 54px;
+      }
+    }
+      #GeneratedNumbers .gen-extra {
+        display: none;
+      }
+      #GeneratedNumbers.show-extra .gen-extra {
+        display: table-cell;
+      }
     </style>
 </head>
 
@@ -819,10 +882,10 @@
                                           <td>${cons}</td>
                                           <td>${st.sum}</td>
                                           <td>${st.std.toFixed(2)}</td>
-                                          <td>${st.odd}</td>
-                                          <td>${st.even}</td>
-                                          <td>${sumRec}</td>
-                                          <td>${stddevRec}</td>
+                                          <td class="gen-extra">${st.odd}</td>
+                                          <td class="gen-extra">${st.even}</td>
+                                          <td class="gen-extra">${sumRec}</td>
+                                          <td class="gen-extra">${stddevRec}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
@@ -878,6 +941,20 @@
                                     if (gen) {
                                       if (isMobile) gen.classList.remove('show'); // 모바일 기본 접힘
                                       else gen.classList.add('show');             // PC 기본 펼침(원하면)
+                                    }
+
+                                    const genTable = document.getElementById('GeneratedNumbers');
+                                    const toggleBtn = document.getElementById('toggleGenExtra');
+
+                                    if (genTable && toggleBtn) {
+                                      // 기본은 닫힘
+                                      genTable.classList.remove('show-extra');
+                                      toggleBtn.textContent = '추가 정보 열기';
+
+                                      toggleBtn.addEventListener('click', () => {
+                                        const open = genTable.classList.toggle('show-extra');
+                                        toggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                      });
                                     }
 
                                     includedInput = byId("included");
@@ -1323,28 +1400,35 @@
                           <div class="col-12">
                             <div class="card shadow mb-4">
                               <div class="generation card-body">
-                                <table id="GeneratedNumbers">
-                                  <thead>
-                                    <tr>
-                                      <th>추첨 조합</th>
-                                      <th>첫번째</th>
-                                      <th>두번째</th>
-                                      <th>세번째</th>
-                                      <th>네번째</th>
-                                      <th>다섯번째</th>
-                                      <th>여섯번째</th>
-                                      <th>연번</th>
-                                      <th>총합</th>
-                                      <th>표준편차</th>
-                                      <th>홀수</th>
-                                      <th>짝수</th>
-                                      <th>총합 기준</th>
-                                      <th>표준편차 기준</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody></tbody>
-                                </table>
 
+                                <div class="d-flex justify-content-end mb-2">
+                                  <button type="button" id="toggleGenExtra" class="btn btn-sm btn-outline-secondary">
+                                    추가 정보 열기
+                                  </button>
+                                </div>
+                                <div class="table-responsive">
+                                  <table id="GeneratedNumbers">
+                                    <thead>
+                                      <tr>
+                                        <th>추첨 조합</th>
+                                        <th>첫번째</th>
+                                        <th>두번째</th>
+                                        <th>세번째</th>
+                                        <th>네번째</th>
+                                        <th>다섯번째</th>
+                                        <th>여섯번째</th>
+                                        <th>연번</th>
+                                        <th>총합</th>
+                                        <th>표준편차</th>
+                                        <th class="gen-extra">홀수</th>
+                                        <th class="gen-extra">짝수</th>
+                                        <th class="gen-extra">총합 기준</th>
+                                        <th class="gen-extra">표준편차 기준</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                  </table>
+                                </div>
 
                                 <p>update history</p>
                                 <button
