@@ -302,6 +302,74 @@
       #GeneratedNumbers th:first-child,
       #GeneratedNumbers td:first-child { width: 54px; }
     }
+
+    /* ✅ Mobile에서 숫자(1~6) 열이 가장 중요: 폭 우선 배정 */
+    @media (max-width: 576px) {
+
+      /* 기본은 fixed 유지(닫힘 상태에서 카드 폭에 맞추기) */
+      #GeneratedNumbers { table-layout: fixed; }
+
+      /* 1) 중요: 2~7열(첫번째~여섯번째) 폭을 넓게 고정 */
+      #GeneratedNumbers th:nth-child(2),
+      #GeneratedNumbers td:nth-child(2),
+      #GeneratedNumbers th:nth-child(3),
+      #GeneratedNumbers td:nth-child(3),
+      #GeneratedNumbers th:nth-child(4),
+      #GeneratedNumbers td:nth-child(4),
+      #GeneratedNumbers th:nth-child(5),
+      #GeneratedNumbers td:nth-child(5),
+      #GeneratedNumbers th:nth-child(6),
+      #GeneratedNumbers td:nth-child(6),
+      #GeneratedNumbers th:nth-child(7),
+      #GeneratedNumbers td:nth-child(7){
+        width: 40px !important;   /* 숫자 2자리(1~45) 안정적으로 보이는 폭 */
+        min-width: 40px !important;
+      }
+
+      /* 2) 덜 중요: 조합/연번/총합/표준편차는 더 좁게 */
+      #GeneratedNumbers th:first-child,
+      #GeneratedNumbers td:first-child{
+        width: 40px !important;   /* "조합 1"도 대충 보이게만 */
+        min-width: 40px !important;
+      }
+
+      #GeneratedNumbers th:nth-child(8),
+      #GeneratedNumbers td:nth-child(8){
+        width: 34px !important;   /* 연번 */
+        min-width: 34px !important;
+      }
+
+      #GeneratedNumbers th:nth-child(9),
+      #GeneratedNumbers td:nth-child(9){
+        width: 40px !important;   /* 총합(3자리) */
+        min-width: 40px !important;
+      }
+
+      #GeneratedNumbers th:nth-child(10),
+      #GeneratedNumbers td:nth-child(10){
+        width: 42px !important;   /* 표준편차(예: 11.23) */
+        min-width: 42px !important;
+      }
+
+      /* 3) ✅ show-extra 열림 상태에서도 숫자열 폭은 유지 (가변 억제) */
+      #GeneratedNumbers.show-extra th:nth-child(2),
+      #GeneratedNumbers.show-extra td:nth-child(2),
+      #GeneratedNumbers.show-extra th:nth-child(3),
+      #GeneratedNumbers.show-extra td:nth-child(3),
+      #GeneratedNumbers.show-extra th:nth-child(4),
+      #GeneratedNumbers.show-extra td:nth-child(4),
+      #GeneratedNumbers.show-extra th:nth-child(5),
+      #GeneratedNumbers.show-extra td:nth-child(5),
+      #GeneratedNumbers.show-extra th:nth-child(6),
+      #GeneratedNumbers.show-extra td:nth-child(6),
+      #GeneratedNumbers.show-extra th:nth-child(7),
+      #GeneratedNumbers.show-extra td:nth-child(7){
+        width: 40px !important;
+        min-width: 40px !important;
+      }
+    }
+
+
   </style>
 </head>
 
