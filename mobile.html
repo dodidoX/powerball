@@ -1186,7 +1186,12 @@
                                         this.visible(shouldShow, false);
                                       });
 
-                                      dt.columns.adjust().draw(false);
+                                      dt.columns.adjust();
+                                      dt.draw(false);
+
+                                      requestAnimationFrame(() => {
+                                        dt.columns.adjust().draw(false);
+                                      });
                                     }
 
                                     if (histTable && histToggleBtn) {
@@ -1804,6 +1809,52 @@
                                       line-height: 1.1 !important;
                                     }
                                   }
+
+                                  /* ✅ PC에서 "추가정보 닫힘"일 때만 폭 재분배 */
+                                  @media (min-width: 577px){
+                                    #historyTable:not(.show-extra){
+                                      table-layout: fixed !important;   /* 폭 고정 */
+                                      width: 100% !important;
+                                    }
+
+                                    /* No. (1번 컬럼) 최소화 */
+                                    #historyTable:not(.show-extra) th:nth-child(1),
+                                    #historyTable:not(.show-extra) td:nth-child(1){
+                                      width: 44px !important;
+                                      min-width: 44px !important;
+                                      max-width: 44px !important;
+                                      white-space: nowrap !important;
+                                    }
+
+                                    /* 체크박스 (2번 컬럼) 최소화 */
+                                    #historyTable:not(.show-extra) th:nth-child(2),
+                                    #historyTable:not(.show-extra) td:nth-child(2){
+                                      width: 34px !important;
+                                      min-width: 34px !important;
+                                      max-width: 34px !important;
+                                      white-space: nowrap !important;
+                                    }
+
+                                    /* 첫번째~여섯번째(3~8번 컬럼) 균등 폭 */
+                                    #historyTable:not(.show-extra) th:nth-child(3),
+                                    #historyTable:not(.show-extra) td:nth-child(3),
+                                    #historyTable:not(.show-extra) th:nth-child(4),
+                                    #historyTable:not(.show-extra) td:nth-child(4),
+                                    #historyTable:not(.show-extra) th:nth-child(5),
+                                    #historyTable:not(.show-extra) td:nth-child(5),
+                                    #historyTable:not(.show-extra) th:nth-child(6),
+                                    #historyTable:not(.show-extra) td:nth-child(6),
+                                    #historyTable:not(.show-extra) th:nth-child(7),
+                                    #historyTable:not(.show-extra) td:nth-child(7),
+                                    #historyTable:not(.show-extra) th:nth-child(8),
+                                    #historyTable:not(.show-extra) td:nth-child(8){
+                                      width: calc((100% - 44px - 34px) / 6) !important;
+                                      min-width: 64px !important;       /* 공(26px)+여백 고려 */
+                                      white-space: nowrap !important;
+                                    }
+                                  }
+
+
                                 </style>
 
 
