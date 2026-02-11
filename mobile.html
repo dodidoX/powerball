@@ -723,31 +723,20 @@
                                       searching: false,
                                       lengthChange: false,
                                       autoWidth: false,
-                                      ordering: true,
                                       language: { emptyTable: "생성된 번호가 없습니다." },
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
                                       columnDefs: [
-                                        // ✅ No(0), 총합(9), 표준편차(10), 홀수(11), 짝수(12) 등 숫자 컬럼
-                                        { targets: [0, 9, 10, 11, 12], type: 'num' },
-
-                                        // ✅ 첫~여섯(2~7): HTML 안 숫자를 뽑아서 정렬하게
-                                        {
-                                          targets: [2,3,4,5,6,7],
-                                          type: 'num',
-                                          render: function (data, type) {
-                                            if (type === 'sort' || type === 'type') {
-                                              const m = String(data).match(/\d+/);
-                                              return m ? parseInt(m[0], 10) : 0;
-                                            }
-                                            return data; // display/filter는 원본 HTML 유지
-                                          }
-                                        },
-
-                                        // ✅ 체크박스(1), 비교결과(15~20), 삭제(21)는 정렬 비활성
+                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
                                         { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
-                                      ]
+                                      ],
+
+                                      // ✅ 추가: 초기 렌더 완료 후 “모바일 기본 상태” 확정
+                                      initComplete: function () {
+                                        // setHistoryColumns가 바깥에 정의돼 있어도 여기서 호출 가능(스코프만 맞으면 됨)
+                                        setTimeout(() => setHistoryColumns(false), 0);
+                                      }
                                     });
 
                                     return histDT;
@@ -1093,24 +1082,31 @@
                                     if (genTable && toggleBtn) {
                                       const isMobile = window.matchMedia("(max-width: 576px)").matches;
 
-                                      // ✅ PC: 기본 열림, 모바일: 기본 닫힘
-                                      const initialOpen = !isMobile;
+                                      // ✅ PC: 기본 열림 / 모바일: 기본 닫힘
+                                      if (isMobile) {
+                                        genTable.classList.remove('show-extra');
+                                        toggleBtn.textContent = '추가 정보 열기';
+                                      } else {
+                                        genTable.classList.add('show-extra');
+                                        toggleBtn.textContent = '추가 정보 닫기';
+                                      }
 
-                                      histTable.classList.toggle('show-extra', initialOpen);
-                                      histToggleBtn.textContent = initialOpen ? '추가 정보 닫기' : '추가 정보 열기';
-                                      setHistoryColumns(initialOpen);
-
-                                      histToggleBtn.addEventListener('click', () => {
-                                        const open = histTable.classList.toggle('show-extra');
-                                        histToggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
-                                        setHistoryColumns(open);
+                                      toggleBtn.addEventListener('click', () => {
+                                        const open = genTable.classList.toggle('show-extra');
+                                        toggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
                                       });
 
+                                      // (선택) 리사이즈 시 PC/모바일 기준으로 자동 재정렬하고 싶으면 아래 켜도 됨
                                       window.addEventListener('resize', () => {
-                                        const open = histTable.classList.contains('show-extra');
-                                        setHistoryColumns(open);
+                                        const mobileNow = window.matchMedia("(max-width: 576px)").matches;
+                                        if (mobileNow) {
+                                          genTable.classList.remove('show-extra');
+                                          toggleBtn.textContent = '추가 정보 열기';
+                                        } else {
+                                          genTable.classList.add('show-extra');
+                                          toggleBtn.textContent = '추가 정보 닫기';
+                                        }
                                       });
-
                                     }
 
                                     // 2) 입력/버튼 초기화
@@ -1169,25 +1165,27 @@
                                     ensureHistDT();                   
 
                                     function setHistoryColumns(openExtra) {
-                                      const dt = ensureHistDT();
-                                      if (!dt) return;
+                                      const isMobileNow = window.matchMedia("(max-width: 576px)").matches;
 
-                                      // 스크롤 래퍼 토글(열림일 때만 스크롤 허용)
                                       const wrap = document.querySelector('.hist-table-wrap');
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
-                                      // ✅ "기본(닫힘)" 상태에서 남길 컬럼(0-based)
-                                      // 0: No, 1: 체크박스, 2~7: 첫~여섯
-                                      const keep = new Set([0, 1, 2, 3, 4, 5, 6, 7]);
+
+                                      if (!isMobileNow) return;
+
+                                      const dt = ensureHistDT();
+                                      if (!dt) return;
+
+                                      // 모바일 기본: No(0) + 1~6번호(2~7)만 표시
+                                      const keep = new Set([1, 2, 3, 4, 5, 6, 7]);
 
                                       dt.columns().every(function (idx) {
                                         const shouldShow = openExtra ? true : keep.has(idx);
-                                        this.visible(shouldShow, false); // redraw는 아래에서 한번만
+                                        this.visible(shouldShow, false); 
                                       });
 
                                       dt.columns.adjust().draw(false);
                                     }
-
 
                                     if (histTable && histToggleBtn) {
                                       histTable.classList.remove('show-extra');
@@ -1656,7 +1654,7 @@
                                             data-toggle="tooltip"
                                             data-placement="top"
                                             title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
-                                          No.
+                                            No.
                                         </th>
                                         <th><input type="checkbox" id="selectAllHistory"></th>
                                         <th>첫번째</th>
@@ -1672,19 +1670,19 @@
                                         <th>짝수</th>
                                         <th>총합 기준</th>
                                         <th>표준편차 기준</th>
-                                        <th><select id="number-input1"></select></th>
-                                        <th><select id="number-input2"></select></th>
-                                        <th><select id="number-input3"></select></th>
-                                        <th><select id="number-input4"></select></th>
-                                        <th><select id="number-input5"></select></th>
-                                        <th><select id="number-input6"></select></th>
+                                        <th><select id="number-input1" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input2" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input3" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input4" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input5" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input6" placeholder="1~45 입력"></select></th>
                                         <th>삭제</th>
                                       </tr>
                                     </thead>
-                                    <tbody id="historyBody"></tbody>
+                                    <tbody id="historyBody">
+                                    </tbody>
                                   </table>
-                                </div>
-
+                                </div> 
                                 <style>
                                   .hist-table-wrap{
                                     width: 100%;
