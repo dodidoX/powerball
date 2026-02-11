@@ -710,6 +710,21 @@
 
                                   function byId(id){ return document.getElementById(id); }
 
+                                  // 첫번째~여섯번째 정렬하게 하는 DataTables 플러그인
+                                  $.fn.dataTable.ext.order['num-ball'] = function (settings, col) {
+                                    return this.api()
+                                      .column(col, { order: 'index' })
+                                      .nodes()
+                                      .map(td => {
+                                        const el = td.querySelector('.num-ball');
+                                        const t = el ? el.textContent : td.textContent;
+                                        const n = parseInt(String(t).match(/\d+/)?.[0] || "0", 10);
+                                        return isNaN(n) ? 0 : n;
+                                      })
+                                      .toArray();
+                                  };
+
+
                                   function ensureHistDT() {
                                     if ($.fn.DataTable.isDataTable('#historyTable')) {
                                       return $('#historyTable').DataTable();
@@ -732,16 +747,10 @@
                                         { targets: [0, 9, 10, 11, 12], type: 'num' },
 
                                         // ✅ 첫~여섯(2~7): HTML 안 숫자를 뽑아서 정렬하게
-                                        {
+                                        { 
                                           targets: [2,3,4,5,6,7],
-                                          type: 'num',
-                                          render: function (data, type) {
-                                            if (type === 'sort' || type === 'type') {
-                                              const m = String(data).match(/\d+/);
-                                              return m ? parseInt(m[0], 10) : 0;
-                                            }
-                                            return data; // display/filter는 원본 HTML 유지
-                                          }
+                                          orderDataType: 'num-ball',
+                                          type: 'num'
                                         },
 
                                         // ✅ 체크박스(1), 비교결과(15~20), 삭제(21)는 정렬 비활성
