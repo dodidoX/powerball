@@ -395,35 +395,35 @@
     }
   </style>
   <style>
-    /* 번호 공(동그라미) */
     .num-ball{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      color: #fff;                 /* 숫자 흰색 */
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 1;
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,.25);
-    }
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
 
-    /* 모바일에선 더 작게 */
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+
+      font-weight: 700;
+      font-size: 13px;
+      color: #fff;
+
+      /* ✅ 흰 글자 가독성 강화 */
+      text-shadow: 0 1px 1px rgba(0,0,0,.55);
+      -webkit-text-stroke: 0.2px rgba(0,0,0,.35);
+
+      /* 살짝 입체감 */
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.35), 0 1px 2px rgba(0,0,0,.18);
+
+      line-height: 1;
+    }
     @media (max-width: 576px){
       .num-ball{
-        width: 18px;
-        height: 18px;
-        font-size: 11px;
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
       }
     }
-
-    #GeneratedNumbers td,
-    #historyTable td{
-      vertical-align: middle;
-    }
-
   </style>
 
 
@@ -916,7 +916,7 @@
                                       ball.classList.add("num-ball");
                                       ball.textContent = num;
 
-                                      if (num <= 10) ball.style.backgroundColor = "#f1c40f";       // 노란색
+                                      if (num <= 10) ball.style.backgroundColor = "#d4a90a";       // 노란색
                                       else if (num <= 20) ball.style.backgroundColor = "#3498db";  // 파란색
                                       else if (num <= 30) ball.style.backgroundColor = "#e74c3c";  // 빨간색
                                       else if (num <= 40) ball.style.backgroundColor = "#7f8c8d";  // 회색
@@ -927,7 +927,7 @@
 
                                     function ballHTML(num){
                                       let bg = "#2ecc71";
-                                      if (num <= 10) bg = "#f1c40f";
+                                      if (num <= 10) bg = "#d4a90a";
                                       else if (num <= 20) bg = "#3498db";
                                       else if (num <= 30) bg = "#e74c3c";
                                       else if (num <= 40) bg = "#7f8c8d";
@@ -1071,12 +1071,32 @@
                                     const toggleBtn = document.getElementById('toggleGenExtra');
 
                                     if (genTable && toggleBtn) {
-                                      genTable.classList.remove('show-extra');
-                                      toggleBtn.textContent = '추가 정보 열기';
+                                      const isMobile = window.matchMedia("(max-width: 576px)").matches;
+
+                                      // ✅ PC: 기본 열림 / 모바일: 기본 닫힘
+                                      if (isMobile) {
+                                        genTable.classList.remove('show-extra');
+                                        toggleBtn.textContent = '추가 정보 열기';
+                                      } else {
+                                        genTable.classList.add('show-extra');
+                                        toggleBtn.textContent = '추가 정보 닫기';
+                                      }
 
                                       toggleBtn.addEventListener('click', () => {
                                         const open = genTable.classList.toggle('show-extra');
                                         toggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                      });
+
+                                      // (선택) 리사이즈 시 PC/모바일 기준으로 자동 재정렬하고 싶으면 아래 켜도 됨
+                                      window.addEventListener('resize', () => {
+                                        const mobileNow = window.matchMedia("(max-width: 576px)").matches;
+                                        if (mobileNow) {
+                                          genTable.classList.remove('show-extra');
+                                          toggleBtn.textContent = '추가 정보 열기';
+                                        } else {
+                                          genTable.classList.add('show-extra');
+                                          toggleBtn.textContent = '추가 정보 닫기';
+                                        }
                                       });
                                     }
 
