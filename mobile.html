@@ -1025,6 +1025,22 @@
                                     const genTable = document.getElementById('GeneratedNumbers');
                                     const toggleBtn = document.getElementById('toggleGenExtra');
 
+                                    // ✅ historyTable 추가정보 토글(모바일 기본: 핵심열만)
+                                    const histTable = document.getElementById('historyTable');
+                                    const histToggleBtn = document.getElementById('toggleHistExtra');
+
+                                    if (histTable && histToggleBtn) {
+                                      // 모바일 기본은 닫힘, PC는 취향(여기서는 닫힘으로 통일)
+                                      histTable.classList.remove('show-extra');
+                                      histToggleBtn.textContent = '추가 정보 열기';
+
+                                      histToggleBtn.addEventListener('click', () => {
+                                        const open = histTable.classList.toggle('show-extra');
+                                        histToggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                      });
+                                    }
+
+
                                     if (genTable && toggleBtn) {
                                       // 기본은 닫힘
                                       genTable.classList.remove('show-extra');
@@ -1526,42 +1542,156 @@
 
                                 </script>
 
+                                  <div class="d-flex justify-content-end mb-2">
+                                    <button type="button" id="toggleHistExtra" class="btn btn-sm btn-outline-secondary">
+                                      추가 정보 열기
+                                    </button>
 
-                                <table id="historyTable">
-                                  <thead>
-                                    <tr>
-                                      <th id="noHeader"
-                                          data-toggle="tooltip"
-                                          data-placement="top"
-                                          title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
-                                          No. </th>
-                                      <th><input type="checkbox" id="selectAllHistory"></th>
-                                      <th>첫번째</th>
-                                      <th>두번째</th>
-                                      <th>세번째</th>
-                                      <th>네번째</th>
-                                      <th>다섯번째</th>
-                                      <th>여섯번째</th>
-                                      <th>연번</th>
-                                      <th>총합</th>
-                                      <th>표준편차</th>
-                                      <th>홀수</th>
-                                      <th>짝수</th>
-                                      <th>총합 기준</th>
-                                      <th>표준편차 기준</th>
-                                      <th><select id="number-input1" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input2" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input3" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input4" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input5" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input6" placeholder="1~45 입력"></select></th>
-                                      <th>삭제</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody id="historyBody">
-                                  </tbody>
-                                </table>
+                                  </div>
+                                <div class="hist-table-wrap">
+                                  <table id="historyTable">
+                                    <thead>
+                                      <tr>
+                                        <th id="noHeader"
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
+                                            No.
+                                        </th>
+                                        <th><input type="checkbox" id="selectAllHistory"></th>
+                                        <th>첫번째</th>
+                                        <th>두번째</th>
+                                        <th>세번째</th>
+                                        <th>네번째</th>
+                                        <th>다섯번째</th>
+                                        <th>여섯번째</th>
+                                        <th>연번</th>
+                                        <th>총합</th>
+                                        <th>표준편차</th>
+                                        <th>홀수</th>
+                                        <th>짝수</th>
+                                        <th>총합 기준</th>
+                                        <th>표준편차 기준</th>
+                                        <th><select id="number-input1" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input2" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input3" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input4" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input5" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input6" placeholder="1~45 입력"></select></th>
+                                        <th>삭제</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody id="historyBody">
+                                    </tbody>
+                                  </table>
+                                </div> 
+                                <style>
+                                  /* =========================
+                                    HistoryTable: 기본/추가정보 토글 + 모바일 우선순위
+                                    - 모바일 기본: No + 1~6만 보여줌(최우선)
+                                    - 나머지: "추가 정보 열기" 시 가로 스크롤로 전체 표시
+                                  ========================= */
 
+                                  /* 가로 스크롤 래퍼 */
+                                  .hist-table-wrap{
+                                    width: 100%;
+                                    overflow-x: auto;
+                                    -webkit-overflow-scrolling: touch;
+                                  }
+
+                                  /* 기본 상태(PC 포함): 일반 테이블처럼 */
+                                  #historyTable{
+                                    width: 100%;
+                                    table-layout: fixed; /* 기본은 안정적으로 */
+                                  }
+
+                                  /* ✅ show-extra(추가정보 열림): 내용만큼 넓어지고, 래퍼에서 스크롤 */
+                                  #historyTable.show-extra{
+                                    table-layout: auto;
+                                    width: max-content;
+                                    min-width: 100%;
+                                  }
+
+                                  /* (선택) header select 너무 커서 폭 잡아먹는 것 방지 */
+                                  #historyTable thead select{
+                                    max-width: 70px;
+                                  }
+
+                                  /* =========================
+                                    Mobile: 기본은 “No + 1~6”만
+                                  ========================= */
+                                  @media (max-width: 576px){
+
+                                    /* 모바일 기본: 2번열(전체선택 체크박스) 숨김 */
+                                    #historyTable:not(.show-extra) th:nth-child(2),
+                                    #historyTable:not(.show-extra) td:nth-child(2){
+                                      display: none;
+                                    }
+
+                                    /* 모바일 기본: 9열부터 끝까지(연번~삭제) 전부 숨김 */
+                                    #historyTable:not(.show-extra) th:nth-child(n+9),
+                                    #historyTable:not(.show-extra) td:nth-child(n+9){
+                                      display: none;
+                                    }
+
+                                    /* ✅ 모바일에서 1~6 숫자열(3~8) 최우선 폭 */
+                                    #historyTable th:nth-child(3),
+                                    #historyTable td:nth-child(3),
+                                    #historyTable th:nth-child(4),
+                                    #historyTable td:nth-child(4),
+                                    #historyTable th:nth-child(5),
+                                    #historyTable td:nth-child(5),
+                                    #historyTable th:nth-child(6),
+                                    #historyTable td:nth-child(6),
+                                    #historyTable th:nth-child(7),
+                                    #historyTable td:nth-child(7),
+                                    #historyTable th:nth-child(8),
+                                    #historyTable td:nth-child(8){
+                                      width: 40px !important;
+                                      min-width: 40px !important;
+                                    }
+
+                                    /* No 열은 너무 안 좁게만 */
+                                    #historyTable th:nth-child(1),
+                                    #historyTable td:nth-child(1){
+                                      width: 42px !important;
+                                      min-width: 42px !important;
+                                    }
+
+                                    /* ✅ show-extra 열림(모바일): 전체 열 표시 + 가로 스크롤 */
+                                    #historyTable.show-extra th,
+                                    #historyTable.show-extra td{
+                                      display: table-cell; /* 숨김 해제 */
+                                      white-space: nowrap;
+                                    }
+
+                                    /* 모바일에서 추가정보 열(연번~)은 “후순위”로 좁게 */
+                                    #historyTable.show-extra th:nth-child(9),
+                                    #historyTable.show-extra td:nth-child(9){  /* 연번 */
+                                      width: 42px; min-width: 42px;
+                                    }
+                                    #historyTable.show-extra th:nth-child(10),
+                                    #historyTable.show-extra td:nth-child(10){ /* 총합 */
+                                      width: 48px; min-width: 48px;
+                                    }
+                                    #historyTable.show-extra th:nth-child(11),
+                                    #historyTable.show-extra td:nth-child(11){ /* 표준편차 */
+                                      width: 56px; min-width: 56px;
+                                    }
+                                    #historyTable.show-extra th:nth-child(12),
+                                    #historyTable.show-extra td:nth-child(12),
+                                    #historyTable.show-extra th:nth-child(13),
+                                    #historyTable.show-extra td:nth-child(13){ /* 홀/짝 */
+                                      width: 44px; min-width: 44px;
+                                    }
+                                    #historyTable.show-extra th:nth-child(14),
+                                    #historyTable.show-extra td:nth-child(14),
+                                    #historyTable.show-extra th:nth-child(15),
+                                    #historyTable.show-extra td:nth-child(15){ /* 기준 */
+                                      width: 58px; min-width: 58px;
+                                    }
+                                  }
+                                </style>
 
                                 <button onclick="deleteSelectedRows()" style="margin-top: 5px;">선택 삭제</button>
                                 <button onclick="deleteHistory()" style="margin-top: 5px;">전체 삭제</button>
