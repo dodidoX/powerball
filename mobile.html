@@ -728,15 +728,25 @@
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
                                       columnDefs: [
-                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
-                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
-                                      ],
+                                        // ✅ No(0), 총합(9), 표준편차(10), 홀수(11), 짝수(12) 등 숫자 컬럼
+                                        { targets: [0, 9, 10, 11, 12], type: 'num' },
 
-                                      // ✅ 추가: 초기 렌더 완료 후 “모바일 기본 상태” 확정
-                                      initComplete: function () {
-                                        // setHistoryColumns가 바깥에 정의돼 있어도 여기서 호출 가능(스코프만 맞으면 됨)
-                                        setTimeout(() => setHistoryColumns(false), 0);
-                                      }
+                                        // ✅ 첫~여섯(2~7): HTML 안 숫자를 뽑아서 정렬하게
+                                        {
+                                          targets: [2,3,4,5,6,7],
+                                          type: 'num',
+                                          render: function (data, type) {
+                                            if (type === 'sort' || type === 'type') {
+                                              const m = String(data).match(/\d+/);
+                                              return m ? parseInt(m[0], 10) : 0;
+                                            }
+                                            return data; // display/filter는 원본 HTML 유지
+                                          }
+                                        },
+
+                                        // ✅ 체크박스(1), 비교결과(15~20), 삭제(21)는 정렬 비활성
+                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
+                                      ]
                                     });
 
                                     return histDT;
