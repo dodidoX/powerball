@@ -702,12 +702,18 @@
                                   function byId(id){ return document.getElementById(id); }
 
                                   function ensureHistDT() {
-                                    if ($.fn.DataTable.isDataTable('#historyTable')) return histDT;
+                                    if ($.fn.DataTable.isDataTable('#historyTable')) {
+                                      return $('#historyTable').DataTable();
+                                    }
 
                                     histDT = $('#historyTable').DataTable({
+                                      dom: 't', 
+                                      paging: false,
+                                      info: false,
                                       destroy: true,
                                       searching: false,
-                                      info: true,
+                                      lengthChange: false,
+                                      autoWidth: false,
                                       language: { emptyTable: "생성된 번호가 없습니다." },
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
@@ -991,8 +997,9 @@
                                   function saveCombinations(){
                                     if (!generatedTbody) return;
                                     const dt = ensureHistDT();
-                                    const existing = new Set(dt.rows().data().toArray()
-                                      .map(r => r.slice(0,6).join(',')));
+                                    const existing = new Set(
+                                      dt.rows().data().toArray().map(r => r.slice(2, 8).join(','))
+                                    );
                                     generatedTbody.querySelectorAll('tr').forEach(tr => {
                                       const tds = tr.querySelectorAll('td');
                                       if (tds.length < 14) return;
@@ -1011,6 +1018,7 @@
                                     });
                                   }
 
+//
 
                                   document.addEventListener('DOMContentLoaded', () => {
 
@@ -1022,27 +1030,13 @@
                                       else gen.classList.add('show');             // PC 기본 펼침(원하면)
                                     }
 
+                                    // =========================
+                                    // 1) GeneratedNumbers 추가정보 토글
+                                    // =========================
                                     const genTable = document.getElementById('GeneratedNumbers');
                                     const toggleBtn = document.getElementById('toggleGenExtra');
 
-                                    // ✅ historyTable 추가정보 토글(모바일 기본: 핵심열만)
-                                    const histTable = document.getElementById('historyTable');
-                                    const histToggleBtn = document.getElementById('toggleHistExtra');
-
-                                    if (histTable && histToggleBtn) {
-                                      // 모바일 기본은 닫힘, PC는 취향(여기서는 닫힘으로 통일)
-                                      histTable.classList.remove('show-extra');
-                                      histToggleBtn.textContent = '추가 정보 열기';
-
-                                      histToggleBtn.addEventListener('click', () => {
-                                        const open = histTable.classList.toggle('show-extra');
-                                        histToggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
-                                      });
-                                    }
-
-
                                     if (genTable && toggleBtn) {
-                                      // 기본은 닫힘
                                       genTable.classList.remove('show-extra');
                                       toggleBtn.textContent = '추가 정보 열기';
 
@@ -1052,26 +1046,24 @@
                                       });
                                     }
 
+                                    // =========================
+                                    // 2) 입력/버튼 초기화
+                                    // =========================
                                     includedInput = byId("included");
                                     excludedInput = byId("excluded");
                                     weightedInput = byId("weighted");
                                     weightValueInput = byId("weightValue");
 
-
                                     weightValueInput.addEventListener("focus", () => {
                                       weightValueInput.value = weightValueInput.value.replace(/\s*%$/, "");
                                     });
                                     weightValueInput.addEventListener("input", () => {
-
                                       weightValueInput.value = weightValueInput.value.replace(/[^\d.]/g, "");
                                     });
                                     weightValueInput.addEventListener("blur", () => {
                                       normalizePercentText(weightValueInput);
                                     });
-
-
                                     normalizePercentText(weightValueInput);
-
 
                                     sumMinInput = byId("sum_range_min");
                                     sumMaxInput = byId("sum_range_max");
@@ -1089,24 +1081,74 @@
                                     histTbl = byId("historyTable");
                                     histTbody = byId("historyBody");
 
-                                    pickSelects = Array.from({length:6}, (_,i)=> byId(`number-input${i+1}`));
-
+                                    pickSelects = Array.from({ length: 6 }, (_, i) => byId(`number-input${i + 1}`));
 
                                     pickSelects.forEach(sel => {
                                       if (!sel) return;
                                       sel.innerHTML = "";
-                                      for (let i=NUM_MIN; i<=NUM_MAX; i++){
+                                      for (let i = NUM_MIN; i <= NUM_MAX; i++) {
                                         const op = document.createElement("option");
-                                        op.value = i; op.textContent = i;
+                                        op.value = i;
+                                        op.textContent = i;
                                         sel.appendChild(op);
                                       }
                                       sel.addEventListener('input', compareInputWithTable);
                                       sel.addEventListener('change', compareInputWithTable);
                                     });
 
+                                    // =========================
+                                    // 3) HistoryTable: DataTables 초기화 + 모바일 열 숨김/표시 토글
+                                    // =========================
+                                    const histTable = document.getElementById('historyTable');
+                                    const histToggleBtn = document.getElementById('toggleHistExtra');
 
+                                    // DataTables 먼저 준비
                                     ensureHistDT();
-                                    
+
+                                    function setHistoryColumns(openExtra) {
+                                      const isMobileNow = window.matchMedia("(max-width: 576px)").matches;
+
+                                      const wrap = document.querySelector('.hist-table-wrap');
+                                      if (wrap) wrap.classList.toggle('is-extra', openExtra);
+
+                                      // ✅ PC에서는 "열 숨김"은 하지 않고, 스크롤 래퍼만 토글(원하면 여기서 PC도 숨김 적용 가능)
+                                      if (!isMobileNow) return;
+
+                                      const dt = ensureHistDT();
+                                      if (!dt) return;
+
+                                      // ✅ 모바일 기본: No(0) + 1~6번호(2~7)만 표시
+                                      const keep = new Set([0, 2, 3, 4, 5, 6, 7]);
+
+                                      dt.columns().every(function (idx) {
+                                        const shouldShow = openExtra ? true : keep.has(idx);
+                                        this.visible(shouldShow, false); // redraw는 마지막에
+                                      });
+
+                                      dt.columns.adjust().draw(false);
+                                    }
+
+                                    if (histTable && histToggleBtn) {
+                                      // ✅ 기본 닫힘
+                                      histTable.classList.remove('show-extra');
+                                      histToggleBtn.textContent = '추가 정보 열기';
+
+                                      // ✅ 최초 1회 적용 (모바일이면 여기서 열 숨김 확정)
+                                      setHistoryColumns(false);
+
+                                      // ✅ 토글은 "한 번만" 등록
+                                      histToggleBtn.addEventListener('click', () => {
+                                        const open = histTable.classList.toggle('show-extra');
+                                        histToggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                        setHistoryColumns(open);
+                                      });
+
+                                      // ✅ 회전/리사이즈 대응
+                                      window.addEventListener('resize', () => {
+                                        const open = histTable.classList.contains('show-extra');
+                                        setHistoryColumns(open);
+                                      });
+                                    }
 
                                     const selectAll = byId('selectAllHistory');
                                     if (selectAll) {
@@ -1622,16 +1664,29 @@
                                   ========================= */
                                   @media (max-width: 576px){
 
-                                    /* 모바일 기본: 2번열(전체선택 체크박스) 숨김 */
-                                    #historyTable:not(.show-extra) th:nth-child(2),
-                                    #historyTable:not(.show-extra) td:nth-child(2){
-                                      display: none;
+
+                                    /* historyTable 가로 스크롤은 '추가정보'일 때만 */
+                                    .hist-table-wrap{
+                                      width: 100%;
+                                      overflow-x: hidden;  /* ✅ 기본: 스크롤 없음 */
+                                      -webkit-overflow-scrolling: touch;
                                     }
 
-                                    /* 모바일 기본: 9열부터 끝까지(연번~삭제) 전부 숨김 */
-                                    #historyTable:not(.show-extra) th:nth-child(n+9),
-                                    #historyTable:not(.show-extra) td:nth-child(n+9){
-                                      display: none;
+                                    .hist-table-wrap.is-extra{
+                                      overflow-x: auto;    /* ✅ 추가정보: 스크롤 허용 */
+                                    }
+
+                                    /* 기본은 화면폭에 맞추기 */
+                                    #historyTable{
+                                      width: 100% !important;
+                                      table-layout: fixed;
+                                    }
+
+                                    /* 추가정보일 때는 내용폭만큼 넓어지게 */
+                                    #historyTable.show-extra{
+                                      width: max-content !important;
+                                      min-width: 100%;
+                                      table-layout: auto;
                                     }
 
                                     /* ✅ 모바일에서 1~6 숫자열(3~8) 최우선 폭 */
