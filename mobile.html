@@ -1118,7 +1118,7 @@
                                       if (!dt) return;
 
                                       // ✅ 모바일 기본: No(0) + 1~6번호(2~7)만 표시
-                                      const keep = new Set([0, 2, 3, 4, 5, 6, 7]);
+                                      const keep = new Set([1, 2, 3, 4, 5, 6, 7]);
 
                                       dt.columns().every(function (idx) {
                                         const shouldShow = openExtra ? true : keep.has(idx);
@@ -1630,7 +1630,7 @@
                                 <style>
                                   /* =========================
                                     HistoryTable: 기본/추가정보 토글 + 모바일 우선순위
-                                    - 모바일 기본: No + 1~6만 보여줌(최우선)
+                                    - 모바일 기본: 체크박스 + 1~6을 한 화면에(최우선)
                                     - 나머지: "추가 정보 열기" 시 가로 스크롤로 전체 표시
                                   ========================= */
 
@@ -1641,10 +1641,10 @@
                                     -webkit-overflow-scrolling: touch;
                                   }
 
-                                  /* 기본 상태(PC 포함): 일반 테이블처럼 */
+                                  /* 기본 상태(PC 포함) */
                                   #historyTable{
                                     width: 100%;
-                                    table-layout: fixed; /* 기본은 안정적으로 */
+                                    table-layout: fixed;
                                   }
 
                                   /* ✅ show-extra(추가정보 열림): 내용만큼 넓어지고, 래퍼에서 스크롤 */
@@ -1654,42 +1654,64 @@
                                     min-width: 100%;
                                   }
 
-                                  /* (선택) header select 너무 커서 폭 잡아먹는 것 방지 */
+                                  /* header select 폭 제한 */
                                   #historyTable thead select{
                                     max-width: 70px;
                                   }
 
                                   /* =========================
-                                    Mobile: 기본은 “No + 1~6”만
+                                    Mobile
                                   ========================= */
                                   @media (max-width: 576px){
 
-
-                                    /* historyTable 가로 스크롤은 '추가정보'일 때만 */
+                                    /* 모바일 기본(닫힘): 스크롤 없이 한 화면 */
                                     .hist-table-wrap{
-                                      width: 100%;
-                                      overflow-x: hidden;  /* ✅ 기본: 스크롤 없음 */
-                                      -webkit-overflow-scrolling: touch;
+                                      overflow-x: hidden !important;
                                     }
-
                                     .hist-table-wrap.is-extra{
-                                      overflow-x: auto;    /* ✅ 추가정보: 스크롤 허용 */
+                                      overflow-x: auto !important;
                                     }
 
-                                    /* 기본은 화면폭에 맞추기 */
+                                    /* 모바일에서 표 자체도 압축 */
                                     #historyTable{
+                                      table-layout: fixed !important;
                                       width: 100% !important;
-                                      table-layout: fixed;
+                                      margin: 0 !important;
                                     }
 
-                                    /* 추가정보일 때는 내용폭만큼 넓어지게 */
-                                    #historyTable.show-extra{
-                                      width: max-content !important;
-                                      min-width: 100%;
-                                      table-layout: auto;
+                                    #historyTable th,
+                                    #historyTable td{
+                                      padding: 1px 2px !important;
+                                      height: 22px !important;
+                                      line-height: 1.05 !important;
+                                      font-size: 11px !important;
+                                      white-space: nowrap !important;
+                                      overflow: hidden !important;
+                                      text-overflow: ellipsis !important;
                                     }
 
-                                    /* ✅ 모바일에서 1~6 숫자열(3~8) 최우선 폭 */
+                                    #historyTable thead th{
+                                      font-size: 10px !important;
+                                      height: 22px !important;
+                                    }
+
+                                    /* ✅ 모바일 기본에서는 No(1열) 숨김 → 체크박스+1~6 공간 확보 */
+                                    #historyTable:not(.show-extra) th:nth-child(1),
+                                    #historyTable:not(.show-extra) td:nth-child(1){
+                                      display: none !important;
+                                    }
+
+                                    /* ✅ 체크박스 열(2열) 항상 보이게 + 폭 고정 */
+                                    #historyTable th:nth-child(2),
+                                    #historyTable td:nth-child(2){
+                                      width: 28px !important;
+                                      min-width: 28px !important;
+                                    }
+                                    #historyTable th:nth-child(2) input{
+                                      transform: scale(0.95);
+                                    }
+
+                                    /* ✅ 1~6 숫자열(3~8) 타이트 고정 */
                                     #historyTable th:nth-child(3),
                                     #historyTable td:nth-child(3),
                                     #historyTable th:nth-child(4),
@@ -1702,51 +1724,30 @@
                                     #historyTable td:nth-child(7),
                                     #historyTable th:nth-child(8),
                                     #historyTable td:nth-child(8){
-                                      width: 40px !important;
-                                      min-width: 40px !important;
+                                      width: 36px !important;
+                                      min-width: 36px !important;
                                     }
 
-                                    /* No 열은 너무 안 좁게만 */
-                                    #historyTable th:nth-child(1),
-                                    #historyTable td:nth-child(1){
-                                      width: 42px !important;
-                                      min-width: 42px !important;
+                                    /* ✅ show-extra 열림: 전체 열 표시 + 가로 스크롤 */
+                                    #historyTable.show-extra{
+                                      width: max-content !important;
+                                      min-width: 100% !important;
+                                      table-layout: auto !important;
                                     }
-
-                                    /* ✅ show-extra 열림(모바일): 전체 열 표시 + 가로 스크롤 */
                                     #historyTable.show-extra th,
                                     #historyTable.show-extra td{
-                                      display: table-cell; /* 숨김 해제 */
-                                      white-space: nowrap;
+                                      overflow: visible !important;
+                                      text-overflow: clip !important;
                                     }
 
-                                    /* 모바일에서 추가정보 열(연번~)은 “후순위”로 좁게 */
-                                    #historyTable.show-extra th:nth-child(9),
-                                    #historyTable.show-extra td:nth-child(9){  /* 연번 */
-                                      width: 42px; min-width: 42px;
-                                    }
-                                    #historyTable.show-extra th:nth-child(10),
-                                    #historyTable.show-extra td:nth-child(10){ /* 총합 */
-                                      width: 48px; min-width: 48px;
-                                    }
-                                    #historyTable.show-extra th:nth-child(11),
-                                    #historyTable.show-extra td:nth-child(11){ /* 표준편차 */
-                                      width: 56px; min-width: 56px;
-                                    }
-                                    #historyTable.show-extra th:nth-child(12),
-                                    #historyTable.show-extra td:nth-child(12),
-                                    #historyTable.show-extra th:nth-child(13),
-                                    #historyTable.show-extra td:nth-child(13){ /* 홀/짝 */
-                                      width: 44px; min-width: 44px;
-                                    }
-                                    #historyTable.show-extra th:nth-child(14),
-                                    #historyTable.show-extra td:nth-child(14),
-                                    #historyTable.show-extra th:nth-child(15),
-                                    #historyTable.show-extra td:nth-child(15){ /* 기준 */
-                                      width: 58px; min-width: 58px;
+                                    /* show-extra에서는 No도 다시 보이게 */
+                                    #historyTable.show-extra th:nth-child(1),
+                                    #historyTable.show-extra td:nth-child(1){
+                                      display: table-cell !important;
                                     }
                                   }
                                 </style>
+
 
                                 <button onclick="deleteSelectedRows()" style="margin-top: 5px;">선택 삭제</button>
                                 <button onclick="deleteHistory()" style="margin-top: 5px;">전체 삭제</button>
