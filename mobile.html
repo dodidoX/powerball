@@ -711,6 +711,25 @@
                                   function byId(id){ return document.getElementById(id); }
 
                                   function ensureHistDT() {
+                                    if (!window.jQuery || !$.fn || !$.fn.dataTable) return null;
+
+                                    // 정렬 플러그인(첫번째~여섯번째)
+                                    if (!$.fn.dataTable.ext.order['num-ball']) {
+                                      $.fn.dataTable.ext.order['num-ball'] = function (settings, col) {
+                                        return this.api()
+                                          .column(col, { order: 'index' })
+                                          .nodes()
+                                          .map(td => {
+                                            const el = td.querySelector('.num-ball');
+                                            const t = el ? el.textContent : td.textContent;
+                                            const m = String(t).match(/\d+/);
+                                            const n = m ? parseInt(m[0], 10) : 0;
+                                            return Number.isFinite(n) ? n : 0;
+                                          })
+                                          .toArray();
+                                      };
+                                    }
+
                                     if ($.fn.DataTable.isDataTable('#historyTable')) {
                                       return $('#historyTable').DataTable();
                                     }
@@ -734,13 +753,14 @@
                                         // ✅ 첫~여섯(2~7): HTML 안 숫자를 뽑아서 정렬하게
                                         {
                                           targets: [2,3,4,5,6,7],
-                                          type: 'num',
+                                          orderDataType: 'num-ball',
                                           render: function (data, type) {
-                                            if (type === 'sort' || type === 'type') {
+                                            // ✅ 검색/필터 때는 숫자만 남기기 (필터 정확도 ↑)
+                                            if (type === 'filter' || type === 'search') {
                                               const m = String(data).match(/\d+/);
-                                              return m ? parseInt(m[0], 10) : 0;
+                                              return m ? m[0] : '';
                                             }
-                                            return data; // display/filter는 원본 HTML 유지
+                                            return data; // display는 기존 공 HTML 유지
                                           }
                                         },
 
