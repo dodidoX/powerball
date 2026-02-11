@@ -707,7 +707,7 @@
                                     }
 
                                     histDT = $('#historyTable').DataTable({
-                                      dom: 't', 
+                                      dom: 't',
                                       paging: false,
                                       info: false,
                                       destroy: true,
@@ -718,16 +718,24 @@
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
+
+                                      // ✅ 이거 추가
+                                      initComplete: function () {
+                                        // DataTables가 “초기 렌더 완료”한 직후, 모바일 기본 컬럼 상태 확정
+                                        if (typeof setHistoryColumns === "function") {
+                                          setHistoryColumns(false);
+                                        }
+                                      },
+
                                       columnDefs: [
-
                                         { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
-
-
                                         { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
                                       ]
                                     });
+
                                     return histDT;
                                   }
+
 
 
                                   let includedInput, excludedInput, weightedInput, weightValueInput;
@@ -1103,7 +1111,7 @@
                                     const histToggleBtn = document.getElementById('toggleHistExtra');
 
                                     // DataTables 먼저 준비
-                                    ensureHistDT();
+                                    ensureHistDT();                   
 
                                     function setHistoryColumns(openExtra) {
                                       const isMobileNow = window.matchMedia("(max-width: 576px)").matches;
@@ -1709,6 +1717,12 @@
                                     }
                                     #historyTable th:nth-child(2) input{
                                       transform: scale(0.95);
+                                    }
+
+                                    /* ✅ (중요) 모바일 기본(닫힘)에서도 체크박스 열(2열)은 무조건 표시 */
+                                    #historyTable:not(.show-extra) th:nth-child(2),
+                                    #historyTable:not(.show-extra) td:nth-child(2){
+                                      display: table-cell !important;
                                     }
 
                                     /* ✅ 1~6 숫자열(3~8) 타이트 고정 */
