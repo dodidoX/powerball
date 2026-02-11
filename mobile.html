@@ -1171,37 +1171,34 @@
                                     const histTable = document.getElementById('historyTable');
                                     const histToggleBtn = document.getElementById('toggleHistExtra');
 
-
-                                    ensureHistDT();                   
-
                                     function setHistoryColumns(openExtra) {
-                                      const isMobileNow = window.matchMedia("(max-width: 576px)").matches;
+                                      const dt = ensureHistDT();
+                                      if (!dt) return;
 
                                       const wrap = document.querySelector('.hist-table-wrap');
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
-
-                                      if (!isMobileNow) return;
-
-                                      const dt = ensureHistDT();
-                                      if (!dt) return;
-
-                                      // 모바일 기본: No(0) + 1~6번호(2~7)만 표시
-                                      const keep = new Set([1, 2, 3, 4, 5, 6, 7]);
+                                      // 0: No, 1: 체크박스, 2~7: 첫번째~여섯번째
+                                      const keep = new Set([0, 1, 2, 3, 4, 5, 6, 7]);
 
                                       dt.columns().every(function (idx) {
                                         const shouldShow = openExtra ? true : keep.has(idx);
-                                        this.visible(shouldShow, false); 
+                                        this.visible(shouldShow, false);
                                       });
 
                                       dt.columns.adjust().draw(false);
                                     }
 
                                     if (histTable && histToggleBtn) {
-                                      histTable.classList.remove('show-extra');
-                                      histToggleBtn.textContent = '추가 정보 열기';
+                                      // 초기 상태: PC는 열림, 모바일은 닫힘
+                                      const isMobile = window.matchMedia("(max-width: 576px)").matches;
+                                      const initialOpen = !isMobile;
 
-                                      setHistoryColumns(false);
+                                      histTable.classList.toggle('show-extra', initialOpen);
+                                      histToggleBtn.textContent = initialOpen ? '추가 정보 닫기' : '추가 정보 열기';
+
+                                      setHistoryColumns(initialOpen);
+                                      setTimeout(() => setHistoryColumns(initialOpen), 0);
 
                                       histToggleBtn.addEventListener('click', () => {
                                         const open = histTable.classList.toggle('show-extra');
@@ -1209,12 +1206,12 @@
                                         setHistoryColumns(open);
                                       });
 
-                                      // 회전/리사이즈 대응
                                       window.addEventListener('resize', () => {
                                         const open = histTable.classList.contains('show-extra');
                                         setHistoryColumns(open);
                                       });
                                     }
+
 
                                     const selectAll = byId('selectAllHistory');
                                     if (selectAll) {
