@@ -404,25 +404,35 @@
       height: 26px;
       border-radius: 50%;
 
-      font-weight: 700;
+      font-weight: 800;
       font-size: 13px;
-
-      color: #ffffff;
-      box-shadow: none;
-      text-shadow: none;
-      -webkit-text-stroke: 0.4px rgba(0,0,0,.45);
-
       line-height: 1;
-      letter-spacing: 0.3px;
+      letter-spacing: 0;
+
+      color: #fff;
+
+      /* ✅ 3D/입체감 전부 제거 */
+      box-shadow: none !important;
+      background-image: none !important;
+      filter: none !important;
+
+      /* ✅ 숫자 효과 전부 제거 */
+      text-shadow: none !important;
+
+      /* ✅ 글자 테두리: 검정색으로 또렷하게 */
+      -webkit-text-stroke: 1px #000;
+      paint-order: stroke fill; /* 일부 브라우저에서 stroke 우선 렌더 */
     }
+
+    /* 모바일에서 더 작게 */
     @media (max-width: 576px){
       .num-ball{
         width: 22px;
         height: 22px;
         font-size: 12px;
+        -webkit-text-stroke: 0.9px #000;
       }
     }
-
   </style>
 
 
