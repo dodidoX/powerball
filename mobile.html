@@ -544,10 +544,16 @@
 
                         <div class="col-12 col-lg-6 order-2 order-lg-2">
 
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6>
-                                </div>
+                          <div class="card shadow mb-4" id="pickCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                                  data-toggle="collapse" data-target="#pickCollapse"
+                                  aria-expanded="true" aria-controls="pickCollapse"
+                                  style="cursor:pointer;">
+                                  <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6></div>
+                              
+                            <div id="pickCollapse" class="collapse show">
+                              <div class="card-body">
+
                                 <div class="selection option-container"> 
                                   <p>
                                     <input
@@ -643,9 +649,11 @@
                                   <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
                                 
                                 </div>
-                            </div> <!-- card shadow mb-4 -->
+                              </div> <!-- card shadow mb-4 -->
                             </div> <!-- col-12 col-lg-6 -->
-                      </div><!-- /.row --> 
+                          </div>
+                      </div>
+                    </div><!-- /.row --> 
 
 
                                   <script>
@@ -1693,8 +1701,8 @@
                                         <th>표준편차</th>
                                         <th>홀수</th>
                                         <th>짝수</th>
-                                        <th>총합 기준</th>
-                                        <th>표준편차 기준</th>
+                                        <th class="th-tight">총합<br>기준</th>
+                                        <th class="th-tight">편차<br>기준</th>
                                         <th><select id="number-input1" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input2" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input3" placeholder="1~45 입력"></select></th>
@@ -1866,7 +1874,31 @@
                                     }
                                   }
 
+                                  /* "총합기준/편차기준" 컬럼 폭을 "연번"급으로 강제 */
+                                  #historyTable th:nth-child(9),
+                                  #historyTable td:nth-child(9),
+                                  #historyTable th:nth-child(14),
+                                  #historyTable td:nth-child(14),
+                                  #historyTable th:nth-child(15),
+                                  #historyTable td:nth-child(15){
+                                    width: 52px !important;
+                                    min-width: 52px !important;
+                                    max-width: 52px !important;
+                                    white-space: nowrap;
+                                  }
 
+                                  #historyTable th.th-tight{
+                                    font-size: 9px !important;       
+                                    line-height: 1 !important;
+                                    padding: 1px 2px !important;
+
+                                    white-space: nowrap !important;   
+                                    overflow: hidden !important;    
+                                    text-overflow: ellipsis !important;
+
+                                    letter-spacing: -0.3px !important; 
+                                  }
+ㅉ
                                 </style>
 
 
