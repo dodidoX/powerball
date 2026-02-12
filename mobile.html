@@ -522,14 +522,14 @@
                                           <input type="text" id="sum_range_max" value="">
                                         </div>
                                       </div>
-                                      <p>
-                                        조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 14.5
+                                      <div class="gen-row">
+                                        <div class="gen-label">조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 14.5</div>
                                         <div class="range-row">
                                           <input type="text" id="stddev_range_min" value="">
                                           <span>~</span>
                                           <input type="text" id="stddev_range_max" value="">
                                         </div>
-                                      </p>
+                                      </div>
                                       <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
 
                                       
@@ -644,7 +644,8 @@
                                 
                                 </div>
                             </div> <!-- card shadow mb-4 -->
-                        </div> <!-- col-12 col-lg-6 -->
+                            </div> <!-- col-12 col-lg-6 -->
+                      </div><!-- /.row --> 
 
 
                                   <script>
@@ -1616,7 +1617,7 @@
                               }
                             </script>
 
-
+                        <div class="row">  
                           <div class="col-12">
                             <div class="card shadow mb-4">
                               <div class="generation card-body">
@@ -1663,9 +1664,6 @@
                                   title="모든 번호를 다 생성한 이후<br>딱 1번만 켜시는걸 추천드립니다">
                                   포함 확인 Off
                                 </button>
-                                <script>
-
-                                </script>
 
                                   <div class="d-flex justify-content-end mb-2">
                                     <button type="button" id="toggleHistExtra" class="btn btn-sm btn-outline-secondary">
@@ -1892,7 +1890,6 @@
                 <div class="container py-2">
                     <div class="text-center"> 
                         <span> https://blog.naver.com/lottocreator </span>
-                        </span>
                     </div>
                 </div>
             </footer>
