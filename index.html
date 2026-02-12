@@ -31,64 +31,39 @@
 
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     
-    <style>
+  <style>
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-family: Arial, sans-serif;
       margin: 20px 0;
-      border: 1px solid black;
-      border-collapse: collapse;
-      height: 27px
+      border: 1px solid #000;
     }
-
-
     th, td {
       border: 1px solid #ccc;
       text-align: center;
-      padding: 8px;
-      height: 42px;
+      padding: 6px;
     }
+    th { background: #f2f2f2; font-weight: 700; }
+    tr:nth-child(even) { background: #f8f8f8; }
+    tr:hover { background: #e6e6e6; }
 
-    th {
-      background-color: #f2f2f2;
-      font-weight: bold;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f8f8f8;
-    }
-
-    tr:hover {
-      background-color: #e6e6e6;
-    }
-
-    #combination-label1, #combination-label2 {
-      font-weight: bold;
-    }
-
+    /*  1) Number buttons / options */
+    .numpadding { padding: 0 20px; }
     .number-buttons {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
     }
-
-    .numpadding {
-      padding: 0 20px;
-    }
-
-    .number-buttons button {
-
-    background-color: #000000; /* 배경색 */
-    border: none; /* 테두리 없음 */
-    color: white; /* 글자색 */
-    text-align: center; /* 텍스트 정렬 */
-    text-decoration: none; /* 텍스트 장식 없음 */
-    display: inline-block; /* 인라인 블록 표시 */
-    font-size: 16px; /* 글꼴 크기 */
-    margin: 1px 1px; /* 마진 설정 */
-    cursor: pointer; /* 커서를 포인터로 변경 */
-    border-radius: 4px; /* 모서리 둥글게 */
-    padding: 8px 16px; /* 패딩 설정 */
+    .number-buttons .number-button {
+      background: #000;
+      border: 1px solid gray;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 8px 0;
     }
 
     .option-container {
@@ -96,66 +71,369 @@
       align-items: center;
       gap: 20px;
       padding: 5px 0 0 20px;
+      flex-wrap: wrap; /* PC에서도 줄바꿈 가능하게 */
     }
+
+    /* 2) Compare toggle button */
+    #toggleCompare {
+      transition: all 0.25s;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      border-radius: 6px;
+    }
+    #toggleCompare.on {
+      background: #4CAF50;
+      color: #fff;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,.35);
+    }
+    #toggleCompare.off {
+      color: #000;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25);
+      transform: translateY(-1px);
+      background: #fff;
+    }
+    .tooltip-leftalign .tooltip-inner { text-align: left; }
+
+    /*  3) HistoryTable  */
+    #historyTable th:last-child,
+    #historyTable td:last-child {
+      padding: 4px 6px;
+      white-space: nowrap;
+      width: 72px;
+    }
+    #historyTable thead th:nth-child(2) {
+      width: 56px;
+      padding: 4px 6px;
+    }
+    #historyTable .deleteBtn {
+      padding: 2px 8px;
+      font-size: 12px;
+      line-height: 1.1;
+      height: 24px;
+      border-radius: 4px;
+    }
+    #selectAllHistory { cursor: pointer; }
 
     #historyTable td,
     #historyTable th {
-      height: 6px; /* 행 높이 설정 */
-      min-height: 5px; /* 최소 높이 설정 */
+      height: 6px;
+      min-height: 5px;
     }
-    </style>
-    <style>
-      #toggleCompare {
-          transition: all 0.3s; /* 부드러운 전환 효과 */
-          padding: 10px 20px;
-          border: none;
-          cursor: pointer;
-          outline: none;
-          border-radius: 5px;
-      }
-  
-      #toggleCompare.on {
-          background-color: #4CAF50; /* 눌러진 상태의 배경색 */
-          color: white; /* 눌러진 상태의 글자색 */
-          box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5); /* 움푹 파인 효과 */
-      }
-  
-      #toggleCompare.off {
-          color: black; /* 튀어나온 상태의 글자색 */
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 튀어나온 효과 */
-          transform: translateY(-2px); /* 버튼을 약간 위로 올림 */
+    #historyTable { margin: 12px 0; }
+
+    /*  4) GeneratedNumbers */
+    .gen-table-wrap{
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #GeneratedNumbers{
+      table-layout: fixed;
+      width: 100%;
+      margin: 0;
+    }
+
+    #GeneratedNumbers th,
+    #GeneratedNumbers td{
+      padding: 2px 4px !important;
+      height: 26px !important;
+      line-height: 1.1 !important;
+      font-size: 12px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #GeneratedNumbers thead th{
+      height: 24px !important;
+      font-size: 11px !important;
+    }
+
+    #GeneratedNumbers th:nth-child(2),
+    #GeneratedNumbers td:nth-child(2),
+    #GeneratedNumbers th:nth-child(3),
+    #GeneratedNumbers td:nth-child(3),
+    #GeneratedNumbers th:nth-child(4),
+    #GeneratedNumbers td:nth-child(4),
+    #GeneratedNumbers th:nth-child(5),
+    #GeneratedNumbers td:nth-child(5),
+    #GeneratedNumbers th:nth-child(6),
+    #GeneratedNumbers td:nth-child(6),
+    #GeneratedNumbers th:nth-child(7),
+    #GeneratedNumbers td:nth-child(7){
+      width: 44px;        /* PC 기본 */
+      min-width: 44px;
+    }
+
+    #GeneratedNumbers th:first-child,
+    #GeneratedNumbers td:first-child{
+      width: 64px;
+      min-width: 64px;
+    }
+
+    #GeneratedNumbers th:nth-child(8),
+    #GeneratedNumbers td:nth-child(8){
+      width: 48px;
+      min-width: 48px;
+    }
+
+    #GeneratedNumbers th:nth-child(9),
+    #GeneratedNumbers td:nth-child(9){
+      width: 52px;
+      min-width: 52px;
+    }
+
+    #GeneratedNumbers th:nth-child(10),
+    #GeneratedNumbers td:nth-child(10){
+      width: 64px;
+      min-width: 64px;
+    }
+
+    #GeneratedNumbers .gen-extra{ display: none; }
+
+    #GeneratedNumbers.show-extra{
+      table-layout: auto;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    #GeneratedNumbers.show-extra .gen-extra{
+      display: table-cell;
+    }
+
+    #GeneratedNumbers.show-extra th,
+    #GeneratedNumbers.show-extra td{
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    #GeneratedNumbers.show-extra th:nth-child(2),
+    #GeneratedNumbers.show-extra td:nth-child(2),
+    #GeneratedNumbers.show-extra th:nth-child(3),
+    #GeneratedNumbers.show-extra td:nth-child(3),
+    #GeneratedNumbers.show-extra th:nth-child(4),
+    #GeneratedNumbers.show-extra td:nth-child(4),
+    #GeneratedNumbers.show-extra th:nth-child(5),
+    #GeneratedNumbers.show-extra td:nth-child(5),
+    #GeneratedNumbers.show-extra th:nth-child(6),
+    #GeneratedNumbers.show-extra td:nth-child(6),
+    #GeneratedNumbers.show-extra th:nth-child(7),
+    #GeneratedNumbers.show-extra td:nth-child(7){
+      width: 44px;
+      min-width: 44px;
+    }
+
+    #GeneratedNumbers.show-extra th:nth-child(11),
+    #GeneratedNumbers.show-extra td:nth-child(11),
+    #GeneratedNumbers.show-extra th:nth-child(12),
+    #GeneratedNumbers.show-extra td:nth-child(12){
+      width: 44px;     
+      min-width: 44px;
+    }
+
+    #GeneratedNumbers.show-extra th:nth-child(13),
+    #GeneratedNumbers.show-extra td:nth-child(13),
+    #GeneratedNumbers.show-extra th:nth-child(14),
+    #GeneratedNumbers.show-extra td:nth-child(14){
+      width: 52px;    
+      min-width: 52px;
+    }
+
+    /* 5) Mobile */
+    @media (max-width: 576px) {
+
+      .card-header.py-3 { padding: 10px 12px !important; }
+      .card-body { padding: 12px !important; }
+
+      .card-header h6.m-0 {
+        font-size: 15px !important;
+        line-height: 1.2 !important;
       }
 
-      .tooltip-leftalign .tooltip-inner { text-align: left; }
-
-      #historyTable th:last-child,
-      #historyTable td:last-child {
-        padding: 4px 6px;         /* 세로 패딩 축소 */
-        white-space: nowrap;      /* 줄바꿈 방지 */
-        width: 72px;              /* 고정 폭(원하면 조절) */
+      .generator h1 {
+        font-size: 18px !important;
+        margin: 0 0 10px 0 !important;
+      }
+      .generator p {
+        margin: 8px 0 !important;
+        font-size: 13px !important;
+        line-height: 1.35 !important;
       }
 
+      .generator input[type="text"] {
+        width: 100% !important;
+        height: 34px !important;
+        padding: 6px 10px !important;
+        margin-top: 6px !important;
+        font-size: 14px !important;
+        box-sizing: border-box !important;
+      }
 
-      #historyTable .deleteBtn {
-        padding: 2px 8px;
+      .generator .range-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .generator .range-row input { width: 100% !important; }
+
+      .generator button {
+        width: 100% !important;
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+        margin-top: 8px !important;
+      }
+
+      .option-container {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px 10px !important;
+        padding: 10px 12px !important;
+        align-items: center !important;
+      }
+      .option-container p { margin: 0 !important; display:flex; align-items:center; gap:6px; }
+      .option-container label {
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0 !important;
+        white-space: normal !important;
+      }
+
+      #weightValue {
+        width: 100% !important;
+        height: 34px !important;
+        padding: 6px 10px !important;
+        font-size: 14px !important;
+        box-sizing: border-box !important;
+      }
+      #resetButton {
+        width: 100% !important;
+        padding: 8px 10px !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+      }
+
+      .numpadding { padding: 0 12px !important; }
+      .number-buttons {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 6px !important;
+      }
+      .number-buttons .number-button {
+        border-radius: 8px;
+        font-size: 14px;
+        padding: 10px 0;
+      }
+
+      #GeneratedNumbers th,
+      #GeneratedNumbers td {
+        height: 22px !important;
+        font-size: 11px !important;
+        padding: 1px 3px !important;
+      }
+      #GeneratedNumbers thead th { font-size: 10px !important; }
+
+      /* 모바일에서 폭 재배치: 숫자열(2~7) 최우선, 나머지는 더 좁게 */
+      #GeneratedNumbers th:nth-child(2),
+      #GeneratedNumbers td:nth-child(2),
+      #GeneratedNumbers th:nth-child(3),
+      #GeneratedNumbers td:nth-child(3),
+      #GeneratedNumbers th:nth-child(4),
+      #GeneratedNumbers td:nth-child(4),
+      #GeneratedNumbers th:nth-child(5),
+      #GeneratedNumbers td:nth-child(5),
+      #GeneratedNumbers th:nth-child(6),
+      #GeneratedNumbers td:nth-child(6),
+      #GeneratedNumbers th:nth-child(7),
+      #GeneratedNumbers td:nth-child(7){
+        width: 40px !important;
+        min-width: 40px !important;
+      }
+
+      #GeneratedNumbers th:first-child,
+      #GeneratedNumbers td:first-child{
+        width: 40px !important;
+        min-width: 40px !important;
+      }
+
+      #GeneratedNumbers th:nth-child(8),
+      #GeneratedNumbers td:nth-child(8){
+        width: 34px !important;
+        min-width: 34px !important;
+      }
+
+      #GeneratedNumbers th:nth-child(9),
+      #GeneratedNumbers td:nth-child(9){
+        width: 40px !important;
+        min-width: 40px !important;
+      }
+
+      #GeneratedNumbers th:nth-child(10),
+      #GeneratedNumbers td:nth-child(10){
+        width: 42px !important;
+        min-width: 42px !important;
+      }
+
+      #GeneratedNumbers.show-extra th:nth-child(2),
+      #GeneratedNumbers.show-extra td:nth-child(2),
+      #GeneratedNumbers.show-extra th:nth-child(3),
+      #GeneratedNumbers.show-extra td:nth-child(3),
+      #GeneratedNumbers.show-extra th:nth-child(4),
+      #GeneratedNumbers.show-extra td:nth-child(4),
+      #GeneratedNumbers.show-extra th:nth-child(5),
+      #GeneratedNumbers.show-extra td:nth-child(5),
+      #GeneratedNumbers.show-extra th:nth-child(6),
+      #GeneratedNumbers.show-extra td:nth-child(6),
+      #GeneratedNumbers.show-extra th:nth-child(7),
+      #GeneratedNumbers.show-extra td:nth-child(7){
+        width: 40px !important;
+        min-width: 40px !important;
+      }
+    }
+  </style>
+  <style>
+    .num-ball{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1;
+      letter-spacing: 0;
+
+      color: #fff;
+
+
+      box-shadow: none !important;
+      background-image: none !important;
+      filter: none !important;
+
+
+      text-shadow: none !important;
+
+
+      -webkit-text-stroke: 1px #000;
+      paint-order: stroke fill; 
+    }
+
+    /* 모바일에서 더 작게 */
+    @media (max-width: 576px){
+      .num-ball{
+        width: 22px;
+        height: 22px;
         font-size: 12px;
-        line-height: 1.1;
-        height: 24px;             /* 한 줄 높이 고정 느낌 */
-        border-radius: 4px;
+        -webkit-text-stroke: 0.9px #000;
       }
+    }
+  </style>
 
 
-      #historyTable thead th:nth-child(2) {
-        width: 56px;
-        padding: 4px 6px;
-      }
-
-
-      #selectAllHistory { cursor: pointer; }
-
-    </style>
-  
-  
 </head>
 
 <body id="page-top">
@@ -202,19 +480,21 @@
 
 
                 <div class="container-fluid">
-
-
                     <h1 class="h3 mb-4 text-gray-800"></h1>
 
                     <div class="row">
 
-                        <div class="col-lg-6">
+                        <div class="col-12 col-lg-6 order-1 order-lg-1">
 
-
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">로또 번호 생성기</h6>
-                                </div>
+                            <div class="card shadow mb-4" id="genCard">
+                              <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                                  data-toggle="collapse" data-target="#genCollapse"
+                                  aria-expanded="false" aria-controls="genCollapse"
+                                  style="cursor:pointer;">
+                                <h6 class="m-0 font-weight-bold text-primary">로또 번호 생성기</h6>
+                                <span class="text-muted small">열기/닫기</span>
+                              </div>
+                              <div id="genCollapse" class="collapse">
                                 <div class="card-body">
 
                                     <div class="container">
@@ -232,35 +512,46 @@
                                         조건 3. 가중치를 설정할 숫자를 입력하세요. ex) 5, 43
                                         <input type="text" id="weighted" value="">
                                       </p>
-                                      <p>
-                                        조건 4. 원하는 총합 범위를 입력하세요 ex) 96 ~ 175
-                                        <input type="text" id="sum_range_min" size="5" value=""> ~
-                                        <input type="text" id="sum_range_max" size="5" value="">
-                                      </p>
-                                      <p>
-                                        조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 14.5
-                                        <input type="text" id="stddev_range_min" size="5" value=""> ~
-                                        <input type="text" id="stddev_range_max" size="5" value="">
-                                      </p>
-                                      <p>조건 6. '새로운 번호 생성하기' 버튼을 눌러주세요 </p>
+                                      <div class="gen-row">
+                                      <div class="gen-label">조건 4. 원하는 총합 범위를 입력하세요 ex) 96 ~ 175</div>
+                                        <div class="range-row">
+                                          <input type="text" id="sum_range_min" value="">
+                                          <span>~</span>
+                                          <input type="text" id="sum_range_max" value="">
+                                        </div>
+                                      </div>
+                                      <div class="gen-row">
+                                        <div class="gen-label">조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 14.5</div>
+                                        <div class="range-row">
+                                          <input type="text" id="stddev_range_min" value="">
+                                          <span>~</span>
+                                          <input type="text" id="stddev_range_max" value="">
+                                        </div>
+                                      </div>
                                       <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
 
                                       
                                       </div>
 
                                     </div>
-
-                                </div>
+                                  </div>
+                              </div>
                             </div>
 
                         </div> 
 
-                        <div class="col-lg-6">
+                        <div class="col-12 col-lg-6 order-2 order-lg-2">
 
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6>
-                                </div>
+                          <div class="card shadow mb-4" id="pickCard">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                                  data-toggle="collapse" data-target="#pickCollapse"
+                                  aria-expanded="true" aria-controls="pickCollapse"
+                                  style="cursor:pointer;">
+                                  <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6></div>
+                              
+                            <div id="pickCollapse" class="collapse show">
+                              <div class="card-body">
+
                                 <div class="selection option-container"> 
                                   <p>
                                     <input
@@ -302,7 +593,7 @@
                                     <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
                                   </p>
                                   <p>
-                                    <button id="resetButton">숫자 <br>초기화</button>
+                                    <button id="resetButton">숫자 초기화</button>
                                   </p>
                                 </div>
                                 <div class="numpadding">
@@ -353,7 +644,14 @@
                                     <button class="number-button">44</button>
                                     <button class="number-button">45</button>
                                   </div>
+                                  <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                
                                 </div>
+                              </div> <!-- card shadow mb-4 -->
+                            </div> <!-- col-12 col-lg-6 -->
+                          </div>
+                      </div>
+                    </div><!-- /.row --> 
 
 
                                   <script>
@@ -421,26 +719,68 @@
                                   function byId(id){ return document.getElementById(id); }
 
                                   function ensureHistDT() {
-                                    if ($.fn.DataTable.isDataTable('#historyTable')) return histDT;
+                                    if (!window.jQuery || !$.fn || !$.fn.dataTable) return null;
+
+                                    // 정렬 플러그인(첫번째~여섯번째)
+                                    if (!$.fn.dataTable.ext.order['num-ball']) {
+                                      $.fn.dataTable.ext.order['num-ball'] = function (settings, col) {
+                                        return this.api()
+                                          .column(col, { order: 'index' })
+                                          .nodes()
+                                          .map(td => {
+                                            const el = td.querySelector('.num-ball');
+                                            const t = el ? el.textContent : td.textContent;
+                                            const m = String(t).match(/\d+/);
+                                            const n = m ? parseInt(m[0], 10) : 0;
+                                            return Number.isFinite(n) ? n : 0;
+                                          })
+                                          .toArray();
+                                      };
+                                    }
+
+                                    if ($.fn.DataTable.isDataTable('#historyTable')) {
+                                      return $('#historyTable').DataTable();
+                                    }
 
                                     histDT = $('#historyTable').DataTable({
+                                      dom: 't',
+                                      paging: false,
+                                      info: false,
                                       destroy: true,
                                       searching: false,
-                                      info: true,
+                                      lengthChange: false,
+                                      autoWidth: false,
                                       language: { emptyTable: "생성된 번호가 없습니다." },
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
                                       columnDefs: [
 
-                                        { targets: [0, 2,3,4,5,6,7, 9,10,11,12], type: 'num' },
+                                        { targets: [0, 9, 10, 11, 12], type: 'num' },
+
+
+                                        {
+                                          targets: [2,3,4,5,6,7],
+                                          orderDataType: 'num-ball',
+                                          render: function (data, type) {
+
+                                            if (type === 'filter' || type === 'search') {
+                                              const m = String(data).match(/\d+/);
+                                              return m ? m[0] : '';
+                                            }
+                                            return data; 
+                                          }
+                                        },
 
 
                                         { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
                                       ]
                                     });
+
                                     return histDT;
                                   }
+
+
 
 
                                   let includedInput, excludedInput, weightedInput, weightValueInput;
@@ -467,9 +807,6 @@
                                       else if (exclude.includes(number)) bg = "red";
                                       btn.style.backgroundColor = bg;
                                       btn.style.borderColor = "gray";
-                                      btn.style.borderWidth = "1px";
-                                      btn.style.borderRadius = "3px";
-                                      btn.style.color = "white";
                                     });
                                   }
 
@@ -521,7 +858,7 @@
                                     const newRowData = [
                                       historySeq++,                                       // No.
                                       '<input type="checkbox" class="row-select">',       // 체크박스
-                                      ...numbers,                                         // 6개 번호(2~7)
+                                      ...numbers.map(n => ballHTML(n)),                   // 6개 번호(2~7) 로또공 
                                       consecutive,                                        // 8
                                       sum,                                                // 9
                                       stddev,                                             // 10
@@ -583,28 +920,17 @@
                                     isCompareFunctionOn = !isCompareFunctionOn;
                                     const btn = byId('toggleCompare');
                                     if (isCompareFunctionOn) {
-                                      btn.innerText = "비교 기능 On";
+                                      btn.innerText = "포함 확인 On";
                                       btn.classList.remove('off'); btn.classList.add('on');
                                       compareInputWithTable();
                                     } else {
-                                      btn.innerText = "비교 기능 Off";
+                                      btn.innerText = "포함 확인 Off";
                                       btn.classList.remove('on'); btn.classList.add('off');
                                       resetCompareIndicators();
                                     }
                                   }
 
 
-                                  document.addEventListener('DOMContentLoaded', () => {
-                                    const btn = byId('toggleCompare');
-                                    if (btn) {
-                                      btn.innerText = "비교 기능 Off";
-                                      btn.classList.remove('on');
-                                      btn.classList.add('off');
-                                    }
-                                      if (window.jQuery && $.fn.tooltip) {
-                                      $('[data-toggle="tooltip"]').tooltip({ html: true, container: 'body', trigger: 'hover'});
-                                    }
-                                  });
 
                                   function resetCompareIndicators() {
                                     const dt = ensureHistDT();
@@ -620,14 +946,41 @@
                                     dt.rows().every(function() {
                                       const row = this.node();
                                       const cells = row.getElementsByTagName('td');
-                                      const rowNums = Array.from({ length: 6 }, (_, i) => Number(cells[2 + i].innerText));
+                                      const rowNums = Array.from({ length: 6 }, (_, i) => {
+                                        const ball = cells[2 + i].querySelector('.num-ball');
+                                        return ball ? Number(ball.textContent) : Number(cells[2 + i].textContent);
+                                      });
                                       picks.forEach((pick, idx) => {
-                                        const col = 15 + idx; // 비교결과 열은 15~20
+                                        const col = 15 + idx; 
                                         cells[col].innerText = rowNums.includes(pick) ? "O" : "";
                                       });
                                     });
                                   }
 
+
+                                    function makeBall(num){
+                                      const ball = document.createElement("span");
+                                      ball.classList.add("num-ball");
+                                      ball.textContent = num;
+
+                                      if (num <= 10) ball.style.backgroundColor = "#f1c40f";       // 노란색
+                                      else if (num <= 20) ball.style.backgroundColor = "#3498db";  // 파란색
+                                      else if (num <= 30) ball.style.backgroundColor = "#e74c3c";  // 빨간색
+                                      else if (num <= 40) ball.style.backgroundColor = "#7f8c8d";  // 회색
+                                      else ball.style.backgroundColor = "#2ecc71";                 // 초록색
+
+                                      return ball;
+                                    }
+
+                                    function ballHTML(num){
+                                      let bg = "#2ecc71";
+                                      if (num <= 10) bg = "#f1c40f";
+                                      else if (num <= 20) bg = "#3498db";
+                                      else if (num <= 30) bg = "#e74c3c";
+                                      else if (num <= 40) bg = "#7f8c8d";
+
+                                      return `<span class="num-ball" style="background-color:${bg}">${num}</span>`;
+                                    }
 
                                     async function generateNewNumbers() {
                                       // 1) 입력값 수집
@@ -690,17 +1043,20 @@
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
-                                          ${nums.map(n => `<td>${n}</td>`).join("")}
+                                          ${nums.map(n => `<td class="num-cell"></td>`).join("")}
                                           <td>${cons}</td>
                                           <td>${st.sum}</td>
                                           <td>${st.std.toFixed(2)}</td>
-                                          <td>${st.odd}</td>
-                                          <td>${st.even}</td>
-                                          <td>${sumRec}</td>
-                                          <td>${stddevRec}</td>
+                                          <td class="gen-extra">${st.odd}</td>
+                                          <td class="gen-extra">${st.even}</td>
+                                          <td class="gen-extra">${sumRec}</td>
+                                          <td class="gen-extra">${stddevRec}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
+
+                                        const tds = tr.querySelectorAll("td.num-cell");
+                                        tds.forEach((td, idx) => td.appendChild(makeBall(nums[idx])));
 
                                         updateHistory(
                                           nums,
@@ -724,8 +1080,9 @@
                                   function saveCombinations(){
                                     if (!generatedTbody) return;
                                     const dt = ensureHistDT();
-                                    const existing = new Set(dt.rows().data().toArray()
-                                      .map(r => r.slice(0,6).join(',')));
+                                    const existing = new Set(
+                                      dt.rows().data().toArray().map(r => r.slice(2, 8).join(','))
+                                    );
                                     generatedTbody.querySelectorAll('tr').forEach(tr => {
                                       const tds = tr.querySelectorAll('td');
                                       if (tds.length < 14) return;
@@ -744,29 +1101,64 @@
                                     });
                                   }
 
+//
 
                                   document.addEventListener('DOMContentLoaded', () => {
+
+
+                                    const isMobile = window.matchMedia("(max-width: 576px)").matches;
+                                    const gen = document.getElementById('genCollapse');
+                                    if (gen) {
+                                      if (isMobile) gen.classList.remove('show'); 
+                                      else gen.classList.add('show');             
+                                    }
+
+                                    const genTable = document.getElementById('GeneratedNumbers');
+                                    const toggleBtn = document.getElementById('toggleGenExtra');
+
+                                    if (genTable && toggleBtn) {
+                                      const isMobile = window.matchMedia("(max-width: 576px)").matches;
+
+                                      if (isMobile) {
+                                        genTable.classList.remove('show-extra');
+                                        toggleBtn.textContent = '추가 정보 열기';
+                                      } else {
+                                        genTable.classList.add('show-extra');
+                                        toggleBtn.textContent = '추가 정보 닫기';
+                                      }
+
+                                      toggleBtn.addEventListener('click', () => {
+                                        const open = genTable.classList.toggle('show-extra');
+                                        toggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                      });
+
+                                      window.addEventListener('resize', () => {
+                                        const mobileNow = window.matchMedia("(max-width: 576px)").matches;
+                                        if (mobileNow) {
+                                          genTable.classList.remove('show-extra');
+                                          toggleBtn.textContent = '추가 정보 열기';
+                                        } else {
+                                          genTable.classList.add('show-extra');
+                                          toggleBtn.textContent = '추가 정보 닫기';
+                                        }
+                                      });
+                                    }
 
                                     includedInput = byId("included");
                                     excludedInput = byId("excluded");
                                     weightedInput = byId("weighted");
                                     weightValueInput = byId("weightValue");
 
-
                                     weightValueInput.addEventListener("focus", () => {
                                       weightValueInput.value = weightValueInput.value.replace(/\s*%$/, "");
                                     });
                                     weightValueInput.addEventListener("input", () => {
-
                                       weightValueInput.value = weightValueInput.value.replace(/[^\d.]/g, "");
                                     });
                                     weightValueInput.addEventListener("blur", () => {
                                       normalizePercentText(weightValueInput);
                                     });
-
-
                                     normalizePercentText(weightValueInput);
-
 
                                     sumMinInput = byId("sum_range_min");
                                     sumMaxInput = byId("sum_range_max");
@@ -784,15 +1176,15 @@
                                     histTbl = byId("historyTable");
                                     histTbody = byId("historyBody");
 
-                                    pickSelects = Array.from({length:6}, (_,i)=> byId(`number-input${i+1}`));
-
+                                    pickSelects = Array.from({ length: 6 }, (_, i) => byId(`number-input${i + 1}`));
 
                                     pickSelects.forEach(sel => {
                                       if (!sel) return;
                                       sel.innerHTML = "";
-                                      for (let i=NUM_MIN; i<=NUM_MAX; i++){
+                                      for (let i = NUM_MIN; i <= NUM_MAX; i++) {
                                         const op = document.createElement("option");
-                                        op.value = i; op.textContent = i;
+                                        op.value = i;
+                                        op.textContent = i;
                                         sel.appendChild(op);
                                       }
                                       sel.addEventListener('input', compareInputWithTable);
@@ -800,8 +1192,50 @@
                                     });
 
 
-                                    ensureHistDT();
-                                    
+                                    const histTable = document.getElementById('historyTable');
+                                    const histToggleBtn = document.getElementById('toggleHistExtra');
+
+                                    function setHistoryColumns(openExtra) {
+                                      const dt = ensureHistDT();
+                                      if (!dt) return;
+
+                                      const wrap = document.querySelector('.hist-table-wrap');
+                                      if (wrap) wrap.classList.toggle('is-extra', openExtra);
+
+                                      // 0: No, 1: 체크박스, 2~7: 첫번째~여섯번째
+                                      const keep = new Set([0, 1, 2, 3, 4, 5, 6, 7]);
+
+                                      dt.columns().every(function (idx) {
+                                        const shouldShow = openExtra ? true : keep.has(idx);
+                                        this.visible(shouldShow, false);
+                                      });
+
+                                      dt.columns.adjust().draw(false);
+                                    }
+
+                                    if (histTable && histToggleBtn) {
+                                      // 초기 상태: PC는 열림, 모바일은 닫힘
+                                      const isMobile = window.matchMedia("(max-width: 576px)").matches;
+                                      const initialOpen = !isMobile;
+
+                                      histTable.classList.toggle('show-extra', initialOpen);
+                                      histToggleBtn.textContent = initialOpen ? '추가 정보 닫기' : '추가 정보 열기';
+
+                                      setHistoryColumns(initialOpen);
+                                      setTimeout(() => setHistoryColumns(initialOpen), 0);
+
+                                      histToggleBtn.addEventListener('click', () => {
+                                        const open = histTable.classList.toggle('show-extra');
+                                        histToggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                        setHistoryColumns(open);
+                                      });
+
+                                      window.addEventListener('resize', () => {
+                                        const open = histTable.classList.contains('show-extra');
+                                        setHistoryColumns(open);
+                                      });
+                                    }
+
 
                                     const selectAll = byId('selectAllHistory');
                                     if (selectAll) {
@@ -898,12 +1332,23 @@
                                     attachButtonHandlers(null);
                                     paintButtons();
 
+                                    const btn = byId('toggleCompare');
+                                    if (btn) {
+                                      btn.innerText = "포함 확인 Off";
+                                      btn.classList.remove('on');
+                                      btn.classList.add('off');
+                                    }
+
+                                    if (window.jQuery && $.fn.tooltip) {
+                                      $('[data-toggle="tooltip"]').tooltip({ html: true, container: 'body', trigger: 'hover'});
+                                    }
+
                                   });
                                   </script>
 
-                                <script></script>
-
-                            </div>
+                                
+                                  
+            
 
                             <script>
                               async function exportTableToExcel(filename) {
@@ -1172,87 +1617,282 @@
                                 link.download = filename;
                                 link.click();
                               }
-
-
                             </script>
-                        </div>
+
+                        <div class="row">  
                           <div class="col-12">
                             <div class="card shadow mb-4">
                               <div class="generation card-body">
-                                <table id="GeneratedNumbers">
-                                  <thead>
-                                    <tr>
-                                      <th>추첨 조합</th>
-                                      <th>첫번째</th>
-                                      <th>두번째</th>
-                                      <th>세번째</th>
-                                      <th>네번째</th>
-                                      <th>다섯번째</th>
-                                      <th>여섯번째</th>
-                                      <th>연번</th>
-                                      <th>총합</th>
-                                      <th>표준편차</th>
-                                      <th>홀수</th>
-                                      <th>짝수</th>
-                                      <th>총합 기준</th>
-                                      <th>표준편차 기준</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody></tbody>
-                                </table>
 
+                                <div class="d-flex justify-content-end mb-2">
+                                  <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                </div>
+                                  <button type="button" id="toggleGenExtra" class="btn btn-sm btn-outline-secondary">
+                                    추가 정보 열기
+                                  </button>                                
+                                <div class="gen-table-wrap">
+                                  <table id="GeneratedNumbers">
+                                    <thead>
+                                      <tr>
+                                        <th>추첨 조합</th>
+                                        <th>첫번째</th>
+                                        <th>두번째</th>
+                                        <th>세번째</th>
+                                        <th>네번째</th>
+                                        <th>다섯번째</th>
+                                        <th>여섯번째</th>
+                                        <th>연번</th>
+                                        <th>총합</th>
+                                        <th>표준편차</th>
+                                        <th class="gen-extra">홀수</th>
+                                        <th class="gen-extra">짝수</th>
+                                        <th class="gen-extra">총합 기준</th>
+                                        <th class="gen-extra">표준편차 기준</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                  </table>
+                                </div>
 
                                 <p>update history</p>
                                 <button
                                   id="toggleCompare"
-                                  class="on"
+                                  class="off"
                                   onclick="toggleCompareFunction()"
                                   data-toggle="tooltip"
                                   data-placement="top"
                                   data-html="true"
                                   data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
                                   title="모든 번호를 다 생성한 이후<br>딱 1번만 켜시는걸 추천드립니다">
-                                  비교 기능 On
+                                  포함 확인 Off
                                 </button>
-                                <script>
 
-                                </script>
+                                  <div class="d-flex justify-content-end mb-2">
+                                    <button type="button" id="toggleHistExtra" class="btn btn-sm btn-outline-secondary">
+                                      추가 정보 열기
+                                    </button>
+
+                                  </div>
+                                <div class="hist-table-wrap">
+                                  <table id="historyTable">
+                                    <thead>
+                                      <tr>
+                                        <th id="noHeader"
+                                            data-toggle="tooltip"
+                                            data-placement="top"
+                                            title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
+                                            No.
+                                        </th>
+                                        <th><input type="checkbox" id="selectAllHistory"></th>
+                                        <th>첫번째</th>
+                                        <th>두번째</th>
+                                        <th>세번째</th>
+                                        <th>네번째</th>
+                                        <th>다섯번째</th>
+                                        <th>여섯번째</th>
+                                        <th>연번</th>
+                                        <th>총합</th>
+                                        <th>표준편차</th>
+                                        <th>홀수</th>
+                                        <th>짝수</th>
+                                        <th class="th-tight">총합<br>기준</th>
+                                        <th class="th-tight">편차<br>기준</th>
+                                        <th><select id="number-input1" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input2" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input3" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input4" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input5" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input6" placeholder="1~45 입력"></select></th>
+                                        <th>삭제</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody id="historyBody">
+                                    </tbody>
+                                  </table>
+                                </div> 
+                                <style>
+                                  .hist-table-wrap{
+                                    width: 100%;
+                                    overflow-x: auto;
+                                    -webkit-overflow-scrolling: touch;
+                                  }
+
+                                  #historyTable{
+                                    width: 100%;
+                                    table-layout: fixed;
+                                  }
+
+                                  #historyTable.show-extra{
+                                    table-layout: auto;
+                                    width: max-content;
+                                    min-width: 100%;
+                                  }
+
+                                  #historyTable thead select{
+                                    max-width: 70px;
+                                  }
 
 
-                                <table id="historyTable">
-                                  <thead>
-                                    <tr>
-                                      <th id="noHeader"
-                                          data-toggle="tooltip"
-                                          data-placement="top"
-                                          title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
-                                          No. </th>
-                                      <th><input type="checkbox" id="selectAllHistory"></th>
-                                      <th>첫번째</th>
-                                      <th>두번째</th>
-                                      <th>세번째</th>
-                                      <th>네번째</th>
-                                      <th>다섯번째</th>
-                                      <th>여섯번째</th>
-                                      <th>연번</th>
-                                      <th>총합</th>
-                                      <th>표준편차</th>
-                                      <th>홀수</th>
-                                      <th>짝수</th>
-                                      <th>총합 기준</th>
-                                      <th>표준편차 기준</th>
-                                      <th><select id="number-input1" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input2" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input3" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input4" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input5" placeholder="1~45 입력"></select></th>
-                                      <th><select id="number-input6" placeholder="1~45 입력"></select></th>
-                                      <th>삭제</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody id="historyBody">
-                                  </tbody>
-                                </table>
+                                  @media (max-width: 576px){
+
+                                    .hist-table-wrap{
+                                      overflow-x: hidden !important;
+                                    }
+                                    .hist-table-wrap.is-extra{
+                                      overflow-x: auto !important;
+                                    }
+
+                                    #historyTable{
+                                      table-layout: fixed !important;
+                                      width: 100% !important;
+                                      margin: 0 !important;
+                                    }
+
+                                    #historyTable th,
+                                    #historyTable td{
+                                      padding: 1px 2px !important;
+                                      height: 22px !important;
+                                      line-height: 1.05 !important;
+                                      font-size: 11px !important;
+                                      white-space: nowrap !important;
+                                      overflow: hidden !important;
+                                      text-overflow: ellipsis !important;
+                                    }
+
+                                    #historyTable thead th{
+                                      font-size: 10px !important;
+                                      height: 22px !important;
+                                    }
+
+                                    #historyTable:not(.show-extra) th:nth-child(1),
+                                    #historyTable:not(.show-extra) td:nth-child(1){
+                                      display: none !important;
+                                    }
+
+                                    #historyTable th:nth-child(2),
+                                    #historyTable td:nth-child(2){
+                                      width: 28px !important;
+                                      min-width: 28px !important;
+                                    }
+                                    #historyTable th:nth-child(2) input{
+                                      transform: scale(0.95);
+                                    }
+
+                                    #historyTable:not(.show-extra) th:nth-child(2),
+                                    #historyTable:not(.show-extra) td:nth-child(2){
+                                      display: table-cell !important;
+                                    }
+
+                                    #historyTable th:nth-child(3),
+                                    #historyTable td:nth-child(3),
+                                    #historyTable th:nth-child(4),
+                                    #historyTable td:nth-child(4),
+                                    #historyTable th:nth-child(5),
+                                    #historyTable td:nth-child(5),
+                                    #historyTable th:nth-child(6),
+                                    #historyTable td:nth-child(6),
+                                    #historyTable th:nth-child(7),
+                                    #historyTable td:nth-child(7),
+                                    #historyTable th:nth-child(8),
+                                    #historyTable td:nth-child(8){
+                                      width: 36px !important;
+                                      min-width: 36px !important;
+                                    }
+
+                                    #historyTable.show-extra{
+                                      width: max-content !important;
+                                      min-width: 100% !important;
+                                      table-layout: auto !important;
+                                    }
+                                    #historyTable.show-extra th,
+                                    #historyTable.show-extra td{
+                                      overflow: visible !important;
+                                      text-overflow: clip !important;
+                                    }
+
+                                    #historyTable.show-extra th:nth-child(1),
+                                    #historyTable.show-extra td:nth-child(1){
+                                      display: table-cell !important;
+                                    }
+                                  }
+
+                                  @media (max-width: 576px){
+                                    #toggleCompare{
+                                      padding: 5px 10px !important;
+                                      font-size: 13px !important;
+                                      border-radius: 4px !important;
+                                      line-height: 1.1 !important;
+                                    }
+                                  }
+
+                                  @media (min-width: 577px){
+                                    #historyTable:not(.show-extra){
+                                      table-layout: fixed !important;   /* 폭 고정 */
+                                      width: 100% !important;
+                                    }
+
+                                    /* No. (1번 컬럼) 최소화 */
+                                    #historyTable:not(.show-extra) th:nth-child(1),
+                                    #historyTable:not(.show-extra) td:nth-child(1){
+                                      width: 44px !important;
+                                      min-width: 44px !important;
+                                      max-width: 44px !important;
+                                      white-space: nowrap !important;
+                                    }
+
+                                    /* 체크박스 (2번 컬럼) 최소화 */
+                                    #historyTable:not(.show-extra) th:nth-child(2),
+                                    #historyTable:not(.show-extra) td:nth-child(2){
+                                      width: 34px !important;
+                                      min-width: 34px !important;
+                                      max-width: 34px !important;
+                                      white-space: nowrap !important;
+                                    }
+
+                                    /* 첫번째~여섯번째(3~8번 컬럼) 균등 폭 */
+                                    #historyTable:not(.show-extra) th:nth-child(3),
+                                    #historyTable:not(.show-extra) td:nth-child(3),
+                                    #historyTable:not(.show-extra) th:nth-child(4),
+                                    #historyTable:not(.show-extra) td:nth-child(4),
+                                    #historyTable:not(.show-extra) th:nth-child(5),
+                                    #historyTable:not(.show-extra) td:nth-child(5),
+                                    #historyTable:not(.show-extra) th:nth-child(6),
+                                    #historyTable:not(.show-extra) td:nth-child(6),
+                                    #historyTable:not(.show-extra) th:nth-child(7),
+                                    #historyTable:not(.show-extra) td:nth-child(7),
+                                    #historyTable:not(.show-extra) th:nth-child(8),
+                                    #historyTable:not(.show-extra) td:nth-child(8){
+                                      width: calc((100% - 44px - 34px) / 6) !important;
+                                      min-width: 64px !important;     
+                                      white-space: nowrap !important;
+                                    }
+                                  }
+
+                                  #historyTable th:nth-child(9),
+                                  #historyTable td:nth-child(9),
+                                  #historyTable th:nth-child(14),
+                                  #historyTable td:nth-child(14),
+                                  #historyTable th:nth-child(15),
+                                  #historyTable td:nth-child(15){
+                                    width: 52px !important;
+                                    min-width: 52px !important;
+                                    max-width: 52px !important;
+                                    white-space: nowrap;
+                                  }
+
+                                  #historyTable th.th-tight{
+                                    font-size: 10px !important;       
+                                    line-height: 1 !important;
+                                    padding: 1px 2px !important;
+
+                                    white-space: nowrap !important;   
+                                    overflow: hidden !important;    
+                                    text-overflow: ellipsis !important;
+
+                                    letter-spacing: -0.5px !important; 
+                                  }
+
+                                </style>
 
 
                                 <button onclick="deleteSelectedRows()" style="margin-top: 5px;">선택 삭제</button>
@@ -1275,7 +1915,6 @@
                 <div class="container py-2">
                     <div class="text-center"> 
                         <span> https://blog.naver.com/lottocreator </span>
-                        </span>
                     </div>
                 </div>
             </footer>
