@@ -81,41 +81,12 @@
                     <!-- Page Heading -->
                     <h1 class="h3 mb-1 text-gray-800">회차별 번호 출현 횟수</h1>
                     <div>
-                        <p class="mb-4"> 이곳에서는 역대 로또 당첨번호에 대한  <strong><u>회차별 번호 출현 횟수</u></strong>를 확인할 수 있습니다.
-                        해당 데이터를 활용해서 <a class="collapse-item" href="numbers_generator.html"><strong><u>번호 생성 페이지</u></strong></a>에서 번호를 생성해보세요</p>
+                        <p class="mb-4"> 로또 당첨번호  <strong><u>동시 출현 번호 </u></strong>확인
                         <p>조회하고 싶은 회차 범위를 입력하세요
                             <select id="round_range_start"></select> ~
                             <select id="round_range_end"></select>
                             <button id="calculateStatsButton">조회하기</button></p> <!-- 드롭 다운 -->
-                            <script>    
-                            document.addEventListener("DOMContentLoaded", function () {
-                                function updateDropdown() {
-                                  const roundRangeStart = document.getElementById("round_range_start");
-                                  const roundRangeEnd = document.getElementById("round_range_end");
-                                  const dataTable = document.getElementById("dataTable-1");
-                                  const rowCount = dataTable.rows.length - 1;
-                          
-                                  for (let i = 1; i <= rowCount; i++) {
-                                    const optionStart = document.createElement("option");
-                                    const optionEnd = document.createElement("option");
-                                    optionStart.value = i;
-                                    optionStart.text = i;
-                                    optionEnd.value = i;
-                                    optionEnd.text = i;
-                          
-                                    roundRangeStart.add(optionStart);
-                                    roundRangeEnd.add(optionEnd);
-                                  }
-                                }
-                          
-                                const roundRangeEndSelect = document.getElementById("round_range_end");
-                                const maxOption = Math.max.apply(
-                                  null,
-                                  Array.from(roundRangeEndSelect.options).map((opt) => parseInt(opt.value))
-                                );
-                                roundRangeEndSelect.value = maxOption;
-                              });
-                            </script>
+
                         </div>
                     <!-- Content Row -->
                     <div class="row">
@@ -157,6 +128,7 @@
                                 const thead = document.createElement("thead");
                                 const tbody = document.createElement("tbody");
 
+                                // 헤더
                                 const trHead = document.createElement("tr");
                                 const thCorner = document.createElement("th");
                                 thCorner.textContent = "↓번호/동시출현번호→";
@@ -169,6 +141,7 @@
                                 }
                                 thead.appendChild(trHead);
 
+                                // 바디
                                 for (let r = 1; r <= 45; r++) {
                                     const tr = document.createElement("tr");
 
@@ -178,16 +151,16 @@
 
                                     for (let c = 1; c <= 45; c++) {
                                     const td = document.createElement("td");
-                                    td.textContent = matrix[r][c];
+                                    td.textContent = matrix?.[r]?.[c] ?? 0;
                                     tr.appendChild(td);
                                     }
-
                                     tbody.appendChild(tr);
                                 }
 
                                 table.appendChild(thead);
                                 table.appendChild(tbody);
 
+                                // DataTables 재초기화
                                 if ($.fn.DataTable.isDataTable("#cooccur")) {
                                     $("#cooccur").DataTable().clear().destroy();
                                 }
@@ -211,47 +184,69 @@
                                 return await res.json(); // { meta, matrix }
                                 }
 
+                                function clampAndSwap(s, e, minRound, maxRound) {
+                                let start = parseInt(s, 10);
+                                let end = parseInt(e, 10);
+
+                                if (!Number.isFinite(start)) start = minRound;
+                                if (!Number.isFinite(end)) end = maxRound;
+
+                                // 범위 보정
+                                if (start < minRound) start = minRound;
+                                if (start > maxRound) start = maxRound;
+
+                                if (end < minRound) end = minRound;
+                                if (end > maxRound) end = maxRound;
+
+                                // start > end이면 스왑
+                                if (end < start) [start, end] = [end, start];
+
+                                return { start, end };
+                                }
+
                                 async function initRoundSelectorsAndTable() {
                                 const startSel = document.getElementById("round_range_start");
                                 const endSel = document.getElementById("round_range_end");
                                 const btn = document.getElementById("calculateStatsButton");
-
                                 if (!startSel || !endSel || !btn) return;
 
                                 try {
-                                    // 1) 메타 확보(전체 범위)
-                                    const data = await fetchMatrix(1, 9999999); // 서버가 알아서 maxRound로 clamp
-                                    const { minRound, maxRound, start, end } = data.meta;
+                                    // ✅ 1) 전체 범위 메타 + 전체 matrix(초기 화면)
+                                    const initData = await fetchMatrix(1, 9999999);
+                                    const { minRound, maxRound } = initData.meta;
 
-                                    // 2) 드롭다운 채우기
+                                    // ✅ 2) 드롭다운 채우기
                                     setSelectOptions(startSel, minRound, maxRound);
                                     setSelectOptions(endSel, minRound, maxRound);
 
-                                    // 기본값: 전체 범위
-                                    startSel.value = String(start ?? minRound);
-                                    endSel.value = String(end ?? maxRound);
+                                    // 기본값: 전체
+                                    startSel.value = String(minRound);
+                                    endSel.value = String(maxRound);
 
-                                    // 3) 표 렌더
-                                    renderCooccurTable(data.matrix);
+                                    // ✅ 3) 표 렌더
+                                    renderCooccurTable(initData.matrix);
 
-                                    // 4) 버튼 클릭: 선택 구간 재조회
+                                    // ✅ 4) 버튼 클릭: 선택 구간 재조회
                                     btn.addEventListener("click", async () => {
-                                    const s = parseInt(startSel.value, 10);
-                                    const e = parseInt(endSel.value, 10);
+                                    const { start, end } = clampAndSwap(startSel.value, endSel.value, minRound, maxRound);
 
-                                    // UX: 버튼 잠깐 비활성
+                                    // UI 반영(스왑/클램프된 값 표시)
+                                    startSel.value = String(start);
+                                    endSel.value = String(end);
+
                                     btn.disabled = true;
+                                    const originalText = btn.textContent;
                                     btn.textContent = "조회중...";
 
                                     try {
-                                        const d = await fetchMatrix(s, e);
+                                        const d = await fetchMatrix(start, end);
                                         renderCooccurTable(d.matrix);
                                     } catch (err) {
                                         console.error(err);
                                         alert(`조회 실패: ${String(err)}`);
                                     } finally {
                                         btn.disabled = false;
-                                        btn.textContent = "조회하기";
+                                        btn.textContent = originalText;
                                     }
                                     });
 
@@ -263,6 +258,7 @@
 
                                 document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
                                 </script>
+
 
 
                                 <style>  
