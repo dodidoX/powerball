@@ -107,7 +107,7 @@
                                 <div class="card-body">
 
                                 <script> /* 테이블 생성 */
-                                const API_URL = "/.netlify/functions/get_numbers"; /* coincidence */
+                                const API_BASE = "/.netlify/functions/get_numbers"; /* coincidence */
 
                                 function setSelectOptions(selectEl, min, max) {
                                 selectEl.innerHTML = "";
@@ -205,56 +205,80 @@
                                 }
 
                                 async function initRoundSelectorsAndTable() {
+
                                 const startSel = document.getElementById("round_range_start");
                                 const endSel = document.getElementById("round_range_end");
                                 const btn = document.getElementById("calculateStatsButton");
+
                                 if (!startSel || !endSel || !btn) return;
 
                                 try {
-                                    // ✅ 1) 전체 범위 메타 + 전체 matrix(초기 화면)
-                                    const initData = await fetchMatrix(1, 9999999);
-                                    const { minRound, maxRound } = initData.meta;
 
-                                    // ✅ 2) 드롭다운 채우기
+                                    // ✅ 초기 데이터 fetch
+                                    const initData = await fetchMatrix(1, 9999999);
+
+                                    const meta = initData.meta;
+                                    const matrix = initData.matrix;
+
+                                    const minRound = meta.minRound;
+                                    const maxRound = meta.maxRound;
+
+                                    // ✅ 드롭다운 채우기
                                     setSelectOptions(startSel, minRound, maxRound);
                                     setSelectOptions(endSel, minRound, maxRound);
 
-                                    // 기본값: 전체
+                                    // 기본값
                                     startSel.value = String(minRound);
                                     endSel.value = String(maxRound);
 
-                                    // ✅ 3) 표 렌더
-                                    renderCooccurTable(initData.matrix);
+                                    // ✅ 테이블 렌더
+                                    renderCooccurTable(matrix);
 
-                                    // ✅ 4) 버튼 클릭: 선택 구간 재조회
+                                    // ✅ 버튼 클릭 이벤트
                                     btn.addEventListener("click", async () => {
-                                    const { start, end } = clampAndSwap(startSel.value, endSel.value, minRound, maxRound);
 
-                                    // UI 반영(스왑/클램프된 값 표시)
-                                    startSel.value = String(start);
-                                    endSel.value = String(end);
+                                    const range = clampAndSwap(
+                                        startSel.value,
+                                        endSel.value,
+                                        minRound,
+                                        maxRound
+                                    );
+
+                                    startSel.value = String(range.start);
+                                    endSel.value = String(range.end);
 
                                     btn.disabled = true;
                                     const originalText = btn.textContent;
                                     btn.textContent = "조회중...";
 
                                     try {
-                                        const d = await fetchMatrix(start, end);
-                                        renderCooccurTable(d.matrix);
+
+                                        const data = await fetchMatrix(range.start, range.end);
+
+                                        renderCooccurTable(data.matrix);
+
                                     } catch (err) {
+
                                         console.error(err);
-                                        alert(`조회 실패: ${String(err)}`);
+                                        alert("조회 실패: " + err.message);
+
                                     } finally {
+
                                         btn.disabled = false;
                                         btn.textContent = originalText;
+
                                     }
+
                                     });
 
                                 } catch (err) {
+
                                     console.error(err);
-                                    alert(`초기화 실패: ${String(err)}`);
+                                    alert("초기화 실패: " + err.message);
+
                                 }
                                 }
+
 
                                 document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
                                 </script>
