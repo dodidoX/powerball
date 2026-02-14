@@ -135,68 +135,23 @@
                                 </div>
                                 <div class="card-body">
                                 <script>
-                                /**
-                                * 함께출현 45x45
-                                * 행: 기준번호(1~45)
-                                * 열: 같이 나온 번호(1~45)
-                                * 셀[i][j] = i가 나온 회차들에서 j가 같이 나온 횟수 (i != j)
-                                */
-
-                                const API_URL = "/.netlify/functions/get_numbers"; // numbers.json 제공 함수
-
-                                function buildEmptyMatrix() {
-                                return Array.from({ length: 46 }, () => Array(46).fill(0));
-                                }
-
-                                function extractSixNumbers(item) {
-                                const nums = [];
-                                for (let k = 1; k <= 6; k++) {
-                                    const v = parseInt(item[`number${k}`], 10);
-                                    if (!Number.isFinite(v)) return null;
-                                    nums.push(v);
-                                }
-                                return nums;
-                                }
-
-                                function computeCooccur(numbersJson) {
-                                const M = buildEmptyMatrix();
-
-                                for (const item of numbersJson) {
-                                    const nums = extractSixNumbers(item);
-                                    if (!nums) continue;
-
-                                    // ✅ 같은 회차에서 (자기 자신 포함) 함께출현 카운트
-                                    for (let a = 0; a < nums.length; a++) {
-                                    const rowNum = nums[a];
-                                    for (let b = 0; b < nums.length; b++) {
-                                        const colNum = nums[b];
-                                        M[rowNum][colNum] += 1;  // ← a===b(대각선)도 +1
-                                    }
-                                    }
-                                }
-
-                                return M;
-                                }
+                                const API_URL = "/.netlify/functions/get_numbers";
 
                                 function renderCooccurTable(matrix) {
                                 const container = document.getElementById("cooccur");
                                 if (!container) return;
 
-                                // 기존 테이블 내용 초기화
                                 container.innerHTML = "";
 
                                 const thead = document.createElement("thead");
                                 const tbody = document.createElement("tbody");
 
-                                // 헤더 row
                                 const trHead = document.createElement("tr");
 
-                                // 1행1열 제목
                                 const thCorner = document.createElement("th");
                                 thCorner.textContent = "↓번호/동시출현번호→";
                                 trHead.appendChild(thCorner);
 
-                                // 열 헤더 1~45
                                 for (let c = 1; c <= 45; c++) {
                                     const th = document.createElement("th");
                                     th.textContent = c;
@@ -204,19 +159,16 @@
                                 }
                                 thead.appendChild(trHead);
 
-                                // 본문: 행 1~45
                                 for (let r = 1; r <= 45; r++) {
                                     const tr = document.createElement("tr");
 
-                                    // 행 이름(첫 컬럼)
                                     const thRow = document.createElement("th");
                                     thRow.textContent = r;
                                     tr.appendChild(thRow);
 
-                                    // 45칸
                                     for (let c = 1; c <= 45; c++) {
                                     const td = document.createElement("td");
-                                    td.textContent = matrix[r][c]; // 자기자신 포함해도 0
+                                    td.textContent = matrix[r][c];
                                     tr.appendChild(td);
                                     }
 
@@ -226,8 +178,6 @@
                                 container.appendChild(thead);
                                 container.appendChild(tbody);
 
-                                // DataTables 적용(이미 프로젝트에 jQuery/DataTables가 있다는 전제)
-                                // 45열이라 가로스크롤 권장
                                 if ($.fn.DataTable.isDataTable("#cooccur")) {
                                     $("#cooccur").DataTable().clear().destroy();
                                 }
@@ -248,10 +198,10 @@
                                 try {
                                     const res = await fetch(API_URL, { cache: "no-store" });
                                     if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-                                    const json = await res.json();
+                                    const data = await res.json();
 
-                                    const matrix = computeCooccur(json);
-                                    renderCooccurTable(matrix);
+                                    // data = { meta, matrix }
+                                    renderCooccurTable(data.matrix);
                                 } catch (err) {
                                     console.error(err);
                                     const container = document.getElementById("cooccur");
@@ -261,6 +211,7 @@
 
                                 document.addEventListener("DOMContentLoaded", initCooccur);
                                 </script>
+
                                 <style>
                                 /* 첫 열(행번호)과 헤더를 좀 더 "표처럼" 보이게 */
                                 #cooccur th, #cooccur td {
