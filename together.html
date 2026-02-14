@@ -131,23 +131,33 @@
                                 </div>
 
                                 <div class="table-responsive card-body">
-                                    <table class="table" id="cooccur" width="100%"></table> <!-- 여기에 출력1-->
+                                    <table class="table" id="cooccur" width="100%"></table> <!-- 여기에 출력-->
                                 </div>
                                 <div class="card-body">
-                                <script>
-                                const API_URL = "/.netlify/functions/get_numbers";
+
+                                <script> /* 테이블 생성 */
+                                const API_URL = "/.netlify/functions/get_numbers"; /* coincidence */
+
+                                function setSelectOptions(selectEl, min, max) {
+                                selectEl.innerHTML = "";
+                                for (let i = min; i <= max; i++) {
+                                    const opt = document.createElement("option");
+                                    opt.value = String(i);
+                                    opt.textContent = String(i);
+                                    selectEl.appendChild(opt);
+                                }
+                                }
 
                                 function renderCooccurTable(matrix) {
-                                const container = document.getElementById("cooccur");
-                                if (!container) return;
+                                const table = document.getElementById("cooccur");
+                                if (!table) return;
 
-                                container.innerHTML = "";
+                                table.innerHTML = "";
 
                                 const thead = document.createElement("thead");
                                 const tbody = document.createElement("tbody");
 
                                 const trHead = document.createElement("tr");
-
                                 const thCorner = document.createElement("th");
                                 thCorner.textContent = "↓번호/동시출현번호→";
                                 trHead.appendChild(thCorner);
@@ -175,8 +185,8 @@
                                     tbody.appendChild(tr);
                                 }
 
-                                container.appendChild(thead);
-                                container.appendChild(tbody);
+                                table.appendChild(thead);
+                                table.appendChild(tbody);
 
                                 if ($.fn.DataTable.isDataTable("#cooccur")) {
                                     $("#cooccur").DataTable().clear().destroy();
@@ -194,33 +204,75 @@
                                 });
                                 }
 
-                                async function initCooccur() {
-                                try {
-                                    const res = await fetch(API_URL, { cache: "no-store" });
-                                    if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-                                    const data = await res.json();
+                                async function fetchMatrix(start, end) {
+                                const url = `${API_BASE}?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+                                const res = await fetch(url, { cache: "no-store" });
+                                if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+                                return await res.json(); // { meta, matrix }
+                                }
 
-                                    // data = { meta, matrix }
+                                async function initRoundSelectorsAndTable() {
+                                const startSel = document.getElementById("round_range_start");
+                                const endSel = document.getElementById("round_range_end");
+                                const btn = document.getElementById("calculateStatsButton");
+
+                                if (!startSel || !endSel || !btn) return;
+
+                                try {
+                                    // 1) 메타 확보(전체 범위)
+                                    const data = await fetchMatrix(1, 9999999); // 서버가 알아서 maxRound로 clamp
+                                    const { minRound, maxRound, start, end } = data.meta;
+
+                                    // 2) 드롭다운 채우기
+                                    setSelectOptions(startSel, minRound, maxRound);
+                                    setSelectOptions(endSel, minRound, maxRound);
+
+                                    // 기본값: 전체 범위
+                                    startSel.value = String(start ?? minRound);
+                                    endSel.value = String(end ?? maxRound);
+
+                                    // 3) 표 렌더
                                     renderCooccurTable(data.matrix);
+
+                                    // 4) 버튼 클릭: 선택 구간 재조회
+                                    btn.addEventListener("click", async () => {
+                                    const s = parseInt(startSel.value, 10);
+                                    const e = parseInt(endSel.value, 10);
+
+                                    // UX: 버튼 잠깐 비활성
+                                    btn.disabled = true;
+                                    btn.textContent = "조회중...";
+
+                                    try {
+                                        const d = await fetchMatrix(s, e);
+                                        renderCooccurTable(d.matrix);
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert(`조회 실패: ${String(err)}`);
+                                    } finally {
+                                        btn.disabled = false;
+                                        btn.textContent = "조회하기";
+                                    }
+                                    });
+
                                 } catch (err) {
                                     console.error(err);
-                                    const container = document.getElementById("cooccur");
-                                    if (container) container.innerHTML = `<tbody><tr><td>데이터 로드 실패: ${String(err)}</td></tr></tbody>`;
+                                    alert(`초기화 실패: ${String(err)}`);
                                 }
                                 }
 
-                                document.addEventListener("DOMContentLoaded", initCooccur);
+                                document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
                                 </script>
 
-                                <style>
-                                /* 첫 열(행번호)과 헤더를 좀 더 "표처럼" 보이게 */
+
+                                <style>  
+
                                 #cooccur th, #cooccur td {
                                     text-align: center;
                                     vertical-align: middle;
                                     white-space: nowrap;
                                 }
 
-                                /* DataTables scrollX 사용 시 헤더/첫열 고정 느낌 주고 싶으면 sticky 사용 */
                                 #cooccur thead th {
                                     position: sticky;
                                     top: 0;
@@ -235,7 +287,6 @@
                                     background: #fff;
                                 }
 
-                                /* 좌상단 코너 셀 */
                                 #cooccur thead th:first-child {
                                     left: 0;
                                     z-index: 4;

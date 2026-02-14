@@ -28,38 +28,42 @@ function computeCooccur(numbersJson) {
     const nums = extractSixNumbers(item);
     if (!nums) continue;
 
-    // ✅ 같은 회차에서 (자기 자신 포함) 함께출현 카운트
+    // ✅ 대각선 포함(자기 자신도 출현횟수로 카운트)
     for (let a = 0; a < nums.length; a++) {
       const rowNum = nums[a];
       for (let b = 0; b < nums.length; b++) {
         const colNum = nums[b];
-        M[rowNum][colNum] += 1; // 대각선 포함
+        M[rowNum][colNum] += 1;
       }
     }
   }
   return M;
 }
 
-function getMeta(numbersJson) {
-  // round 최대/최소 정도만 간단히
-  let minRound = Infinity;
-  let maxRound = -Infinity;
-
-  for (const item of numbersJson) {
+function getRoundMinMax(arr) {
+  let minR = Infinity;
+  let maxR = -Infinity;
+  for (const item of arr) {
     const r = parseInt(item.round, 10);
     if (!Number.isFinite(r)) continue;
-    if (r < minRound) minRound = r;
-    if (r > maxRound) maxRound = r;
+    if (r < minR) minR = r;
+    if (r > maxR) maxR = r;
   }
-
   return {
-    count: numbersJson.length,
-    minRound: Number.isFinite(minRound) ? minRound : null,
-    maxRound: Number.isFinite(maxRound) ? maxRound : null,
+    minRound: Number.isFinite(minR) ? minR : null,
+    maxRound: Number.isFinite(maxR) ? maxR : null,
   };
 }
 
-exports.handler = async () => {
+function filterByRound(arr, start, end) {
+  return arr.filter((item) => {
+    const r = parseInt(item.round, 10);
+    if (!Number.isFinite(r)) return false;
+    return r >= start && r <= end;
+  });
+}
+
+exports.handler = async (event) => {
   try {
     if (!numbers) {
       return {
@@ -72,18 +76,41 @@ exports.handler = async () => {
       };
     }
 
-    const matrix = computeCooccur(numbers);
-    const meta = getMeta(numbers);
+    const { minRound, maxRound } = getRoundMinMax(numbers);
+
+    // 쿼리 파라미터
+    const qs = event.queryStringParameters || {};
+    let start = parseInt(qs.start, 10);
+    let end = parseInt(qs.end, 10);
+
+    // 기본값: 전체 범위
+    if (!Number.isFinite(start)) start = minRound ?? 1;
+    if (!Number.isFinite(end)) end = maxRound ?? start;
+
+    // 안전장치
+    if (minRound != null && start < minRound) start = minRound;
+    if (maxRound != null && end > maxRound) end = maxRound;
+    if (end < start) [start, end] = [end, start];
+
+    const filtered = filterByRound(numbers, start, end);
+    const matrix = computeCooccur(filtered);
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "public, max-age=300",
+        // 버튼 조회가 잦으니 너무 길게 캐시 잡지 않는 편 추천
+        "Cache-Control": "public, max-age=60",
       },
       body: JSON.stringify({
-        meta,
-        // 0행/0열은 미사용이지만 그대로 주는 게 렌더가 단순함
+        meta: {
+          totalCount: numbers.length,
+          filteredCount: filtered.length,
+          minRound,
+          maxRound,
+          start,
+          end,
+        },
         matrix,
       }),
     };
