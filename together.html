@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5RZ8RQX8B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-K5RZ8RQX8B');
+  </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Lotto Number Generator</title>
+
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+      
+</head>
+
+<body id="page-top">
+
+
+    <div id="wrapper">
+    
+
+
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
+
+
+            <div id="content" class="flex-grow-1">
+
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                  <!-- 왼쪽: 브랜드 -->
+                  <a class="navbar-brand font-weight-bold" href="index.html">로또 라이프</a>
+
+                  <!-- 오른쪽 정렬을 위한 공간 -->
+                  <ul class="navbar-nav ml-auto">
+
+                    <!-- 로또 번호 생성 (드롭다운) -->
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-cog mr-1"></i>
+                        메뉴
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
+                        <a class="dropdown-item" href="numbers_generator.html">번호 생성</a>
+                        <a class="dropdown-item" href="tables.html">역대 당첨 현황</a>
+                        <a class="dropdown-item" href="match.html">내 번호 성적</a>
+                        <a class="dropdown-item" href="frequency.html">번호 출현 현황</a>
+                        <a class="dropdown-item" href="places.html">1등 당첨점</a>
+                      </div>
+                    </li>
+
+                  </ul>
+
+                </nav>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-1 text-gray-800">회차별 번호 출현 횟수</h1>
+                    <div>
+                        <p class="mb-4"> 이곳에서는 역대 로또 당첨번호에 대한  <strong><u>회차별 번호 출현 횟수</u></strong>를 확인할 수 있습니다.
+                        해당 데이터를 활용해서 <a class="collapse-item" href="numbers_generator.html"><strong><u>번호 생성 페이지</u></strong></a>에서 번호를 생성해보세요</p>
+                        <p>조회하고 싶은 회차 범위를 입력하세요
+                            <select id="round_range_start"></select> ~
+                            <select id="round_range_end"></select>
+                            <button id="calculateStatsButton">조회하기</button></p> <!-- 드롭 다운 -->
+                            <script>    
+                            document.addEventListener("DOMContentLoaded", function () {
+                                function updateDropdown() {
+                                  const roundRangeStart = document.getElementById("round_range_start");
+                                  const roundRangeEnd = document.getElementById("round_range_end");
+                                  const dataTable = document.getElementById("dataTable-1");
+                                  const rowCount = dataTable.rows.length - 1;
+                          
+                                  for (let i = 1; i <= rowCount; i++) {
+                                    const optionStart = document.createElement("option");
+                                    const optionEnd = document.createElement("option");
+                                    optionStart.value = i;
+                                    optionStart.text = i;
+                                    optionEnd.value = i;
+                                    optionEnd.text = i;
+                          
+                                    roundRangeStart.add(optionStart);
+                                    roundRangeEnd.add(optionEnd);
+                                  }
+                                }
+                          
+                                const roundRangeEndSelect = document.getElementById("round_range_end");
+                                const maxOption = Math.max.apply(
+                                  null,
+                                  Array.from(roundRangeEndSelect.options).map((opt) => parseInt(opt.value))
+                                );
+                                roundRangeEndSelect.value = maxOption;
+                              });
+                            </script>
+                        </div>
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- First Column -->
+                        <div class="col-12">
+
+
+                            <!-- Custom Text Color Utilities -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                                    
+                                </div>
+
+                                <div class="table-responsive card-body">
+                                    <table class="table" id="cooccur" width="100%"></table> <!-- 여기에 출력1-->
+                                </div>
+                                <div class="card-body">
+                                <script>
+                                /**
+                                * 함께출현 45x45
+                                * 행: 기준번호(1~45)
+                                * 열: 같이 나온 번호(1~45)
+                                * 셀[i][j] = i가 나온 회차들에서 j가 같이 나온 횟수 (i != j)
+                                */
+
+                                const API_URL = "/.netlify/functions/get_numbers"; // numbers.json 제공 함수
+
+                                function buildEmptyMatrix() {
+                                // 인덱스 편하게 0~45 사용(0은 미사용)
+                                return Array.from({ length: 46 }, () => Array(46).fill(0));
+                                }
+
+                                function extractSixNumbers(item) {
+                                // number1~number6가 문자열이니 정수로 변환
+                                const nums = [];
+                                for (let k = 1; k <= 6; k++) {
+                                    const v = parseInt(item[`number${k}`], 10);
+                                    if (!Number.isFinite(v)) return null;
+                                    nums.push(v);
+                                }
+                                return nums;
+                                }
+
+                                function computeCooccur(numbersJson) {
+                                const M = buildEmptyMatrix();
+
+                                for (const item of numbersJson) {
+                                    const nums = extractSixNumbers(item);
+                                    if (!nums) continue;
+
+                                    // (요구사항) i행 j열에 +1 (i != j, 같은 회차 안에서 서로 카운트)
+                                    for (let a = 0; a < nums.length; a++) {
+                                    const rowNum = nums[a];
+                                    for (let b = 0; b < nums.length; b++) {
+                                        if (a === b) continue;
+                                        const colNum = nums[b];
+                                        M[rowNum][colNum] += 1;
+                                    }
+                                    }
+                                }
+
+                                // 대각선(자기 자신)은 의미 없으니 0 유지(이미 0)
+                                return M;
+                                }
+
+                                function renderCooccurTable(matrix) {
+                                const container = document.getElementById("cooccur");
+                                if (!container) return;
+
+                                // 기존 테이블 내용 초기화
+                                container.innerHTML = "";
+
+                                const thead = document.createElement("thead");
+                                const tbody = document.createElement("tbody");
+
+                                // 헤더 row
+                                const trHead = document.createElement("tr");
+
+                                // 1행1열 제목
+                                const thCorner = document.createElement("th");
+                                thCorner.textContent = "↓번호/동시출현번호→";
+                                trHead.appendChild(thCorner);
+
+                                // 열 헤더 1~45
+                                for (let c = 1; c <= 45; c++) {
+                                    const th = document.createElement("th");
+                                    th.textContent = c;
+                                    trHead.appendChild(th);
+                                }
+                                thead.appendChild(trHead);
+
+                                // 본문: 행 1~45
+                                for (let r = 1; r <= 45; r++) {
+                                    const tr = document.createElement("tr");
+
+                                    // 행 이름(첫 컬럼)
+                                    const thRow = document.createElement("th");
+                                    thRow.textContent = r;
+                                    tr.appendChild(thRow);
+
+                                    // 45칸
+                                    for (let c = 1; c <= 45; c++) {
+                                    const td = document.createElement("td");
+                                    td.textContent = matrix[r][c]; // 자기자신 포함해도 0
+                                    tr.appendChild(td);
+                                    }
+
+                                    tbody.appendChild(tr);
+                                }
+
+                                container.appendChild(thead);
+                                container.appendChild(tbody);
+
+                                // DataTables 적용(이미 프로젝트에 jQuery/DataTables가 있다는 전제)
+                                // 45열이라 가로스크롤 권장
+                                if ($.fn.DataTable.isDataTable("#cooccur")) {
+                                    $("#cooccur").DataTable().clear().destroy();
+                                }
+
+                                $("#cooccur").DataTable({
+                                    paging: false,
+                                    searching: true,
+                                    info: false,
+                                    order: [],
+                                    autoWidth: false,
+                                    responsive: false,
+                                    scrollX: true,
+                                    scrollCollapse: true,
+                                });
+                                }
+
+                                async function initCooccur() {
+                                try {
+                                    const res = await fetch(API_URL, { cache: "no-store" });
+                                    if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+                                    const json = await res.json();
+
+                                    const matrix = computeCooccur(json);
+                                    renderCooccurTable(matrix);
+                                } catch (err) {
+                                    console.error(err);
+                                    const container = document.getElementById("cooccur");
+                                    if (container) container.innerHTML = `<tbody><tr><td>데이터 로드 실패: ${String(err)}</td></tr></tbody>`;
+                                }
+                                }
+
+                                document.addEventListener("DOMContentLoaded", initCooccur);
+                                </script>
+                                <style>
+                                /* 첫 열(행번호)과 헤더를 좀 더 "표처럼" 보이게 */
+                                #cooccur th, #cooccur td {
+                                    text-align: center;
+                                    vertical-align: middle;
+                                    white-space: nowrap;
+                                }
+
+                                /* DataTables scrollX 사용 시 헤더/첫열 고정 느낌 주고 싶으면 sticky 사용 */
+                                #cooccur thead th {
+                                    position: sticky;
+                                    top: 0;
+                                    z-index: 3;
+                                    background: #f8f9fc;
+                                }
+
+                                #cooccur tbody th {
+                                    position: sticky;
+                                    left: 0;
+                                    z-index: 2;
+                                    background: #fff;
+                                }
+
+                                /* 좌상단 코너 셀 */
+                                #cooccur thead th:first-child {
+                                    left: 0;
+                                    z-index: 4;
+                                    position: sticky;
+                                }
+                                </style>
+
+
+                                <script>
+                                function getRoundRange() {
+                                    const start = parseInt(document.getElementById("round_range_start").value) || 1;
+                                    const end = parseInt(document.getElementById("round_range_end").value) || Infinity;
+                                    return { start, end };
+                                }
+                                
+                                function getTableData(start, end, includeBonus = false) {
+                                const table = document.getElementById("dataTable-1");
+                                const rows = table.querySelectorAll("tbody tr");
+                                const numbers = [];
+
+                                for (const row of rows) {
+                                    const roundNumber = parseInt(row.querySelector("td:first-child").textContent);
+
+                                    if (roundNumber >= start && roundNumber <= end) {
+                                    const rowData = row.querySelectorAll("td");
+
+                                    // 일반번호 6개: td index 2~7
+                                    for (let i = 2; i <= 7; i++) {
+                                        numbers.push(parseInt(rowData[i].textContent));
+                                    }
+
+                                    // 보너스 포함 td index 8 추가
+                                    if (includeBonus) {
+                                        const bonusTd = row.querySelector("td.bonus");
+                                        if (bonusTd) numbers.push(parseInt(bonusTd.textContent));
+                                    }
+                                    }
+                                }
+
+                                return numbers;
+                                }
+
+                                function addRanks(statsSortedDesc) {
+                                let previousRank = 0;
+                                let previousCount = -1;
+
+                                return statsSortedDesc.map((s, index) => {
+                                    let rank;
+                                    if (s.count === previousCount) {
+                                    rank = previousRank;
+                                    } else {
+                                    rank = index + 1;
+                                    previousRank = rank;
+                                    }
+                                    previousCount = s.count;
+                                    return { ...s, rank };
+                                });
+                                }
+                                
+                                  function calculateStats(numbers) {
+                                    const counts = Array(45).fill(0);
+                                
+                                    for (const number of numbers) {
+                                      counts[number - 1]++;
+                                    }
+                                
+                                    const stats = counts.map((count, index) => ({ number: index + 1, count })).sort((a, b) => b.count - a.count);
+                                    return stats;
+                                  }
+                                
+                                    function displayStats(statsNoBonus, statsWithBonus) {
+                                    const existingTable = document.getElementById("statsTable");
+                                    if (existingTable) existingTable.remove();
+
+                                    const statsContainer = document.getElementById("stats");
+                                    const table = document.createElement("table");
+                                    table.id = "statsTable";
+                                    table.style.width = "100%";
+
+                                    const thead = document.createElement("thead");
+                                    const tbody = document.createElement("tbody");
+                                    const headerRow = document.createElement("tr");
+
+                                    const headers = [
+                                        ["번호", ""],
+                                        ["출현 횟수", "보너스 미포함"],
+                                        ["순위", "보너스 미포함"],
+                                        ["출현 횟수", "보너스 포함"],
+                                        ["순위", "보너스 포함"]
+                                        ];
+
+                                        headers.forEach(([line1, line2]) => {
+                                        const th = document.createElement("th");
+
+
+                                        th.appendChild(document.createTextNode(line1));
+
+
+                                        if (line2) {
+                                            th.appendChild(document.createElement("br"));
+
+                                            const small = document.createElement("small");
+                                            small.textContent = `(${line2})`;
+                                            th.appendChild(small);
+                                        }
+
+                                        headerRow.appendChild(th);
+                                        });
+
+                                    thead.appendChild(headerRow);
+                                    table.appendChild(thead);
+
+                                    const rankedNoBonus = addRanks(statsNoBonus);
+                                    const rankedWithBonus = addRanks(statsWithBonus);
+
+                                    const mapNoBonus = new Map(rankedNoBonus.map((s) => [s.number, s]));
+                                    const mapWithBonus = new Map(rankedWithBonus.map((s) => [s.number, s]));
+
+                                    for (let num = 1; num <= 45; num++) {
+                                        const a = mapNoBonus.get(num) || { count: 0, rank: "-" };
+                                        const b = mapWithBonus.get(num) || { count: 0, rank: "-" };
+
+                                        const tr = document.createElement("tr");
+
+                                        const tdNum = document.createElement("td");
+
+                                        // 동그라미(공)
+                                        const ball = document.createElement("span");
+                                        ball.classList.add("num-ball");
+                                        ball.textContent = num;
+
+                                        if (num <= 10) ball.style.backgroundColor = "#f1c40f";       // 노란색
+                                        else if (num <= 20) ball.style.backgroundColor = "#3498db";  // 파란색
+                                        else if (num <= 30) ball.style.backgroundColor = "#e74c3c";  // 빨간색
+                                        else if (num <= 40) ball.style.backgroundColor = "#7f8c8d";  // 회색
+                                        else ball.style.backgroundColor = "#2ecc71";                 // 초록색
+
+                                        tdNum.appendChild(ball); // 초록색
+
+                                        const tdCount = document.createElement("td");
+                                        tdCount.textContent = a.count;
+
+                                        const tdRank = document.createElement("td");
+                                        tdRank.textContent = a.rank;
+
+                                        const tdCountB = document.createElement("td");
+                                        tdCountB.textContent = b.count;
+
+                                        const tdRankB = document.createElement("td");
+                                        tdRankB.textContent = b.rank;
+
+                                        tr.appendChild(tdNum);
+                                        tr.appendChild(tdCount);
+                                        tr.appendChild(tdRank);
+                                        tr.appendChild(tdCountB);
+                                        tr.appendChild(tdRankB);
+
+                                        tbody.appendChild(tr);
+                                    }
+
+                                    table.appendChild(tbody);
+                                    statsContainer.appendChild(table);
+
+                                    $("#statsTable").DataTable({
+                                    paging: false,
+                                    searching: false,
+                                    info: false,
+                                    order: [],
+                                    autoWidth: false,
+                                    responsive: true
+                                    });
+                                    }
+
+
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    const { start, end } = getRoundRange();
+
+                                    const numbersNoBonus = getTableData(start, end, false);
+                                    const numbersWithBonus = getTableData(start, end, true);
+
+                                    const statsNoBonus = calculateStats(numbersNoBonus);
+                                    const statsWithBonus = calculateStats(numbersWithBonus);
+
+                                    displayStats(statsNoBonus, statsWithBonus);
+                                    });
+
+                                document.getElementById("calculateStatsButton").addEventListener("click", () => {
+                                    const { start, end } = getRoundRange();
+
+                                    const numbersNoBonus = getTableData(start, end, false);
+                                    const numbersWithBonus = getTableData(start, end, true);
+
+                                    const statsNoBonus = calculateStats(numbersNoBonus);
+                                    const statsWithBonus = calculateStats(numbersWithBonus);
+
+                                    displayStats(statsNoBonus, statsWithBonus);
+                                    });
+
+                                </script>
+
+                                </div>
+                            </div>
+
+                            <!-- Custom Font Size Utilities -->
+                            <div class="card shadow mb-4" style="display:none;">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">000</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-xs">.text-xs</p>
+                                    <p class="text-lg mb-0">.text-lg</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Second Column -->
+                        <div class="col-lg-4">
+                        <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const sourceTable = document.getElementById("dataTable-1");
+                            const targetTable = document.getElementById("stats2");
+                            const roundRangeStartSelect = document.getElementById("round_range_start");
+                            const roundRangeEndSelect = document.getElementById("round_range_end");
+                            const calculateStatsButton = document.getElementById("calculateStatsButton");
+                        
+                            for (let i = 1; i < sourceTable.rows.length; i++) {
+                                const option = document.createElement("option");
+                                option.value = i;
+                                option.innerText = i;
+                                roundRangeStartSelect.appendChild(option.cloneNode(true));
+                                roundRangeEndSelect.appendChild(option);
+                            }
+                        
+                            const initialRangeStart = 1;
+                            const initialRangeEnd = sourceTable.rows.length - 1;
+                            roundRangeStartSelect.value = initialRangeStart;
+                            roundRangeEndSelect.value = initialRangeEnd;
+                        
+
+                            updateStats(initialRangeStart, initialRangeEnd);
+                        
+                            calculateStatsButton.addEventListener("click", function () {
+                                const rangeStart = parseInt(roundRangeStartSelect.value);
+                                const rangeEnd = parseInt(roundRangeEndSelect.value);
+                                updateStats(rangeStart, rangeEnd);
+                            });
+                        
+                            function updateStats(rangeStart, rangeEnd) {
+                                if ($.fn.DataTable.isDataTable('#stats2')) {
+                                    $('#stats2').DataTable().clear().destroy();
+                                }
+                        
+                                const targetTableBody = targetTable.getElementsByTagName("tbody")[0] || targetTable.createTBody();
+                                while (targetTableBody.rows.length > 0) {
+                                    targetTableBody.deleteRow(0);
+                                }
+                    
+                            }
+                            function drawChart(data, labels) {
+                                const ctx = document.getElementById("sum_range_chart").getContext("2d");
+
+                                if (window.myBarChart) {
+                                    window.myBarChart.destroy();
+                                }
+
+                                window.myBarChart = new Chart(ctx, {
+                                    type: "bar",
+                                    data: {
+                                        labels: labels,
+                                        datasets: [
+                                        {
+                                            label: "회차별 번호 총합 분포",
+                                            data: data,
+                                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                                            borderColor: "rgba(75, 192, 192, 1)",
+                                            borderWidth: 1,
+                                        },
+                                        ],
+                                    },
+                                    options: {
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                            },
+                                        },
+                                    },
+                                });
+                            }
+                        });
+                        </script>
+                        </div>
+
+                        <style>
+                            #statsTable th {
+                            white-space: nowrap;   /* 자동 줄바꿈 금지 */
+                            line-height: 1.25;
+                            text-align: center;
+                            }
+
+                            #statsTable th small {
+                            display: block;        /* small을 한 줄로 */
+                            font-size: 0.85em;
+                            color: #6c757d;        /* Bootstrap text-muted */
+                            }
+
+                            #statsTable {
+                            width: 100%;
+                            }
+
+                            #statsTable th,
+                            #statsTable td {
+                            text-align: center;
+                            vertical-align: middle;
+                            }
+
+                            /* 번호 칸 공통 스타일 */
+                            #statsTable td.num-cell{
+                            color:#fff;
+                            font-weight:700;
+                            border-radius:6px;
+                            }
+
+                            /* 번호 셀은 그냥 격자/흰배경 유지 */
+                            #statsTable td:first-child {
+                            background: #fff;
+                            }
+
+                            /* 동그라미(로또 공) */
+                            #statsTable .num-ball {
+                            color: #fff;
+                            font-weight: 700;
+
+                            width: 36px;
+                            height: 36px;
+                            border-radius: 50%;
+
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            margin: 0 auto;
+                            }
+
+
+                            /* 테이블 전체 격자선 */
+                            #statsTable {
+                            border-collapse: collapse;
+                            }
+
+                            #statsTable th,
+                            #statsTable td {
+                            border: 1px solid #e5e7eb;  
+                            padding: 8px 10px;
+                            }
+
+                            #statsTable thead th {
+                            background-color: #f8f9fc;  
+                            font-weight: 600;
+                            }
+
+                            /* 테이블 폭 */
+                            #statsTable {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            table-layout: fixed;          /* 핵심: 컬럼 폭을 화면 기준으로 재분배 */
+                            }
+
+                            /* 셀 내용 긴 경우 */
+                            #statsTable th,
+                            #statsTable td {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            }
+
+                            /*모바일에서 글자/패딩 줄이기 */
+                            @media (max-width: 576px) {
+                            #statsTable th,
+                            #statsTable td {
+                                padding: 6px 6px !important;
+                                font-size: 0.85rem;
+                            }
+
+                            #statsTable th small {
+                                font-size: 0.75em;
+                            }
+
+                            /* 번호 공 크기 축소 */
+                            #statsTable .num-ball {
+                                width: 30px;
+                                height: 30px;
+                                font-size: 0.9rem;
+                            }
+                            }
+                        </style>
+
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <footer class="sticky-footer bg-white mt-auto">
+                <div class="container py-2">
+                    <div class="text-center"> 
+                        <span> https://blog.naver.com/lottocreator </span>
+                        </span>
+                    </div>
+                </div>
+            </footer>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/demo/datatables-demo.js"></script>
+
+
+</body>
+
+</html>
