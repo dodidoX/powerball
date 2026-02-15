@@ -317,10 +317,10 @@
 
                                     container.appendChild(table);
 
-                                    if ($.fn.DataTable.isDataTable("#statsTable"))
-                                        $("#statsTable").DataTable().destroy();
+                                    if ($.fn.DataTable.isDataTable("#stats"))
+                                        $("#stats").DataTable().destroy();
 
-                                    $("#statsTable").DataTable({
+                                    $("#stats").DataTable({
                                         paging: false,
                                         searching: false,
                                         info: false,
@@ -410,15 +410,15 @@
                         /* =========================
                         기본 테이블 스타일
                         ========================= */
-                        #statsTable{
+                        #stats{
                         width:100% !important;
                         max-width:100% !important;
                         table-layout: fixed;
                         border-collapse: collapse;
                         }
 
-                        #statsTable th,
-                        #statsTable td{
+                        #stats th,
+                        #stats td{
                         text-align:center;
                         vertical-align:middle;
                         border:1px solid #e5e7eb;
@@ -429,13 +429,13 @@
                         }
 
                         /* 헤더 */
-                        #statsTable thead th{
+                        #stats thead th{
                         background-color:#f8f9fc;
                         font-weight:600;
                         line-height:1.15;
                         }
 
-                        #statsTable th small{
+                        #stats th small{
                         display:block;
                         font-size:0.85em;
                         color:#6c757d;
@@ -444,7 +444,7 @@
                         /* =========================
                         로또 번호 공 스타일 + 색상
                         ========================= */
-                        #statsTable .num-ball{
+                        #stats .num-ball{
                         color:#fff !important;
                         font-weight:700;
                         width:36px;
@@ -458,16 +458,16 @@
                         box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25);
                         }
 
-                        #statsTable .ball-yellow{ background:linear-gradient(145deg,#ffd700,#f1c40f); }
-                        #statsTable .ball-blue{ background:linear-gradient(145deg,#4da3ff,#3498db); }
-                        #statsTable .ball-red{ background:linear-gradient(145deg,#ff6b6b,#e74c3c); }
-                        #statsTable .ball-gray{ background:linear-gradient(145deg,#9aa0a6,#7f8c8d); }
-                        #statsTable .ball-green{ background:linear-gradient(145deg,#58d68d,#2ecc71); }
+                        #stats .ball-yellow{ background:linear-gradient(145deg,#ffd700,#f1c40f); }
+                        #stats .ball-blue{ background:linear-gradient(145deg,#4da3ff,#3498db); }
+                        #stats .ball-red{ background:linear-gradient(145deg,#ff6b6b,#e74c3c); }
+                        #stats .ball-gray{ background:linear-gradient(145deg,#9aa0a6,#7f8c8d); }
+                        #stats .ball-green{ background:linear-gradient(145deg,#58d68d,#2ecc71); }
 
                         /* =========================
                         DataTables wrapper 여백 제거 (statsTable 전용)
                         ========================= */
-                        #statsTable_wrapper{
+                        #stats_wrapper{
                         width:100% !important;
                         max-width:100% !important;
                         }
@@ -478,46 +478,46 @@
                         @media (max-width:576px){
 
                         /* ✅ 범위를 statsTable로만 제한 (부작용 방지) */
-                        #statsTable_wrapper{
+                        #stats_wrapper{
                             overflow-x:hidden;
                         }
 
                         /* ✅ DataTables Bootstrap row/col 여백 제거도 모바일에서만 */
-                        #statsTable_wrapper .row{
+                        #stats_wrapper .row{
                             margin-left:0 !important;
                             margin-right:0 !important;
                         }
-                        #statsTable_wrapper .row > [class*="col-"]{
+                        #stats_wrapper .row > [class*="col-"]{
                             padding-left:0 !important;
                             padding-right:0 !important;
                         }
 
-                        #statsTable th,
-                        #statsTable td{
+                        #stats th,
+                        #stats td{
                             padding:6px 4px;
                             font-size:0.80rem;
                             min-width:0 !important;
                         }
 
-                        #statsTable th small{
+                        #stats th small{
                             font-size:0.68rem;
                         }
 
                         /* 번호공 축소 */
-                        #statsTable .num-ball{
+                        #stats .num-ball{
                             width:28px;
                             height:28px;
                             font-size:0.80rem;
                         }
 
                         /* 1열(번호) 고정 폭 */
-                        #statsTable th:first-child,
-                        #statsTable td:first-child{
+                        #stats th:first-child,
+                        #stats td:first-child{
                             width:46px;
                         }
 
                         /* 헤더가 너무 답답하면(선택): 헤더 폰트만 살짝 더 줄이기 */
-                        #statsTable thead th{
+                        #stats thead th{
                             font-size:0.78rem;
                         }
                         }
