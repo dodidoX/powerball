@@ -441,11 +441,16 @@
                             const host = document.getElementById("rankFilter");
                             if (!host) return;
 
-
                             if (host.dataset.ready === "1") return;
                             host.dataset.ready = "1";
 
-                            // 1~5 버튼 만들기
+                            // ✅ "동반 출현 순위" 라벨 추가 (버튼들 맨 앞)
+                            const label = document.createElement("span");
+                            label.className = "rank-label";
+                            label.textContent = "동반 출현 순위";
+                            host.appendChild(label);
+
+                            // 1~4 버튼 만들기
                             for (let k = 1; k <= 4; k++){
                                 const btn = document.createElement("button");
                                 btn.type = "button";
@@ -472,6 +477,7 @@
                                 host.appendChild(btn);
                             }
                             }
+
 
                             function applyRankFilter(){
                             const table = document.getElementById("cooccur");
