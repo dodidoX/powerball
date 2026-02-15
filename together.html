@@ -81,12 +81,15 @@
                     <!-- Page Heading -->
                     <h1 class="h3 mb-1 text-gray-800">동반 출현 번호</h1>
                     <div>
-                        <p class="mb-4"> 로또 당첨번호  <strong><u>동반 출현 번호 </u></strong>확인
-                            <p>조회하고 싶은 회차 범위를 입력하세요
-                                <select id="round_range_start"></select> ~
-                                <select id="round_range_end"></select>
-                                <button id="calculateStatsButton">조회하기</button>
-                            </p> <!-- 드롭 다운 -->
+                        <p class="mb-4">
+                        로또 당첨번호 <strong><u>동반 출현 번호</u></strong> 확인
+                        </p>
+
+                        <p>
+                        조회하고 싶은 회차 범위를 입력하세요
+                        <select id="round_range_start"></select> ~
+                        <select id="round_range_end"></select>
+                        <button id="calculateStatsButton">조회하기</button>
                         </p>
                         </div>
                     <!-- Content Row -->
@@ -302,23 +305,20 @@
 
 
                                 <style>
-                                /* =========================
-                                cooccur 화면/폭 최적화
-                                ========================= */
-
-                                /* ✅ 테이블 스크롤 창 (엑셀 느낌) */
                                 .cooccur-wrap{
                                 width: 100%;
                                 max-width: 100%;
-                                overflow: auto;               /* 가로/세로 스크롤은 이 div가 담당 */
+                                overflow-x: auto;      /* 가로 스크롤은 여기서만 */
+                                overflow-y: auto;
                                 -webkit-overflow-scrolling: touch;
                                 }
 
-                                /* 테이블은 최대한 화면폭 활용 */
                                 #cooccur{
-                                width: 100% !important;
-                                border-collapse: separate;    /* sticky 겹침 안정화 */
+                                width: max-content !important;
+                                min-width: 100% !important;   /* 화면보다 작으면 화면폭에 맞춰서 */
+                                border-collapse: separate;
                                 border-spacing: 0;
+                                table-layout: fixed;
                                 }
 
                                 /* 셀 기본 */
@@ -405,6 +405,9 @@
                                 #cooccur{
                                 table-layout: fixed; /* 46x46에 매우 유리 */
                                 }
+
+                                html, body { overflow-x: hidden; }
+                                #wrapper, #content-wrapper, #content { overflow-x: hidden; }
 
                             </style>
 
