@@ -115,6 +115,7 @@
                                     <select id="round_range_end"></select>
                                     <button id="calculateStatsButton">조회하기</button>
                                 </div>
+                                <div class="rank-filter" id="rankFilter"></div>
                             </div>
                         </div>
                     <!-- Content Row -->
@@ -139,6 +140,10 @@
 
                             <script>
                             const API_BASE = "/.netlify/functions/coincidence";
+
+                            let CURRENT_MATRIX = null;   // 마지막으로 렌더된 matrix 저장
+                            let ACTIVE_RANK = 0;         // 0이면 비활성, 1~5면 해당 랭크
+
 
                             function hexToRgb(hex){
                             const h = hex.replace("#","").trim();
@@ -229,6 +234,10 @@
 
                             table.appendChild(thead);
                             table.appendChild(tbody);
+
+                            CURRENT_MATRIX = matrix;   // 저장
+                            applyRankFilter();         // 활성 랭크 있으면 적용
+                            attachCooccurInteractions();
                             }
 
                             function setSelectOptions(selectEl, min, max) {
@@ -238,6 +247,7 @@
                                 opt.value = String(i);
                                 opt.textContent = String(i);
                                 selectEl.appendChild(opt);
+//
                             }
                             }
 
@@ -314,7 +324,10 @@
                             }
                             }
 
-                            document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
+                            document.addEventListener("DOMContentLoaded", () => {
+                            initRoundSelectorsAndTable();
+                            initRankButtons();
+                            });
 
                             function clearCooccurSelection(){
                             const table = document.getElementById("cooccur");
@@ -423,6 +436,98 @@
                                 }
                                 });
                             }
+
+                            function initRankButtons(){
+                            const host = document.getElementById("rankFilter");
+                            if (!host) return;
+
+                            // 이미 만들어졌으면 스킵
+                            if (host.dataset.ready === "1") return;
+                            host.dataset.ready = "1";
+
+                            // 1~5 버튼 만들기
+                            for (let k = 1; k <= 5; k++){
+                                const btn = document.createElement("button");
+                                btn.type = "button";
+                                btn.className = "rank-btn";
+                                btn.textContent = String(k);
+                                btn.dataset.rank = String(k);
+
+                                btn.addEventListener("click", () => {
+                                const rank = parseInt(btn.dataset.rank, 10);
+
+                                // ✅ 같은 버튼 다시 누르면 해제
+                                if (ACTIVE_RANK === rank) {
+                                    ACTIVE_RANK = 0;
+                                } else {
+                                    ACTIVE_RANK = rank;
+                                }
+
+                                // 버튼 UI 반영
+                                host.querySelectorAll(".rank-btn").forEach(b => {
+                                    b.classList.toggle("is-active", parseInt(b.dataset.rank,10) === ACTIVE_RANK);
+                                });
+
+                                applyRankFilter();
+                                });
+
+                                host.appendChild(btn);
+                            }
+                            }
+
+                            function applyRankFilter(){
+                            const table = document.getElementById("cooccur");
+                            if (!table) return;
+
+                            const rows = table.querySelectorAll("tbody tr");
+                            if (!rows.length) return;
+
+                            // 비활성이면 모두 원복(= muted 제거)
+                            if (!ACTIVE_RANK){
+                                table.querySelectorAll("td.cooccur-muted").forEach(td => td.classList.remove("cooccur-muted"));
+                                return;
+                            }
+
+                            // 각 행마다 K번째로 큰 값(동점 포함)만 남기기
+                            rows.forEach((tr, idx) => {
+                                const r = idx + 1;             // 행 번호 1..45
+                                const tds = tr.querySelectorAll("td"); // 45개
+
+                                // 우선 전부 muted 처리
+                                tds.forEach(td => td.classList.add("cooccur-muted"));
+
+                                // 대각선은 항상 보여주기
+                                const diag = tds[r - 1];
+                                if (diag) diag.classList.remove("cooccur-muted");
+
+                                // 행 데이터값 수집(대각선 제외)
+                                const vals = [];
+                                for (let c = 1; c <= 45; c++){
+                                if (c === r) continue;
+                                const v = Number(CURRENT_MATRIX?.[r]?.[c] ?? 0);
+                                vals.push(v);
+                                }
+
+                                // 유니크 값 내림차순 정렬
+                                const uniqDesc = Array.from(new Set(vals)).sort((a,b) => b-a);
+
+                                // K번째 값이 없으면(예: ACTIVE_RANK가 너무 큼) diag만 남김
+                                const target = uniqDesc[ACTIVE_RANK - 1];
+                                if (target === undefined) return;
+
+                                // target 값과 같은 셀들(동점 포함)만 muted 해제
+                                for (let c = 1; c <= 45; c++){
+                                if (c === r) continue;
+                                const v = Number(CURRENT_MATRIX?.[r]?.[c] ?? 0);
+                                if (v === target){
+                                    const td = tds[c - 1];
+                                    if (td) td.classList.remove("cooccur-muted");
+                                }
+                                }
+                            });
+                            }
+
+
 
                             </script>
 
@@ -578,6 +683,38 @@
                             @media (max-width:576px){
                             .cooccur-info{ font-size: 11px; padding: 8px 10px; }
                             }
+
+
+                            /* ✅ 랭크 필터 버튼 영역 */
+                            .rank-filter{
+                            display:flex;
+                            gap:8px;
+                            flex-wrap:wrap;
+                            padding: 10px 0 6px;
+                            }
+
+                            /* ✅ 버튼 토글 느낌 (부트스트랩 쓰면 클래스만으로도 OK) */
+                            .rank-filter .rank-btn{
+                            padding: 6px 10px;
+                            border: 1px solid rgba(0,0,0,0.2);
+                            background:#fff;
+                            border-radius: 6px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            }
+                            .rank-filter .rank-btn.is-active{
+                            background:#4e73df;   /* sb-admin-2 primary 느낌 */
+                            color:#fff;
+                            border-color:#4e73df;
+                            }
+
+                            /* ✅ 필터로 숨기는 셀: 값은 유지, 화면만 흰색으로 */
+                            #cooccur td.cooccur-muted{
+                            background-color:#fff !important; /* inline background 덮기 */
+                            color:transparent !important;     /* 숫자 숨김 */
+                            font-weight:400 !important;
+                            }
+
 
 
                         </style>
