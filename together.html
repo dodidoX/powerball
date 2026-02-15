@@ -37,12 +37,15 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    width:28px;
-    height:28px;
+    width:24px;
+    height:24px;
     border-radius:50%;
     color:#fff;
     font-weight:700;
-    font-size:13px;
+    font-size:12px;
+    line-height:1;
+    vertical-align:middle;
+    margin-right:4px;
     }
 
     .ball-yellow{ background-color:#f1c40f !important; }
@@ -237,7 +240,6 @@
                             // 5) 테이블에 붙이기
                             table.appendChild(thead);
                             table.appendChild(tbody);
-                            attachCooccurInteractions();
                             }
 
                             /* ===== 아래 함수들은 기존 그대로 ===== */
@@ -295,6 +297,7 @@
                                 endSel.value = String(maxRound);
 
                                 renderCooccurTable(matrix);
+                                attachCooccurInteractions();
 
                                 btn.addEventListener("click", async () => {
                                 const range = clampAndSwap(startSel.value, endSel.value, minRound, maxRound);
@@ -436,14 +439,15 @@
                                 if (td) handlePick(td);
                             });
 
-                            // ✅ 테이블 밖 클릭 시 선택 해제
-                            document.addEventListener("click", (e) => {
+                                const INFO_DEFAULT = info ? info.textContent : "";
+
+                                document.addEventListener("click", (e) => {
                                 if (!table.contains(e.target)) {
-                                lastTd = null;
-                                clearCooccurSelection();
-                                if (info) info.textContent = "";
+                                    lastTd = null;
+                                    clearCooccurSelection();
+                                    if (info) info.textContent = INFO_DEFAULT;  // ✅ 원래 문구로 복원
                                 }
-                            });
+                                });
                             }
 
 
@@ -601,17 +605,23 @@
                             box-shadow: inset 0 0 0 3px rgba(17,24,39,0.35);
                             }
 
-                            /* 상단 정보 바 */
                             .cooccur-info{
                             padding: 8px 12px;
                             font-size: 12px;
                             line-height: 1.2;
                             border-bottom: 1px solid rgba(0,0,0,0.06);
                             background: #fff;
-                            position: sticky;   /* 스크롤 내려도 보이게(선택) */
+                            position: sticky;
                             top: 0;
                             z-index: 60;
+
+                            display:flex;
+                            align-items:center;
+                            gap:6px;
+                            flex-wrap:wrap;
                             }
+
+
                             @media (max-width:576px){
                             .cooccur-info{ font-size: 11px; padding: 8px 10px; }
                             }
