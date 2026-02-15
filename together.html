@@ -153,8 +153,12 @@
                                 // 헤더
                                 const trHead = document.createElement("tr");
                                 const thCorner = document.createElement("th");
-                                thCorner.textContent = "↓번호/동시출현번호→";
+
+                                // ✅ 기존 textContent 대신 innerHTML 사용 (줄바꿈 적용)
+                                thCorner.innerHTML = "동시출현번호→<br><span class='corner-sub'>번호↓</span>";
+
                                 trHead.appendChild(thCorner);
+
 
                                 for (let c = 1; c <= 45; c++) {
                                     const th = document.createElement("th");
@@ -363,7 +367,30 @@
                                 color: #FFFFFF !important;
                                 font-weight: 700;
                                 }
-                                </style>
+
+                                /* ✅ 좌상단 코너 헤더 전용: 2줄이지만 높이는 최대한 낮게 */
+                                #cooccur thead th:first-child{
+                                text-align: center;
+                                vertical-align: middle;
+                                white-space: normal !important;     /* 코너만 줄바꿈 허용 */
+                                line-height: 1.05;                  /* 높이 줄이기 */
+                                padding: 4px 6px !important;        /* 헤더 패딩 줄이기 */
+                                font-size: 0.72rem;                 /* 글자 줄여서 1칸 높이에 가깝게 */
+                                }
+
+                                /* 두 번째 줄(번호↓)만 살짝 더 작게 */
+                                #cooccur thead th:first-child .corner-sub{
+                                display: inline-block;
+                                font-size: 0.68em;
+                                opacity: 0.9;
+                                }
+
+                                #cooccur thead th{
+                                padding-top: 6px;
+                                padding-bottom: 6px;
+                                }
+
+                            </style>
 
 
 
