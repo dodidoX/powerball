@@ -509,21 +509,25 @@
                                 }
 
                                 // 유니크 값 내림차순 정렬
-                                const uniqDesc = Array.from(new Set(vals)).sort((a,b) => b-a);
+                                const uniqDesc = Array.from(new Set(vals))
+                                .filter(v => v > 0)         
+                                .sort((a,b) => b-a);
 
-                                // K번째 값이 없으면(예: ACTIVE_RANK가 너무 큼) diag만 남김
-                                const target = uniqDesc[ACTIVE_RANK - 1];
-                                if (target === undefined) return;
+                                const upto = Math.max(1, Math.min(5, ACTIVE_RANK)); // 1~5
+                                const allowed = new Set(uniqDesc.slice(0, upto));  // 1등~K등 값들(동점 묶임)
 
-                                // target 값과 같은 셀들(동점 포함)만 muted 해제
+                                if (allowed.size === 0) return;
+
+                                // allowed에 속하면 "보이게"
                                 for (let c = 1; c <= 45; c++){
                                 if (c === r) continue;
                                 const v = Number(CURRENT_MATRIX?.[r]?.[c] ?? 0);
-                                if (v === target){
+                                if (allowed.has(v)){
                                     const td = tds[c - 1];
                                     if (td) td.classList.remove("cooccur-muted");
                                 }
                                 }
+
                             });
                             }
 
