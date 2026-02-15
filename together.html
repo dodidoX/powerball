@@ -142,7 +142,6 @@
                             const END_RGB = hexToRgb(GRAD_END);
                             const WHITE = {r:255,g:255,b:255};
 
-                            /* ✅ 여기만 핵심: DataTables 없이 테이블만 렌더 */
                             function renderCooccurTable(matrix) {
                             const table = document.getElementById("cooccur");
                             if (!table) return;
@@ -307,178 +306,134 @@
                             document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
                             </script>
 
+                            <style>
+                            /* =========================
+                            cooccur 최종 레이아웃 (중복 제거 버전)
+                            - 페이지는 절대 가로로 늘어나지 않음
+                            - 가로/세로 스크롤은 cooccur-wrap이 담당
+                            - 1행/1열 sticky 고정 (엑셀 느낌)
+                            ========================= */
 
-                                <style>
-                                .cooccur-wrap{
-                                width: 100%;
-                                max-width: 100%;
-                                overflow-x: auto;      /* 가로 스크롤은 여기서만 */
-                                overflow-y: auto;
-                                -webkit-overflow-scrolling: touch;
-                                }
+                            /* ✅ 페이지 전체 가로 넘침 방지 (1번만) */
+                            html, body {
+                            width: 100%;
+                            max-width: 100%;
+                            overflow-x: hidden;
+                            }
 
-                                #cooccur{
-                                width: max-content !important;
-                                min-width: 100% !important;   /* 화면보다 작으면 화면폭에 맞춰서 */
-                                border-collapse: separate;
-                                border-spacing: 0;
-                                table-layout: fixed;
-                                }
+                            /* SB-admin-2 래퍼들도 가로 넘침 방지 */
+                            #wrapper, #content-wrapper, #content {
+                            width: 100%;
+                            max-width: 100%;
+                            overflow-x: hidden;
+                            }
 
-                                /* 셀 기본 */
-                                #cooccur th, #cooccur td{
-                                text-align: center;
-                                vertical-align: middle;
-                                white-space: nowrap;
-                                padding: 6px 6px;
-                                font-size: 12px;
-                                line-height: 1.1;
-                                }
+                            /* ✅ 스크롤 컨테이너: sticky가 붙는 기준 */
+                            .cooccur-wrap{
+                            width: 100%;
+                            max-width: 100%;
+                            overflow-x: auto;
+                            overflow-y: auto;
+                            -webkit-overflow-scrolling: touch;
 
-                                /* ✅ 1행 고정(엑셀처럼) */
-                                #cooccur thead th{
-                                position: sticky;
-                                top: 0;
-                                z-index: 5;
-                                background: #f8f9fc;
-                                box-shadow: 0 1px 0 rgba(0,0,0,0.06); /* 고정 느낌 */
-                                }
+                            max-height: 70vh;            /* sticky가 붙으려면 scroll 컨테이너 필요 */
+                            overscroll-behavior: contain;
 
-                                /* ✅ 1열(행 번호) 고정 */
-                                #cooccur tbody th{
-                                position: sticky;
-                                left: 0;
-                                z-index: 4;
-                                background: #fff;
-                                box-shadow: 1px 0 0 rgba(0,0,0,0.06);
-                                }
+                            display: block;
+                            }
 
-                                /* ✅ 좌상단 코너(1행+1열 겹침) 가장 위 */
-                                #cooccur thead th:first-child{
-                                position: sticky;
-                                top: 0;
-                                left: 0;
-                                z-index: 6;
-                                background: #f8f9fc;
-                                }
+                            @media (max-width: 576px){
+                            .cooccur-wrap{ max-height: 72vh; }
+                            }
 
-                                /* ✅ 코너 헤더(2줄) */
-                                #cooccur thead th:first-child{
-                                white-space: pre-line !important;
-                                word-break: keep-all;
-                                overflow-wrap: normal;
-                                min-width: 88px;
-                                width: 88px;
-                                padding: 4px 6px;
-                                font-size: 11px;
-                                line-height: 1.05;
-                                }
-                                #cooccur thead th:first-child .corner-sub{
-                                font-size: 0.75em;
-                                opacity: .9;
-                                }
+                            /* ✅ 테이블 (한 번만 선언) */
+                            #cooccur{
+                            display: inline-table;         /* 바깥 레이아웃을 밀지 않게 */
+                            width: max-content !important; /* 내용만큼 커지되 */
+                            min-width: 100% !important;    /* 화면보다 작으면 화면폭에 맞춤 */
 
-                                /* ✅ 대각선(자기 자신 출현 횟수) 회색 */
-                                #cooccur td.diag-cell{
-                                background: #6B7280 !important;
-                                color: #fff !important;
-                                font-weight: 700;
-                                }
+                            border-collapse: separate;     /* sticky 겹침 안정화 */
+                            border-spacing: 0;
+                            table-layout: fixed;           /* 46x46에 유리 */
+                            margin-bottom: 0;              /* bootstrap .table 기본 마진 제거 */
+                            }
 
-                                /* =========================
-                                모바일: 최대한 한 화면에 보이게 더 촘촘하게
-                                ========================= */
-                                @media (max-width: 576px){
-                                #cooccur th, #cooccur td{
-                                    padding: 4px 4px;
-                                    font-size: 10px;
-                                }
-                                #cooccur thead th:first-child{
-                                    min-width: 76px;
-                                    width: 76px;
-                                    font-size: 10px;
-                                }
-                                }
+                            /* 셀 기본 */
+                            #cooccur th, #cooccur td{
+                            text-align: center;
+                            vertical-align: middle;
+                            white-space: nowrap;
+                            padding: 6px 6px;
+                            font-size: 12px;
+                            line-height: 1.1;
+                            min-width: 28px;               /* 한 글자 세로찢김 방지 */
 
-                                /* 셀 폭을 너무 작게 못 줄이게(한 글자 세로찢김 방지) */
-                                #cooccur th, #cooccur td{
-                                min-width: 28px;     /* 숫자 칸 최소 폭 */
-                                }
+                            background-clip: padding-box;  /* sticky 경계 깔끔 */
+                            }
 
-                                html, body { overflow-x: hidden; }
-                                #wrapper, #content-wrapper, #content { overflow-x: hidden; }
+                            /* ✅ 1행 고정 */
+                            #cooccur thead th{
+                            position: sticky;
+                            top: 0;
+                            z-index: 20;
+                            background: #f8f9fc;
+                            box-shadow: 0 1px 0 rgba(0,0,0,0.06); /* 고정 느낌 + 경계선 */
+                            }
 
-                                /* ✅ 1) 페이지 전체는 가로로 절대 안 늘어나게 */
-                                html, body {
-                                width: 100%;
-                                max-width: 100%;
-                                overflow-x: hidden;
-                                }
+                            /* ✅ 1열(행 번호) 고정 */
+                            #cooccur tbody th{
+                            position: sticky;
+                            left: 0;
+                            z-index: 15;
+                            background: #fff;
+                            box-shadow: 1px 0 0 rgba(0,0,0,0.06); /* 고정 느낌 + 경계선 */
+                            }
 
-                                /* SB-admin-2 래퍼들도 가로 넘침 방지 */
-                                #wrapper, #content-wrapper, #content {
-                                width: 100%;
-                                max-width: 100%;
-                                overflow-x: hidden;
-                                }
+                            /* ✅ 좌상단(겹침) */
+                            #cooccur thead th:first-child{
+                            position: sticky;
+                            top: 0;
+                            left: 0;
+                            z-index: 30;
+                            background: #f8f9fc;
 
-                                /* ✅ 2) 가로 스크롤은 cooccur-wrap만 담당 */
-                                .cooccur-wrap{
-                                width: 100%;
-                                max-width: 100%;
-                                overflow-x: auto;
-                                overflow-y: auto;
-                                -webkit-overflow-scrolling: touch;
+                            /* 코너 헤더 2줄 */
+                            white-space: pre-line !important;
+                            word-break: keep-all;
+                            overflow-wrap: normal;
+                            min-width: 88px;
+                            width: 88px;
+                            padding: 4px 6px;
+                            font-size: 11px;
+                            line-height: 1.05;
+                            }
 
-                                /* 핵심: 부모를 밀어내지 않게 */
-                                display: block;
-                                }
+                            #cooccur thead th:first-child .corner-sub{
+                            font-size: 0.75em;
+                            opacity: .9;
+                            }
 
-                                /* ✅ 3) 테이블은 wrap 안에서만 크게(페이지 전체를 키우지 않게) */
-                                #cooccur{
-                                display: inline-table;        /* 핵심: table이 바깥 레이아웃을 밀어내는 걸 방지 */
-                                width: max-content !important; 
-                                min-width: 100% !important;
-                                }
+                            /* 대각선 */
+                            #cooccur td.diag-cell{
+                            background: #6B7280 !important;
+                            color: #fff !important;
+                            font-weight: 700;
+                            }
 
-                                /* 회차 범위 UI */
-                                .range-bar{
-                                display: flex;
-                                align-items: center;
-                                gap: 10px;
-                                flex-wrap: wrap;              /* 좁아지면 자동 줄바꿈 */
-                                margin-bottom: 12px;
-                                }
-
-                                .range-label{
-                                white-space: nowrap;          /* 넓을 땐 한 줄 유지 */
-                                }
-
-                                .range-controls{
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                flex-wrap: wrap;              /* 컨트롤도 줄바꿈 허용 */
-                                }
-
-                                /* 모바일/좁은 화면: 라벨은 한 줄로 따로, 컨트롤은 다음 줄로 */
-                                @media (max-width: 576px){
-                                .range-label{
-                                    flex: 0 0 100%;
-                                    white-space: normal;        /* 모바일에선 자연 줄바꿈 허용 */
-                                }
-                                .range-controls{
-                                    flex: 0 0 100%;
-                                }
-
-                                /* 선택: 모바일에서 버튼 너무 커지면 */
-                                #calculateStatsButton{
-                                    padding: 6px 10px;
-                                    font-size: 12px;
-                                }
-                                }
-
+                            /* 모바일 */
+                            @media (max-width: 576px){
+                            #cooccur th, #cooccur td{
+                                padding: 4px 4px;
+                                font-size: 10px;
+                            }
+                            #cooccur thead th:first-child{
+                                min-width: 76px;
+                                width: 76px;
+                                font-size: 10px;
+                            }
+                            }
                             </style>
+
 
                         </div>
                     </div>
