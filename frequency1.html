@@ -275,13 +275,38 @@
                                         const a = mapA.get(i);
                                         const b = mapB.get(i);
 
+                                        // 번호 구간별 색상 클래스 결정
+                                        let ballClass;
+
+                                        if (i <= 10)
+                                            ballClass = "ball-yellow";
+
+                                        else if (i <= 20)
+                                            ballClass = "ball-blue";
+
+                                        else if (i <= 30)
+                                            ballClass = "ball-red";
+
+                                        else if (i <= 40)
+                                            ballClass = "ball-gray";
+
+                                        else
+                                            ballClass = "ball-green";
+
+
+                                        // 테이블 행 생성
                                         tr.innerHTML = `
-                                            <td><span class="num-ball">${i}</span></td>
+                                            <td>
+                                                <span class="num-ball ${ballClass}">
+                                                    ${i}
+                                                </span>
+                                            </td>
                                             <td>${a.count}</td>
                                             <td>${a.rank}</td>
                                             <td>${b.count}</td>
                                             <td>${b.rank}</td>
                                         `;
+
 
                                         tbody.appendChild(tr);
 
@@ -382,107 +407,134 @@
                         </div>
 
                         <style>
-                            #statsTable th {
-                            white-space: nowrap;   /* 자동 줄바꿈 금지 */
-                            line-height: 1.25;
-                            text-align: center;
-                            }
 
-                            #statsTable th small {
-                            display: block;        /* small을 한 줄로 */
-                            font-size: 0.85em;
-                            color: #6c757d;        /* Bootstrap text-muted */
-                            }
+                        /* =========================
+                        기본 테이블 스타일
+                        ========================= */
 
-                            #statsTable {
-                            width: 100%;
-                            }
+                        #statsTable {
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        table-layout: fixed;
+                        border-collapse: collapse;
+                        }
 
-                            #statsTable th,
-                            #statsTable td {
-                            text-align: center;
-                            vertical-align: middle;
-                            }
+                        #statsTable th,
+                        #statsTable td {
+                        text-align: center;
+                        vertical-align: middle;
+                        border: 1px solid #e5e7eb;
+                        padding: 8px 10px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        }
 
-                            /* 번호 칸 공통 스타일 */
-                            #statsTable td.num-cell{
-                            color:#fff;
-                            font-weight:700;
-                            border-radius:6px;
-                            }
+                        /* 헤더 */
+                        #statsTable th {
+                        white-space: nowrap;
+                        line-height: 1.25;
+                        font-weight: 600;
+                        }
 
-                            /* 번호 셀은 그냥 격자/흰배경 유지 */
-                            #statsTable td:first-child {
-                            background: #fff;
-                            }
+                        #statsTable thead th {
+                        background-color: #f8f9fc;
+                        }
 
-                            /* 동그라미(로또 공) */
-                            #statsTable .num-ball {
-                            color: #fff;
-                            font-weight: 700;
-
-                            width: 36px;
-                            height: 36px;
-                            border-radius: 50%;
-
-                            display: inline-flex;
-                            align-items: center;
-                            justify-content: center;
-
-                            margin: 0 auto;
-                            }
+                        #statsTable th small {
+                        display: block;
+                        font-size: 0.85em;
+                        color: #6c757d;
+                        }
 
 
-                            /* 테이블 전체 격자선 */
-                            #statsTable {
-                            border-collapse: collapse;
-                            }
+                        /* =========================
+                        로또 번호 공 스타일
+                        ========================= */
 
-                            #statsTable th,
-                            #statsTable td {
-                            border: 1px solid #e5e7eb;  
-                            padding: 8px 10px;
-                            }
+                        #statsTable .num-ball {
 
-                            #statsTable thead th {
-                            background-color: #f8f9fc;  
-                            font-weight: 600;
-                            }
+                        color: #ffffff !important;
+                        font-weight: 700;
 
-                            /* 테이블 폭 */
-                            #statsTable {
-                            width: 100% !important;
-                            max-width: 100% !important;
-                            table-layout: fixed;          /* 핵심: 컬럼 폭을 화면 기준으로 재분배 */
-                            }
+                        width: 36px;
+                        height: 36px;
 
-                            /* 셀 내용 긴 경우 */
-                            #statsTable th,
-                            #statsTable td {
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            }
+                        border-radius: 50%;
 
-                            /*모바일에서 글자/패딩 줄이기 */
-                            @media (max-width: 576px) {
-                            #statsTable th,
-                            #statsTable td {
-                                padding: 6px 6px !important;
-                                font-size: 0.85rem;
-                            }
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
 
-                            #statsTable th small {
-                                font-size: 0.75em;
-                            }
+                        margin: 0 auto;
 
-                            /* 번호 공 크기 축소 */
-                            #statsTable .num-ball {
-                                width: 30px;
-                                height: 30px;
-                                font-size: 0.9rem;
-                            }
-                            }
+                        font-size: 0.95rem;
+
+                        box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25);
+                        }
+
+
+                        /* =========================
+                        번호 구간별 색상
+                        ========================= */
+
+                        #statsTable .ball-yellow {
+                        background: linear-gradient(145deg,#ffd700,#f1c40f);
+                        }
+
+                        #statsTable .ball-blue {
+                        background: linear-gradient(145deg,#4da3ff,#3498db);
+                        }
+
+                        #statsTable .ball-red {
+                        background: linear-gradient(145deg,#ff6b6b,#e74c3c);
+                        }
+
+                        #statsTable .ball-gray {
+                        background: linear-gradient(145deg,#9aa0a6,#7f8c8d);
+                        }
+
+                        #statsTable .ball-green {
+                        background: linear-gradient(145deg,#58d68d,#2ecc71);
+                        }
+
+
+
+                        /* =========================
+                        모바일 최적화 (핵심)
+                        ========================= */
+
+                        @media (max-width: 576px) {
+
+                        #statsTable th,
+                        #statsTable td {
+                            padding: 5px 4px !important;
+                            font-size: 0.82rem;
+                        }
+
+                        #statsTable th small {
+                            font-size: 0.7rem;
+                        }
+
+                        #statsTable .num-ball {
+                            width: 28px;
+                            height: 28px;
+                            font-size: 0.8rem;
+                        }
+
+                        }
+
+
+                        /* =========================
+                        DataTables 깨짐 방지
+                        ========================= */
+
+                        .dataTables_wrapper {
+                        width: 100%;
+                        overflow-x: auto;
+                        }
+
                         </style>
+
 
 
 
