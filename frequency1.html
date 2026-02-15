@@ -87,35 +87,7 @@
                             <select id="round_range_start"></select> ~
                             <select id="round_range_end"></select>
                             <button id="calculateStatsButton">조회하기</button></p> <!-- 드롭 다운 -->
-                            <script>    
-                            document.addEventListener("DOMContentLoaded", function () {
-                                function updateDropdown() {
-                                  const roundRangeStart = document.getElementById("round_range_start");
-                                  const roundRangeEnd = document.getElementById("round_range_end");
-                                  const dataTable = document.getElementById("dataTable-1");
-                                  const rowCount = dataTable.rows.length - 1;
-                          
-                                  for (let i = 1; i <= rowCount; i++) {
-                                    const optionStart = document.createElement("option");
-                                    const optionEnd = document.createElement("option");
-                                    optionStart.value = i;
-                                    optionStart.text = i;
-                                    optionEnd.value = i;
-                                    optionEnd.text = i;
-                          
-                                    roundRangeStart.add(optionStart);
-                                    roundRangeEnd.add(optionEnd);
-                                  }
-                                }
-                          
-                                const roundRangeEndSelect = document.getElementById("round_range_end");
-                                const maxOption = Math.max.apply(
-                                  null,
-                                  Array.from(roundRangeEndSelect.options).map((opt) => parseInt(opt.value))
-                                );
-                                roundRangeEndSelect.value = maxOption;
-                              });
-                            </script>
+
                         </div>
                     <!-- Content Row -->
                     <div class="row">
@@ -127,7 +99,10 @@
                             <!-- Custom Text Color Utilities -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                                    
+                                    <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                
+                                    <div class="table-responsive card-body">
+                                        <table class="table" id="stats" width="100%"></table> <!-- 여기에 출력1--> 
+                                    </div>                                                       
                                 </div>
                                 
                                 <script>
@@ -402,17 +377,6 @@
                                 </script>
 
 
-                            </div>
-
-                            <!-- Custom Font Size Utilities -->
-                            <div class="card shadow mb-4" style="display:none;">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">000</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-xs">.text-xs</p>
-                                    <p class="text-lg mb-0">.text-lg</p>
-                                </div>
                             </div>
 
                         </div>
