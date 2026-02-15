@@ -85,12 +85,16 @@
                         로또 당첨번호 <strong><u>동반 출현 번호</u></strong> 확인
                         </p>
 
-                        <p>
-                        조회하고 싶은 회차 범위를 입력하세요
-                        <select id="round_range_start"></select> ~
-                        <select id="round_range_end"></select>
-                        <button id="calculateStatsButton">조회하기</button>
-                        </p>
+                            <div class="range-bar">
+                                <div class="range-label">조회하고 싶은 회차 범위를 입력하세요</div>
+
+                                <div class="range-controls">
+                                    <select id="round_range_start"></select>
+                                    <span class="range-tilde">~</span>
+                                    <select id="round_range_end"></select>
+                                    <button id="calculateStatsButton">조회하기</button>
+                                </div>
+                            </div>
                         </div>
                     <!-- Content Row -->
                     <div class="row">
@@ -435,6 +439,43 @@
                                 display: inline-table;        /* 핵심: table이 바깥 레이아웃을 밀어내는 걸 방지 */
                                 width: max-content !important; 
                                 min-width: 100% !important;
+                                }
+
+                                /* 회차 범위 UI */
+                                .range-bar{
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                flex-wrap: wrap;              /* 좁아지면 자동 줄바꿈 */
+                                margin-bottom: 12px;
+                                }
+
+                                .range-label{
+                                white-space: nowrap;          /* 넓을 땐 한 줄 유지 */
+                                }
+
+                                .range-controls{
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                flex-wrap: wrap;              /* 컨트롤도 줄바꿈 허용 */
+                                }
+
+                                /* 모바일/좁은 화면: 라벨은 한 줄로 따로, 컨트롤은 다음 줄로 */
+                                @media (max-width: 576px){
+                                .range-label{
+                                    flex: 0 0 100%;
+                                    white-space: normal;        /* 모바일에선 자연 줄바꿈 허용 */
+                                }
+                                .range-controls{
+                                    flex: 0 0 100%;
+                                }
+
+                                /* 선택: 모바일에서 버튼 너무 커지면 */
+                                #calculateStatsButton{
+                                    padding: 6px 10px;
+                                    font-size: 12px;
+                                }
                                 }
 
                             </style>
