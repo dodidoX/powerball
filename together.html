@@ -82,11 +82,12 @@
                     <h1 class="h3 mb-1 text-gray-800">동반 출현 번호</h1>
                     <div>
                         <p class="mb-4"> 로또 당첨번호  <strong><u>동반 출현 번호 </u></strong>확인
-                        <p>조회하고 싶은 회차 범위를 입력하세요
-                            <select id="round_range_start"></select> ~
-                            <select id="round_range_end"></select>
-                            <button id="calculateStatsButton">조회하기</button></p> <!-- 드롭 다운 -->
-
+                            <p>조회하고 싶은 회차 범위를 입력하세요
+                                <select id="round_range_start"></select> ~
+                                <select id="round_range_end"></select>
+                                <button id="calculateStatsButton">조회하기</button>
+                            </p> <!-- 드롭 다운 -->
+                        </p>
                         </div>
                     <!-- Content Row -->
                     <div class="row">
@@ -107,230 +108,197 @@
                                 </div>
                             </div>
 
+                            <script>
+                            const API_BASE = "/.netlify/functions/get_numbers";
 
-                                <script>
-                                const API_BASE = "/.netlify/functions/get_numbers";
+                            /* ===== 색 유틸 ===== */
+                            function hexToRgb(hex){
+                            const h = hex.replace("#","").trim();
+                            const full = h.length === 3 ? h.split("").map(ch=>ch+ch).join("") : h;
+                            const n = parseInt(full, 16);
+                            return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+                            }
+                            function lerp(a,b,t){ return a + (b-a)*t; }
+                            function mixRgb(c1, c2, t){
+                            return {
+                                r: Math.round(lerp(c1.r, c2.r, t)),
+                                g: Math.round(lerp(c1.g, c2.g, t)),
+                                b: Math.round(lerp(c1.b, c2.b, t))
+                            };
+                            }
+                            function rgbToCss(c){ return `rgb(${c.r},${c.g},${c.b})`; }
+                            function luminance(c){
+                            return (0.2126*c.r + 0.7152*c.g + 0.0722*c.b) / 255;
+                            }
 
-                                /* ===== 색 유틸 ===== */
-                                function hexToRgb(hex){
-                                const h = hex.replace("#","").trim();
-                                const full = h.length === 3 ? h.split("").map(ch=>ch+ch).join("") : h;
-                                const n = parseInt(full, 16);
-                                return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
-                                }
-                                function lerp(a,b,t){ return a + (b-a)*t; }
-                                function mixRgb(c1, c2, t){
-                                return {
-                                    r: Math.round(lerp(c1.r, c2.r, t)),
-                                    g: Math.round(lerp(c1.g, c2.g, t)),
-                                    b: Math.round(lerp(c1.b, c2.b, t))
-                                };
-                                }
-                                function rgbToCss(c){ return `rgb(${c.r},${c.g},${c.b})`; }
-                                function luminance(c){
-                                // 간단 가독성 판단용
-                                return (0.2126*c.r + 0.7152*c.g + 0.0722*c.b) / 255;
-                                }
+                            const GRAD_END = "#14B8A6";
+                            const END_RGB = hexToRgb(GRAD_END);
+                            const WHITE = {r:255,g:255,b:255};
 
-                                const GRAD_END = "#14B8A6"; // 가장 진한 색 (추천: teal)
-                                const END_RGB = hexToRgb(GRAD_END);
-                                const WHITE = {r:255,g:255,b:255};
-                                const DIAG_BG = "#6B7280"; // 회색(대각선)
-                                const DIAG_FG = "#FFFFFF";
+                            /* ✅ 여기만 핵심: DataTables 없이 테이블만 렌더 */
+                            function renderCooccurTable(matrix) {
+                            const table = document.getElementById("cooccur");
+                            if (!table) return;
 
-                                function renderCooccurTable(matrix) {
-                                const table = document.getElementById("cooccur");
-                                if (!table) return;
+                            // 1) 기존 내용 싹 비우기
+                            table.innerHTML = "";
 
-                                // 기존 DataTable 제거
-                                if ($.fn.DataTable.isDataTable("#cooccur")) {
-                                    $("#cooccur").DataTable().clear().destroy();
-                                }
+                            // 2) thead/tbody 만들기
+                            const thead = document.createElement("thead");
+                            const tbody = document.createElement("tbody");
 
-                                table.innerHTML = "";
+                            // 3) 헤더 행
+                            const trHead = document.createElement("tr");
+                            const thCorner = document.createElement("th");
+                            thCorner.innerHTML = "동반출현번호→<br><span class='corner-sub'>/번호↓</span>";
+                            trHead.appendChild(thCorner);
 
-                                const thead = document.createElement("thead");
-                                const tbody = document.createElement("tbody");
+                            for (let c = 1; c <= 45; c++) {
+                                const th = document.createElement("th");
+                                th.textContent = c;
+                                trHead.appendChild(th);
+                            }
+                            thead.appendChild(trHead);
 
-                                // 헤더
-                                const trHead = document.createElement("tr");
-                                const thCorner = document.createElement("th");
+                            // 4) 바디(46x46)
+                            for (let r = 1; r <= 45; r++) {
 
-                                // ✅ 기존 textContent 대신 innerHTML 사용 (줄바꿈 적용)
-                                thCorner.innerHTML = "동반출현번호→<br><span class='corner-sub'>/번호↓</span>";
-
-                                trHead.appendChild(thCorner);
-
-
+                                // 행별 min/max (대각선 제외)
+                                const vals = [];
                                 for (let c = 1; c <= 45; c++) {
-                                    const th = document.createElement("th");
-                                    th.textContent = c;
-                                    trHead.appendChild(th);
+                                if (c === r) continue;
+                                vals.push(Number(matrix?.[r]?.[c] ?? 0));
                                 }
-                                thead.appendChild(trHead);
+                                let rowMin = Math.min(...vals);
+                                let rowMax = Math.max(...vals);
+                                if (!Number.isFinite(rowMin)) rowMin = 0;
+                                if (!Number.isFinite(rowMax)) rowMax = 0;
 
-                                // 바디
-                                for (let r = 1; r <= 45; r++) {
+                                const denom = (rowMax - rowMin) || 1;
 
-                                    // ✅ 행별 min/max (대각선 제외)
-                                    const vals = [];
-                                    for (let c = 1; c <= 45; c++) {
-                                    if (c === r) continue;
-                                    const v = Number(matrix?.[r]?.[c] ?? 0);
-                                    vals.push(v);
-                                    }
-                                    let rowMin = Math.min(...vals);
-                                    let rowMax = Math.max(...vals);
-                                    if (!Number.isFinite(rowMin)) rowMin = 0;
-                                    if (!Number.isFinite(rowMax)) rowMax = 0;
+                                const tr = document.createElement("tr");
 
-                                    const denom = (rowMax - rowMin) || 1; // max==min이면 1로
+                                // 왼쪽 행 헤더(고정될 th)
+                                const thRow = document.createElement("th");
+                                thRow.textContent = r;
+                                tr.appendChild(thRow);
 
-                                    const tr = document.createElement("tr");
+                                // 데이터 셀
+                                for (let c = 1; c <= 45; c++) {
+                                const td = document.createElement("td");
+                                const v = Number(matrix?.[r]?.[c] ?? 0);
+                                td.textContent = v;
 
-                                    const thRow = document.createElement("th");
-                                    thRow.textContent = r;
-                                    tr.appendChild(thRow);
+                                if (c === r) {
+                                    td.classList.add("diag-cell"); // 대각선 회색
+                                } else {
+                                    // 그라데이션
+                                    const t = Math.max(0, Math.min(1, (v - rowMin) / denom));
+                                    const bgRgb = mixRgb(WHITE, END_RGB, t);
+                                    td.style.backgroundColor = rgbToCss(bgRgb);
 
-                                    for (let c = 1; c <= 45; c++) {
-                                    const td = document.createElement("td");
-                                    const v = Number(matrix?.[r]?.[c] ?? 0);
-                                    td.textContent = v;
-
-                                    // ✅ 대각선은 회색 고정
-                                    if (c === r) {
-                                        td.classList.add("diag-cell");
-                                    } else {
-                                        // ✅ 행별 그라데이션 (흰색 -> teal)
-                                        const t = Math.max(0, Math.min(1, (v - rowMin) / denom));
-                                        const bgRgb = mixRgb(WHITE, END_RGB, t);
-
-                                        td.style.backgroundColor = rgbToCss(bgRgb);
-
-                                        // ✅ 글자색 자동 (배경이 진하면 흰색)
-                                        const lum = luminance(bgRgb);
-                                        td.style.color = (lum < 0.55) ? "#FFFFFF" : "#111827"; // 진하면 흰색, 연하면 진한 회색
-
-                                        // (선택) 약간의 강조: 진한 칸은 폰트 굵게
-                                        if (t > 0.85) td.style.fontWeight = "700";
-                                    }
-
-                                    tr.appendChild(td);
-                                    }
-
-                                    tbody.appendChild(tr);
+                                    // 글자색 자동
+                                    const lum = luminance(bgRgb);
+                                    td.style.color = (lum < 0.55) ? "#FFFFFF" : "#111827";
+                                    if (t > 0.85) td.style.fontWeight = "700";
                                 }
 
-                                table.appendChild(thead);
-                                table.appendChild(tbody);
-
-                                // DataTables 재초기화
-                                $("#cooccur").DataTable({
-                                    paging: false,
-                                    searching: false,
-                                    info: false,
-                                    order: [],
-                                    autoWidth: false,
-                                    responsive: false,
-                                    scrollX: true,
-                                    scrollCollapse: false
-                                });
-
-                                // 폭 조정(헤더/바디 정렬 안정화)
-                                requestAnimationFrame(() => {
-                                    const dt = $("#cooccur").DataTable();
-                                    dt.columns.adjust();
-                                });
+                                tr.appendChild(td);
                                 }
 
-                                /* ===== 나머지 함수들은 기존 그대로 유지 ===== */
+                                tbody.appendChild(tr);
+                            }
 
-                                function setSelectOptions(selectEl, min, max) {
-                                selectEl.innerHTML = "";
-                                for (let i = min; i <= max; i++) {
-                                    const opt = document.createElement("option");
-                                    opt.value = String(i);
-                                    opt.textContent = String(i);
-                                    selectEl.appendChild(opt);
-                                }
-                                }
+                            // 5) 테이블에 붙이기
+                            table.appendChild(thead);
+                            table.appendChild(tbody);
+                            }
 
-                                async function fetchMatrix(start, end) {
-                                const url = `${API_BASE}?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-                                const res = await fetch(url, { cache: "no-store" });
-                                if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-                                return await res.json(); // { meta, matrix }
-                                }
+                            /* ===== 아래 함수들은 기존 그대로 ===== */
+                            function setSelectOptions(selectEl, min, max) {
+                            selectEl.innerHTML = "";
+                            for (let i = min; i <= max; i++) {
+                                const opt = document.createElement("option");
+                                opt.value = String(i);
+                                opt.textContent = String(i);
+                                selectEl.appendChild(opt);
+                            }
+                            }
 
-                                function clampAndSwap(s, e, minRound, maxRound) {
-                                let start = parseInt(s, 10);
-                                let end = parseInt(e, 10);
+                            async function fetchMatrix(start, end) {
+                            const url = `${API_BASE}?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+                            const res = await fetch(url, { cache: "no-store" });
+                            if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+                            return await res.json(); // { meta, matrix }
+                            }
 
-                                if (!Number.isFinite(start)) start = minRound;
-                                if (!Number.isFinite(end)) end = maxRound;
+                            function clampAndSwap(s, e, minRound, maxRound) {
+                            let start = parseInt(s, 10);
+                            let end = parseInt(e, 10);
 
-                                if (start < minRound) start = minRound;
-                                if (start > maxRound) start = maxRound;
+                            if (!Number.isFinite(start)) start = minRound;
+                            if (!Number.isFinite(end)) end = maxRound;
 
-                                if (end < minRound) end = minRound;
-                                if (end > maxRound) end = maxRound;
+                            if (start < minRound) start = minRound;
+                            if (start > maxRound) start = maxRound;
 
-                                if (end < start) [start, end] = [end, start];
+                            if (end < minRound) end = minRound;
+                            if (end > maxRound) end = maxRound;
 
-                                return { start, end };
-                                }
+                            if (end < start) [start, end] = [end, start];
+                            return { start, end };
+                            }
 
-                                async function initRoundSelectorsAndTable() {
-                                const startSel = document.getElementById("round_range_start");
-                                const endSel = document.getElementById("round_range_end");
-                                const btn = document.getElementById("calculateStatsButton");
-                                if (!startSel || !endSel || !btn) return;
+                            async function initRoundSelectorsAndTable() {
+                            const startSel = document.getElementById("round_range_start");
+                            const endSel = document.getElementById("round_range_end");
+                            const btn = document.getElementById("calculateStatsButton");
+                            if (!startSel || !endSel || !btn) return;
+
+                            try {
+                                const initData = await fetchMatrix(1, 9999999);
+                                const { meta, matrix } = initData;
+
+                                const minRound = meta.minRound;
+                                const maxRound = meta.maxRound;
+
+                                setSelectOptions(startSel, minRound, maxRound);
+                                setSelectOptions(endSel, minRound, maxRound);
+
+                                startSel.value = String(minRound);
+                                endSel.value = String(maxRound);
+
+                                renderCooccurTable(matrix);
+
+                                btn.addEventListener("click", async () => {
+                                const range = clampAndSwap(startSel.value, endSel.value, minRound, maxRound);
+                                startSel.value = String(range.start);
+                                endSel.value = String(range.end);
+
+                                btn.disabled = true;
+                                const originalText = btn.textContent;
+                                btn.textContent = "조회중...";
 
                                 try {
-                                    const initData = await fetchMatrix(1, 9999999);
-                                    const meta = initData.meta;
-                                    const matrix = initData.matrix;
-
-                                    const minRound = meta.minRound;
-                                    const maxRound = meta.maxRound;
-
-                                    setSelectOptions(startSel, minRound, maxRound);
-                                    setSelectOptions(endSel, minRound, maxRound);
-
-                                    startSel.value = String(minRound);
-                                    endSel.value = String(maxRound);
-
-                                    renderCooccurTable(matrix);
-
-                                    btn.addEventListener("click", async () => {
-                                    const range = clampAndSwap(startSel.value, endSel.value, minRound, maxRound);
-                                    startSel.value = String(range.start);
-                                    endSel.value = String(range.end);
-
-                                    btn.disabled = true;
-                                    const originalText = btn.textContent;
-                                    btn.textContent = "조회중...";
-
-                                    try {
-                                        const data = await fetchMatrix(range.start, range.end);
-                                        renderCooccurTable(data.matrix);
-                                    } catch (err) {
-                                        console.error(err);
-                                        alert("조회 실패: " + err.message);
-                                    } finally {
-                                        btn.disabled = false;
-                                        btn.textContent = originalText;
-                                    }
-                                    });
-
+                                    const data = await fetchMatrix(range.start, range.end);
+                                    renderCooccurTable(data.matrix);
                                 } catch (err) {
                                     console.error(err);
-                                    alert("초기화 실패: " + err.message);
+                                    alert("조회 실패: " + err.message);
+                                } finally {
+                                    btn.disabled = false;
+                                    btn.textContent = originalText;
                                 }
-                                }
+                                });
 
-                                document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
-                                </script>
+                            } catch (err) {
+                                console.error(err);
+                                alert("초기화 실패: " + err.message);
+                            }
+                            }
+
+                            document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
+                            </script>
 
 
                                 <style>
@@ -427,6 +395,17 @@
                                     font-size: 10px;
                                 }
                                 }
+
+                                /* 셀 폭을 너무 작게 못 줄이게(한 글자 세로찢김 방지) */
+                                #cooccur th, #cooccur td{
+                                min-width: 28px;     /* 숫자 칸 최소 폭 */
+                                }
+
+                                /* 테이블 폭 계산을 예측 가능하게 */
+                                #cooccur{
+                                table-layout: fixed; /* 46x46에 매우 유리 */
+                                }
+
                             </style>
 
                         </div>
