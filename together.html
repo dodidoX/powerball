@@ -100,11 +100,13 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                                    
                                 </div>
-
-                                <div class="table-responsive card-body">
-                                    <table class="table" id="cooccur" width="100%"></table> <!-- 여기에 출력-->
+                                <div class="card-body p-0">
+                                    <div class="cooccur-wrap">
+                                    <table class="table" id="cooccur" width="100%"></table>
+                                    </div> <!-- 여기에 출력-->
                                 </div>
-                                <div class="card-body">
+                            </div>
+
 
                                 <script>
                                 const API_BASE = "/.netlify/functions/get_numbers";
@@ -155,7 +157,7 @@
                                 const thCorner = document.createElement("th");
 
                                 // ✅ 기존 textContent 대신 innerHTML 사용 (줄바꿈 적용)
-                                thCorner.innerHTML = "동시출현번호→<br><span class='corner-sub'>번호↓</span>";
+                                thCorner.innerHTML = "동반출현번호→<br><span class='corner-sub'>/번호↓</span>";
 
                                 trHead.appendChild(thCorner);
 
@@ -231,7 +233,7 @@
                                     autoWidth: false,
                                     responsive: false,
                                     scrollX: true,
-                                    scrollCollapse: true,
+                                    scrollCollapse: false
                                 });
 
                                 // 폭 조정(헤더/바디 정렬 안정화)
@@ -332,125 +334,109 @@
 
 
                                 <style>
-                                /* 기본 */
-                                #cooccur th, #cooccur td {
+                                /* =========================
+                                cooccur 화면/폭 최적화
+                                ========================= */
+
+                                /* ✅ 테이블 스크롤 창 (엑셀 느낌) */
+                                .cooccur-wrap{
+                                width: 100%;
+                                max-width: 100%;
+                                overflow: auto;               /* 가로/세로 스크롤은 이 div가 담당 */
+                                -webkit-overflow-scrolling: touch;
+                                }
+
+                                /* 테이블은 최대한 화면폭 활용 */
+                                #cooccur{
+                                width: 100% !important;
+                                border-collapse: separate;    /* sticky 겹침 안정화 */
+                                border-spacing: 0;
+                                }
+
+                                /* 셀 기본 */
+                                #cooccur th, #cooccur td{
                                 text-align: center;
                                 vertical-align: middle;
                                 white-space: nowrap;
+                                padding: 6px 6px;
+                                font-size: 12px;
+                                line-height: 1.1;
                                 }
 
-                                /* Sticky header/col */
-                                #cooccur thead th {
+                                /* ✅ 1행 고정(엑셀처럼) */
+                                #cooccur thead th{
                                 position: sticky;
                                 top: 0;
-                                z-index: 3;
+                                z-index: 5;
                                 background: #f8f9fc;
+                                box-shadow: 0 1px 0 rgba(0,0,0,0.06); /* 고정 느낌 */
                                 }
 
-                                #cooccur tbody th {
+                                /* ✅ 1열(행 번호) 고정 */
+                                #cooccur tbody th{
                                 position: sticky;
-                                left: 0;
-                                z-index: 2;
-                                background: #fff;
-                                }
-
-                                #cooccur thead th:first-child {
                                 left: 0;
                                 z-index: 4;
+                                background: #fff;
+                                box-shadow: 1px 0 0 rgba(0,0,0,0.06);
+                                }
+
+                                /* ✅ 좌상단 코너(1행+1열 겹침) 가장 위 */
+                                #cooccur thead th:first-child{
                                 position: sticky;
+                                top: 0;
+                                left: 0;
+                                z-index: 6;
                                 background: #f8f9fc;
                                 }
 
-                                /* ✅ 대각선(자기 자신 출현 횟수) 회색 + 흰 글자 */
+                                /* ✅ 코너 헤더(2줄) */
+                                #cooccur thead th:first-child{
+                                white-space: pre-line !important;
+                                word-break: keep-all;
+                                overflow-wrap: normal;
+                                min-width: 88px;
+                                width: 88px;
+                                padding: 4px 6px;
+                                font-size: 11px;
+                                line-height: 1.05;
+                                }
+                                #cooccur thead th:first-child .corner-sub{
+                                font-size: 0.75em;
+                                opacity: .9;
+                                }
+
+                                /* ✅ 대각선(자기 자신 출현 횟수) 회색 */
                                 #cooccur td.diag-cell{
-                                background: #6B7280 !important; /* 회색 */
-                                color: #FFFFFF !important;
+                                background: #6B7280 !important;
+                                color: #fff !important;
                                 font-weight: 700;
                                 }
 
-                                /* ✅ 좌상단 코너 헤더 전용: 2줄 + 높이 최소 + 세로깨짐 방지 */
+                                /* =========================
+                                모바일: 최대한 한 화면에 보이게 더 촘촘하게
+                                ========================= */
+                                @media (max-width: 576px){
+                                #cooccur th, #cooccur td{
+                                    padding: 4px 4px;
+                                    font-size: 10px;
+                                }
                                 #cooccur thead th:first-child{
-                                text-align: center;
-                                vertical-align: middle;
-
-                                /* 줄바꿈은 <br>에서만 나게 */
-                                white-space: pre-line !important;     /* 핵심: br 줄바꿈은 살리고, 자동 줄바꿈 최소화 */
-
-                                /* 한글이 한 글자씩 세로로 찢어지는 것 방지 */
-                                word-break: keep-all;                 /* 단어(한국어는 어절) 유지 */
-                                overflow-wrap: normal;                /* 강제 줄바꿈 금지 */
-
-                                /* 코너셀 폭 확보 (세로로 깨지는 근본 원인 해결) */
-                                min-width: 88px;                      /* 필요하면 80~110 사이로 조절 */
-                                width: 88px;
-
-                                line-height: 1.05;
-                                padding: 4px 6px !important;
-                                font-size: 0.72rem;
+                                    min-width: 76px;
+                                    width: 76px;
+                                    font-size: 10px;
                                 }
-
-                                /* 두 번째 줄(번호↓)만 살짝 더 작게 */
-                                #cooccur thead th:first-child .corner-sub{
-                                display: inline-block;
-                                font-size: 0.68em;
-                                opacity: 0.9;
                                 }
-
-
                             </style>
 
-
-
-
-                                
-                                <style>  
-                                #cooccur th, #cooccur td {
-                                    text-align: center;
-                                    vertical-align: middle;
-                                    white-space: nowrap;
-                                }
-
-                                #cooccur thead th {
-                                    position: sticky;
-                                    top: 0;
-                                    z-index: 3;
-                                    background: #f8f9fc;
-                                }
-
-                                #cooccur tbody th {
-                                    position: sticky;
-                                    left: 0;
-                                    z-index: 2;
-                                    background: #fff;
-                                }
-
-                                #cooccur thead th:first-child {
-                                    left: 0;
-                                    z-index: 4;
-                                    position: sticky;
-                                }
-                                </style>
-
-                                </div>
-                            </div>
-
-                            <!-- Custom Font Size Utilities -->
-                            <div class="card shadow mb-4" style="display:none;">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">000</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-xs">.text-xs</p>
-                                    <p class="text-lg mb-0">.text-lg</p>
-                                </div>
-                            </div>
-
                         </div>
-
+                    </div>
                 </div>
 
-
             </div>
+
+
+        </div>
 
 
 
