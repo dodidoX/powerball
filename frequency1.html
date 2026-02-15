@@ -410,11 +410,10 @@
                         /* =========================
                         기본 테이블 스타일
                         ========================= */
-
                         #statsTable{
                         width:100% !important;
                         max-width:100% !important;
-                        table-layout: fixed;            /* 모바일 한 화면에 넣으려면 fixed가 유리 */
+                        table-layout: fixed;
                         border-collapse: collapse;
                         }
 
@@ -426,7 +425,7 @@
                         padding:8px 10px;
                         overflow:hidden;
                         text-overflow:ellipsis;
-                        white-space: nowrap;            /* 줄바꿈 금지: 높이 커지는 것 방지 */
+                        white-space: nowrap;
                         }
 
                         /* 헤더 */
@@ -445,7 +444,6 @@
                         /* =========================
                         로또 번호 공 스타일 + 색상
                         ========================= */
-
                         #statsTable .num-ball{
                         color:#fff !important;
                         font-weight:700;
@@ -467,43 +465,60 @@
                         #statsTable .ball-green{ background:linear-gradient(145deg,#58d68d,#2ecc71); }
 
                         /* =========================
-                        모바일: 한 화면에 꽉 차게 (스크롤 방지 핵심)
+                        DataTables wrapper 여백 제거 (statsTable 전용)
+                        ========================= */
+                        #statsTable_wrapper{
+                        width:100% !important;
+                        max-width:100% !important;
+                        }
+
+                        /* =========================
+                        모바일: 한 화면에 꽉 차게 + 폭 활용
                         ========================= */
                         @media (max-width:576px){
 
-                        /* DataTables가 강제로 넓히는 걸 막고 "화면폭에 맞춤" */
-                        .dataTables_wrapper{
-                            width:100%;
-                            overflow-x:hidden;            /* 모바일에서는 좌우 스크롤 차단 */
+                        /* ✅ 범위를 statsTable로만 제한 (부작용 방지) */
+                        #statsTable_wrapper{
+                            overflow-x:hidden;
+                        }
+
+                        /* ✅ DataTables Bootstrap row/col 여백 제거도 모바일에서만 */
+                        #statsTable_wrapper .row{
+                            margin-left:0 !important;
+                            margin-right:0 !important;
+                        }
+                        #statsTable_wrapper .row > [class*="col-"]{
+                            padding-left:0 !important;
+                            padding-right:0 !important;
                         }
 
                         #statsTable th,
                         #statsTable td{
                             padding:6px 4px;
                             font-size:0.80rem;
+                            min-width:0 !important;
                         }
 
                         #statsTable th small{
                             font-size:0.68rem;
                         }
 
-                        /* 번호공도 같이 줄여서 첫 컬럼 폭을 줄임 */
+                        /* 번호공 축소 */
                         #statsTable .num-ball{
                             width:28px;
                             height:28px;
                             font-size:0.80rem;
                         }
 
-                        /* 1열(번호)만 고정 폭, 나머지 4열은 균등 분배 */
+                        /* 1열(번호) 고정 폭 */
                         #statsTable th:first-child,
                         #statsTable td:first-child{
-                            width:46px;                   /* 52px -> 46px로 줄여서 여유 확보 */
+                            width:46px;
                         }
 
-                        /* ✅ 기존에 넣었던 min-width는 모바일에서 반드시 무효화 */
-                        #statsTable th,
-                        #statsTable td{
-                            min-width:0 !important;
+                        /* 헤더가 너무 답답하면(선택): 헤더 폰트만 살짝 더 줄이기 */
+                        #statsTable thead th{
+                            font-size:0.78rem;
                         }
                         }
                         </style>
