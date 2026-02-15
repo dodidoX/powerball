@@ -101,8 +101,13 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                
                                     <div class="table-responsive card-body">
-                                        <table class="table" id="stats" width="100%"></table> <!-- 여기에 출력1--> 
-                                    </div>                                                       
+                                    </div>      
+                                 <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                         <table class="table" id="stats" width="100%"></table>
+                                    </div>
+                                 </div>    
+                                                                    
                                 </div>
                                 
                                 <script>
@@ -232,101 +237,71 @@
                                 ============================ */
 
                                 function renderTable(statsNoBonus, statsBonus) {
+                                const table = document.getElementById("stats");
 
-                                    const container = document.getElementById("stats");
+                                // 기존 DataTable 제거
+                                if ($.fn.DataTable.isDataTable("#stats")) {
+                                    $("#stats").DataTable().clear().destroy();
+                                }
 
-                                    container.innerHTML = "";
+                                // ✅ table 자체를 비우고 thead/tbody를 직접 구성 (중첩 테이블 금지)
+                                table.innerHTML = "";
 
-                                    const table = document.createElement("table");
+                                const thead = document.createElement("thead");
+                                const tbody = document.createElement("tbody");
 
-                                    table.id = "statsTable";
-                                    table.className = "table";
+                                const headers = [
+                                    "번호",
+                                    "출현 횟수(보너스 미포함)",
+                                    "순위",
+                                    "출현 횟수(보너스 포함)",
+                                    "순위"
+                                ];
 
-                                    const thead = document.createElement("thead");
-                                    const tbody = document.createElement("tbody");
+                                const trHead = document.createElement("tr");
+                                headers.forEach(h => {
+                                    const th = document.createElement("th");
+                                    th.textContent = h;
+                                    trHead.appendChild(th);
+                                });
+                                thead.appendChild(trHead);
 
-                                    const headers = [
-                                        "번호",
-                                        "출현 횟수(보너스 미포함)",
-                                        "순위",
-                                        "출현 횟수(보너스 포함)",
-                                        "순위"
-                                    ];
+                                const mapA = new Map(statsNoBonus.map(x => [x.number, x]));
+                                const mapB = new Map(statsBonus.map(x => [x.number, x]));
 
-                                    const trHead = document.createElement("tr");
+                                for (let i = 1; i <= 45; i++) {
+                                    const a = mapA.get(i);
+                                    const b = mapB.get(i);
 
-                                    headers.forEach(h => {
+                                    let ballClass;
+                                    if (i <= 10) ballClass = "ball-yellow";
+                                    else if (i <= 20) ballClass = "ball-blue";
+                                    else if (i <= 30) ballClass = "ball-red";
+                                    else if (i <= 40) ballClass = "ball-gray";
+                                    else ballClass = "ball-green";
 
-                                        const th = document.createElement("th");
-                                        th.textContent = h;
-                                        trHead.appendChild(th);
+                                    const tr = document.createElement("tr");
+                                    tr.innerHTML = `
+                                    <td><span class="num-ball ${ballClass}">${i}</span></td>
+                                    <td>${a.count}</td>
+                                    <td>${a.rank}</td>
+                                    <td>${b.count}</td>
+                                    <td>${b.rank}</td>
+                                    `;
+                                    tbody.appendChild(tr);
+                                }
 
-                                    });
+                                table.appendChild(thead);
+                                table.appendChild(tbody);
 
-                                    thead.appendChild(trHead);
-
-                                    const mapA = new Map(statsNoBonus.map(x => [x.number, x]));
-                                    const mapB = new Map(statsBonus.map(x => [x.number, x]));
-
-                                    for (let i = 1; i <= 45; i++) {
-
-                                        const tr = document.createElement("tr");
-
-                                        const a = mapA.get(i);
-                                        const b = mapB.get(i);
-
-                                        // 번호 구간별 색상 클래스 결정
-                                        let ballClass;
-
-                                        if (i <= 10)
-                                            ballClass = "ball-yellow";
-
-                                        else if (i <= 20)
-                                            ballClass = "ball-blue";
-
-                                        else if (i <= 30)
-                                            ballClass = "ball-red";
-
-                                        else if (i <= 40)
-                                            ballClass = "ball-gray";
-
-                                        else
-                                            ballClass = "ball-green";
-
-
-                                        // 테이블 행 생성
-                                        tr.innerHTML = `
-                                            <td>
-                                                <span class="num-ball ${ballClass}">
-                                                    ${i}
-                                                </span>
-                                            </td>
-                                            <td>${a.count}</td>
-                                            <td>${a.rank}</td>
-                                            <td>${b.count}</td>
-                                            <td>${b.rank}</td>
-                                        `;
-
-
-                                        tbody.appendChild(tr);
-
-                                    }
-
-                                    table.appendChild(thead);
-                                    table.appendChild(tbody);
-
-                                    container.appendChild(table);
-
-                                    if ($.fn.DataTable.isDataTable("#stats"))
-                                        $("#stats").DataTable().destroy();
-
-                                    $("#stats").DataTable({
-                                        paging: false,
-                                        searching: false,
-                                        info: false,
-                                        order: []
-                                    });
-
+                                // ✅ DataTables는 최종 DOM 완성 후 붙이기
+                                $("#stats").DataTable({
+                                    paging: false,
+                                    searching: false,
+                                    info: false,
+                                    order: [],
+                                    autoWidth: false    // 폭 계산 꼬임 방지
+                                });
                                 }
 
 
