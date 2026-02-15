@@ -533,6 +533,77 @@
                         overflow-x: auto;
                         }
 
+
+                        /* ===== 모바일 테이블 개선 ===== */
+
+                        #statsTable {
+                        width: 100%;
+                        table-layout: auto !important;   /* fixed 제거 */
+                        }
+
+                        /* 셀 여유 확보 */
+                        #statsTable th,
+                        #statsTable td {
+                        padding: 8px 6px !important;
+                        font-size: 14px;
+                        text-align: center;
+                        }
+
+                        /* 모바일 최적화 */
+                        @media (max-width: 576px) {
+
+                        #statsTable th,
+                        #statsTable td {
+                            padding: 6px 4px !important;
+                            font-size: 13px;
+                        }
+
+                        /* 번호 컬럼 width 확보 */
+                        #statsTable th:first-child,
+                        #statsTable td:first-child {
+                            width: 52px;
+                            min-width: 52px;
+                        }
+
+                        }
+
+                        /* 번호 공 스타일 */
+                        .num-ball {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        width: 28px;
+                        height: 28px;
+
+                        border-radius: 50%;
+                        font-weight: bold;
+                        color: white;
+
+                        font-size: 14px;
+                        }
+
+                        /* 모바일에서 약간 축소 */
+                        @media (max-width: 576px) {
+                        .num-ball {
+                            width: 26px;
+                            height: 26px;
+                            font-size: 13px;
+                        }
+                        }
+
+                        #statsTable th:nth-child(2),
+                        #statsTable th:nth-child(3),
+                        #statsTable th:nth-child(4),
+                        #statsTable th:nth-child(5),
+                        #statsTable td:nth-child(2),
+                        #statsTable td:nth-child(3),
+                        #statsTable td:nth-child(4),
+                        #statsTable td:nth-child(5) {
+                        min-width: 60px;
+                        }
+
+
                         </style>
 
 
