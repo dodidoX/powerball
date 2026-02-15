@@ -32,7 +32,25 @@
     <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
       
 </head>
+<style>
+    .ball{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+    }
 
+    .ball-yellow{ background-color:#f1c40f !important; }
+    .ball-blue  { background-color:#3498db !important; }
+    .ball-red   { background-color:#e74c3c !important; }
+    .ball-gray  { background-color:#7f8c8d !important; }
+    .ball-green { background-color:#2ecc71 !important; }
+</style>
 <body id="page-top">
 
 
@@ -321,18 +339,18 @@
 
                             let COOCCUR_BOUND = false;
 
-                            function ballClass(n){
-                            // 로또 구간: 1~10, 11~20, 21~30, 31~40, 41~45
-                            if (n <= 10) return "ball-yellow";
-                            if (n <= 20) return "ball-blue";
-                            if (n <= 30) return "ball-red";
-                            if (n <= 40) return "ball-gray";
-                            return "ball-green";
+                            function getBallClass(n){
+                                if (n <= 10) return "ball-yellow";
+                                else if (n <= 20) return "ball-blue";
+                                else if (n <= 30) return "ball-red";
+                                else if (n <= 40) return "ball-gray";
+                                else return "ball-green";
                             }
 
-                            function ballHtml(n){
-                            return `<span class="num-ball ${ballClass(n)}">${n}</span>`;
+                            function makeBallHTML(n){
+                                return `<span class="ball ${getBallClass(n)}">${n}</span>`;
                             }
+
 
 
                             function attachCooccurInteractions(){
@@ -357,8 +375,13 @@
                                 const r = rowHeader ? parseInt(rowHeader.textContent, 10) : null;
 
                                 // td.cellIndex: row 안에서의 인덱스(0=th, 1..45=td)
-                                const c = td.cellIndex; // 1..45
-                                const v = td.textContent;
+                                const c = td.cellIndex; // 1..45 유지
+                                // 만약 혹시 0이 나오는 케이스 대비
+                                if (c < 1 || c > 45) return;
+                                // 1..45
+
+                                const v = td.textContent.trim();
+                                const together = parseInt(v, 10);
 
                                 clearCooccurSelection();
 
@@ -386,16 +409,16 @@
                                 const diagTd = tr.querySelector(`td.diag-cell`) || tr.querySelector(`td:nth-child(${r+1})`);
                                 const total = diagTd ? parseInt(diagTd.textContent, 10) : null;
 
-                                const together = parseInt(v, 10);
-
-                                const leftBall  = ballHtml(r);
-                                const rightBall = ballHtml(c);
+                                const leftBall  = makeBallHTML(r);
+                                const rightBall = makeBallHTML(c);
 
                                 if (Number.isFinite(total)) {
-                                    info.innerHTML = `${leftBall} 숫자 <b>${total}</b>회 출현 중 ${rightBall} 숫자 <b>${together}</b>회 동반 출현`;
+                                info.innerHTML =
+                                    `${leftBall} 총 <b>${total}</b>회 출현 중 ` +
+                                    `${rightBall} <b>${together}</b>회 동반 출현`;
                                 } else {
-                                    // 혹시 total을 못 읽어오면 최소 문장
-                                    info.innerHTML = `${leftBall} 숫자와 ${rightBall} 숫자는 <b>${together}</b>회 동반 출현`;
+                                info.innerHTML =
+                                    `${leftBall} 숫자와 ${rightBall} 숫자는 <b>${together}</b>회 동반 출현`;
                                 }
                                 }
                             };
