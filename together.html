@@ -140,7 +140,6 @@
                             <script>
                             const API_BASE = "/.netlify/functions/coincidence";
 
-                            /* ===== 색 유틸 ===== */
                             function hexToRgb(hex){
                             const h = hex.replace("#","").trim();
                             const full = h.length === 3 ? h.split("").map(ch=>ch+ch).join("") : h;
@@ -168,14 +167,11 @@
                             const table = document.getElementById("cooccur");
                             if (!table) return;
 
-                            // 1) 기존 내용 싹 비우기
                             table.innerHTML = "";
 
-                            // 2) thead/tbody 만들기
                             const thead = document.createElement("thead");
                             const tbody = document.createElement("tbody");
 
-                            // 3) 헤더 행
                             const trHead = document.createElement("tr");
                             const thCorner = document.createElement("th");
                             thCorner.innerHTML = "동반출현번호→<br><span class='corner-sub'>/번호↓</span>";
@@ -188,10 +184,8 @@
                             }
                             thead.appendChild(trHead);
 
-                            // 4) 바디(46x46)
                             for (let r = 1; r <= 45; r++) {
 
-                                // 행별 min/max (대각선 제외)
                                 const vals = [];
                                 for (let c = 1; c <= 45; c++) {
                                 if (c === r) continue;
@@ -206,26 +200,22 @@
 
                                 const tr = document.createElement("tr");
 
-                                // 왼쪽 행 헤더(고정될 th)
                                 const thRow = document.createElement("th");
                                 thRow.textContent = r;
                                 tr.appendChild(thRow);
 
-                                // 데이터 셀
                                 for (let c = 1; c <= 45; c++) {
                                 const td = document.createElement("td");
                                 const v = Number(matrix?.[r]?.[c] ?? 0);
                                 td.textContent = v;
 
                                 if (c === r) {
-                                    td.classList.add("diag-cell"); // 대각선 회색
+                                    td.classList.add("diag-cell"); 
                                 } else {
-                                    // 그라데이션
                                     const t = Math.max(0, Math.min(1, (v - rowMin) / denom));
                                     const bgRgb = mixRgb(WHITE, END_RGB, t);
                                     td.style.backgroundColor = rgbToCss(bgRgb);
 
-                                    // 글자색 자동
                                     const lum = luminance(bgRgb);
                                     td.style.color = (lum < 0.55) ? "#FFFFFF" : "#111827";
                                     if (t > 0.85) td.style.fontWeight = "700";
@@ -237,12 +227,10 @@
                                 tbody.appendChild(tr);
                             }
 
-                            // 5) 테이블에 붙이기
                             table.appendChild(thead);
                             table.appendChild(tbody);
                             }
 
-                            /* ===== 아래 함수들은 기존 그대로 ===== */
                             function setSelectOptions(selectEl, min, max) {
                             selectEl.innerHTML = "";
                             for (let i = min; i <= max; i++) {
@@ -257,7 +245,7 @@
                             const url = `${API_BASE}?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
                             const res = await fetch(url, { cache: "no-store" });
                             if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
-                            return await res.json(); // { meta, matrix }
+                            return await res.json(); 
                             }
 
                             function clampAndSwap(s, e, minRound, maxRound) {
@@ -354,61 +342,49 @@
                                 return `<span class="ball ${getBallClass(n)}">${n}</span>`;
                             }
 
-
-
                             function attachCooccurInteractions(){
-                            if (COOCCUR_BOUND) return; // ✅ 한 번만 바인딩
+                            if (COOCCUR_BOUND) return; 
                             COOCCUR_BOUND = true;
 
                             const table = document.getElementById("cooccur");
                             const info  = document.getElementById("cooccurInfo");
                             if (!table) return;
 
-                            let lastTd = null; // ✅ 같은 셀 반복 처리 방지
+                            let lastTd = null; 
 
                             const handlePick = (td) => {
                                 if (!td || td.tagName !== "TD") return;
-                                if (td === lastTd) return; // ✅ 같은 셀은 스킵
+                                if (td === lastTd) return; 
                                 lastTd = td;
 
                                 const tr = td.closest("tr");
                                 if (!tr) return;
 
-                                const rowHeader = tr.querySelector("th");  // 왼쪽 sticky 행번호
+                                const rowHeader = tr.querySelector("th"); 
                                 const r = rowHeader ? parseInt(rowHeader.textContent, 10) : null;
 
-                                // td.cellIndex: row 안에서의 인덱스(0=th, 1..45=td)
-                                const c = td.cellIndex; // 1..45 유지
-                                // 만약 혹시 0이 나오는 케이스 대비
+                                const c = td.cellIndex; 
+
                                 if (c < 1 || c > 45) return;
-                                // 1..45
 
                                 const v = td.textContent.trim();
                                 const together = parseInt(v, 10);
 
                                 clearCooccurSelection();
 
-                                // 선택 셀
                                 td.classList.add("is-selected");
 
-                                // 행 강조
                                 tr.classList.add("is-row-active");
                                 if (rowHeader) rowHeader.classList.add("is-row-header-active");
 
-                                // 열 강조: nth-child는 1-based, 첫번째는 th라 td는 (c+1)
                                 table.querySelectorAll(`tbody tr td:nth-child(${c+1})`).forEach(cell => {
                                 cell.classList.add("is-col-active");
                                 });
 
-                                // 열 헤더(th) 강조: thead에서 (c+1)번째 th
                                 const colHeader = table.querySelector(`thead tr th:nth-child(${c+1})`);
                                 if (colHeader) colHeader.classList.add("is-col-header-active");
 
-                                // 정보 표시
                                 if (info && Number.isFinite(r) && Number.isFinite(c)) {
-                                // rowHeader의 값(대각선)은 "숫자 r 의 총 출현"이라고 보면 됨
-                                // 대부분 matrix[r][r] 또는 대각선 td에 들어있는 값과 동일
-                                // 여기서는 가장 안전하게 "대각선 값"을 DOM에서 가져옴
                                 const diagTd = tr.querySelector(`td.diag-cell`) || tr.querySelector(`td:nth-child(${r+1})`);
                                 const total = diagTd ? parseInt(diagTd.textContent, 10) : null;
 
@@ -426,15 +402,13 @@
                                 }
                             };
 
-                            // ✅ PC/모바일 공통: 클릭(탭)
                             table.addEventListener("click", (e) => {
                                 const td = e.target.closest("td");
                                 handlePick(td);
                             });
 
-                            // ✅ PC 편의: hover는 mouseover로 (mousemove 금지)
                             table.addEventListener("mouseover", (e) => {
-                                if ("ontouchstart" in window) return; // 모바일 hover 비활성
+                                if ("ontouchstart" in window) return; 
                                 const td = e.target.closest("td");
                                 if (td) handlePick(td);
                             });
@@ -445,38 +419,26 @@
                                 if (!table.contains(e.target)) {
                                     lastTd = null;
                                     clearCooccurSelection();
-                                    if (info) info.textContent = INFO_DEFAULT;  // ✅ 원래 문구로 복원
+                                    if (info) info.textContent = INFO_DEFAULT;  
                                 }
                                 });
                             }
 
-
-
                             </script>
 
                         <style>
-                            /* =========================
-                            cooccur 최종 레이아웃 (중복 제거 버전)
-                            - 페이지는 절대 가로로 늘어나지 않음
-                            - 가로/세로 스크롤은 cooccur-wrap이 담당
-                            - 1행/1열 sticky 고정 (엑셀 느낌)
-                            ========================= */
-
-                            /* ✅ 페이지 전체 가로 넘침 방지 (1번만) */
                             html, body {
                             width: 100%;
                             max-width: 100%;
                             overflow-x: hidden;
                             }
 
-                            /* SB-admin-2 래퍼들도 가로 넘침 방지 */
                             #wrapper, #content-wrapper, #content {
                             width: 100%;
                             max-width: 100%;
                             overflow-x: hidden;
                             }
 
-                            /* ✅ 스크롤 컨테이너: sticky가 붙는 기준 */
                             .cooccur-wrap{
                             width: 100%;
                             max-width: 100%;
@@ -484,7 +446,7 @@
                             overflow-y: auto;
                             -webkit-overflow-scrolling: touch;
 
-                            max-height: 70vh;            /* sticky가 붙으려면 scroll 컨테이너 필요 */
+                            max-height: 70vh;         
                             overscroll-behavior: contain;
 
                             display: block;
@@ -494,19 +456,18 @@
                             .cooccur-wrap{ max-height: 72vh; }
                             }
 
-                            /* ✅ 테이블 (한 번만 선언) */
-                            #cooccur{
-                            display: inline-table;         /* 바깥 레이아웃을 밀지 않게 */
-                            width: max-content !important; /* 내용만큼 커지되 */
-                            min-width: 100% !important;    /* 화면보다 작으면 화면폭에 맞춤 */
 
-                            border-collapse: separate;     /* sticky 겹침 안정화 */
+                            #cooccur{
+                            display: inline-table;         
+                            width: max-content !important; 
+                            min-width: 100% !important;   
+
+                            border-collapse: separate;   
                             border-spacing: 0;
-                            table-layout: fixed;           /* 46x46에 유리 */
-                            margin-bottom: 0;              /* bootstrap .table 기본 마진 제거 */
+                            table-layout: fixed;        
+                            margin-bottom: 0;           
                             }
 
-                            /* 셀 기본 */
                             #cooccur th, #cooccur td{
                             text-align: center;
                             vertical-align: middle;
@@ -514,30 +475,27 @@
                             padding: 6px 6px;
                             font-size: 12px;
                             line-height: 1.1;
-                            min-width: 28px;               /* 한 글자 세로찢김 방지 */
+                            min-width: 28px;             
 
-                            background-clip: padding-box;  /* sticky 경계 깔끔 */
+                            background-clip: padding-box;  
                             }
 
-                            /* ✅ 1행 고정 */
                             #cooccur thead th{
                             position: sticky;
                             top: 0;
                             z-index: 20;
                             background: #f8f9fc;
-                            box-shadow: 0 1px 0 rgba(0,0,0,0.06); /* 고정 느낌 + 경계선 */
+                            box-shadow: 0 1px 0 rgba(0,0,0,0.06); 
                             }
 
-                            /* ✅ 1열(행 번호) 고정 */
                             #cooccur tbody th{
                             position: sticky;
                             left: 0;
                             z-index: 15;
                             background: #fff;
-                            box-shadow: 1px 0 0 rgba(0,0,0,0.06); /* 고정 느낌 + 경계선 */
+                            box-shadow: 1px 0 0 rgba(0,0,0,0.06); 
                             }
 
-                            /* ✅ 좌상단(겹침) */
                             #cooccur thead th:first-child{
                             position: sticky;
                             top: 0;
@@ -545,7 +503,6 @@
                             z-index: 30;
                             background: #f8f9fc;
 
-                            /* 코너 헤더 2줄 */
                             white-space: pre-line !important;
                             word-break: keep-all;
                             overflow-wrap: normal;
@@ -561,14 +518,12 @@
                             opacity: .9;
                             }
 
-                            /* 대각선 */
                             #cooccur td.diag-cell{
                             background: #6B7280 !important;
                             color: #fff !important;
                             font-weight: 700;
                             }
 
-                            /* 모바일 */
                             @media (max-width: 576px){
                             #cooccur th, #cooccur td{
                                 padding: 4px 4px;
@@ -581,8 +536,7 @@
                             }
                             }
 
-                            /* ===== 선택/가이드 ===== */
-                            #cooccur th, #cooccur td { position: relative; } /* outline 안정화 */
+                            #cooccur th, #cooccur td { position: relative; } 
 
                             #cooccur td.is-selected{
                             outline: 3px solid rgba(17,24,39,0.85);
@@ -599,7 +553,6 @@
                             box-shadow: inset 0 0 0 2px rgba(17,24,39,0.20);
                             }
 
-                            /* 행/열 헤더도 같이 강조 */
                             #cooccur thead th.is-col-header-active,
                             #cooccur tbody th.is-row-header-active{
                             box-shadow: inset 0 0 0 3px rgba(17,24,39,0.35);
