@@ -407,204 +407,107 @@
                         </div>
 
                         <style>
-
                         /* =========================
                         기본 테이블 스타일
                         ========================= */
 
-                        #statsTable {
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        table-layout: fixed;
+                        #statsTable{
+                        width:100% !important;
+                        max-width:100% !important;
+                        table-layout: fixed;            /* 모바일 한 화면에 넣으려면 fixed가 유리 */
                         border-collapse: collapse;
                         }
 
                         #statsTable th,
-                        #statsTable td {
-                        text-align: center;
-                        vertical-align: middle;
-                        border: 1px solid #e5e7eb;
-                        padding: 8px 10px;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
+                        #statsTable td{
+                        text-align:center;
+                        vertical-align:middle;
+                        border:1px solid #e5e7eb;
+                        padding:8px 10px;
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                        white-space: nowrap;            /* 줄바꿈 금지: 높이 커지는 것 방지 */
                         }
 
                         /* 헤더 */
-                        #statsTable th {
-                        white-space: nowrap;
-                        line-height: 1.25;
-                        font-weight: 600;
+                        #statsTable thead th{
+                        background-color:#f8f9fc;
+                        font-weight:600;
+                        line-height:1.15;
                         }
 
-                        #statsTable thead th {
-                        background-color: #f8f9fc;
+                        #statsTable th small{
+                        display:block;
+                        font-size:0.85em;
+                        color:#6c757d;
                         }
-
-                        #statsTable th small {
-                        display: block;
-                        font-size: 0.85em;
-                        color: #6c757d;
-                        }
-
 
                         /* =========================
-                        로또 번호 공 스타일
+                        로또 번호 공 스타일 + 색상
                         ========================= */
 
-                        #statsTable .num-ball {
-
-                        color: #ffffff !important;
-                        font-weight: 700;
-
-                        width: 36px;
-                        height: 36px;
-
-                        border-radius: 50%;
-
-                        display: inline-flex;
-                        align-items: center;
-                        justify-content: center;
-
-                        margin: 0 auto;
-
-                        font-size: 0.95rem;
-
+                        #statsTable .num-ball{
+                        color:#fff !important;
+                        font-weight:700;
+                        width:36px;
+                        height:36px;
+                        border-radius:50%;
+                        display:inline-flex;
+                        align-items:center;
+                        justify-content:center;
+                        margin:0 auto;
+                        font-size:0.95rem;
                         box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25);
                         }
 
+                        #statsTable .ball-yellow{ background:linear-gradient(145deg,#ffd700,#f1c40f); }
+                        #statsTable .ball-blue{ background:linear-gradient(145deg,#4da3ff,#3498db); }
+                        #statsTable .ball-red{ background:linear-gradient(145deg,#ff6b6b,#e74c3c); }
+                        #statsTable .ball-gray{ background:linear-gradient(145deg,#9aa0a6,#7f8c8d); }
+                        #statsTable .ball-green{ background:linear-gradient(145deg,#58d68d,#2ecc71); }
 
                         /* =========================
-                        번호 구간별 색상
+                        모바일: 한 화면에 꽉 차게 (스크롤 방지 핵심)
                         ========================= */
+                        @media (max-width:576px){
 
-                        #statsTable .ball-yellow {
-                        background: linear-gradient(145deg,#ffd700,#f1c40f);
+                        /* DataTables가 강제로 넓히는 걸 막고 "화면폭에 맞춤" */
+                        .dataTables_wrapper{
+                            width:100%;
+                            overflow-x:hidden;            /* 모바일에서는 좌우 스크롤 차단 */
                         }
-
-                        #statsTable .ball-blue {
-                        background: linear-gradient(145deg,#4da3ff,#3498db);
-                        }
-
-                        #statsTable .ball-red {
-                        background: linear-gradient(145deg,#ff6b6b,#e74c3c);
-                        }
-
-                        #statsTable .ball-gray {
-                        background: linear-gradient(145deg,#9aa0a6,#7f8c8d);
-                        }
-
-                        #statsTable .ball-green {
-                        background: linear-gradient(145deg,#58d68d,#2ecc71);
-                        }
-
-
-
-                        /* =========================
-                        모바일 최적화 (핵심)
-                        ========================= */
-
-                        @media (max-width: 576px) {
 
                         #statsTable th,
-                        #statsTable td {
-                            padding: 5px 4px !important;
-                            font-size: 0.82rem;
+                        #statsTable td{
+                            padding:6px 4px;
+                            font-size:0.80rem;
                         }
 
-                        #statsTable th small {
-                            font-size: 0.7rem;
+                        #statsTable th small{
+                            font-size:0.68rem;
                         }
 
-                        #statsTable .num-ball {
-                            width: 28px;
-                            height: 28px;
-                            font-size: 0.8rem;
+                        /* 번호공도 같이 줄여서 첫 컬럼 폭을 줄임 */
+                        #statsTable .num-ball{
+                            width:28px;
+                            height:28px;
+                            font-size:0.80rem;
                         }
 
-                        }
-
-
-                        /* =========================
-                        DataTables 깨짐 방지
-                        ========================= */
-
-                        .dataTables_wrapper {
-                        width: 100%;
-                        overflow-x: auto;
-                        }
-
-
-                        /* ===== 모바일 테이블 개선 ===== */
-
-                        #statsTable {
-                        width: 100%;
-                        table-layout: auto !important;   /* fixed 제거 */
-                        }
-
-                        /* 셀 여유 확보 */
-                        #statsTable th,
-                        #statsTable td {
-                        padding: 8px 6px !important;
-                        font-size: 14px;
-                        text-align: center;
-                        }
-
-                        /* 모바일 최적화 */
-                        @media (max-width: 576px) {
-
-                        #statsTable th,
-                        #statsTable td {
-                            padding: 6px 4px !important;
-                            font-size: 13px;
-                        }
-
-                        /* 번호 컬럼 width 확보 */
+                        /* 1열(번호)만 고정 폭, 나머지 4열은 균등 분배 */
                         #statsTable th:first-child,
-                        #statsTable td:first-child {
-                            width: 52px;
-                            min-width: 52px;
+                        #statsTable td:first-child{
+                            width:46px;                   /* 52px -> 46px로 줄여서 여유 확보 */
                         }
 
-                        }
-
-                        /* 번호 공 스타일 */
-                        .num-ball {
-                        display: inline-flex;
-                        align-items: center;
-                        justify-content: center;
-
-                        width: 28px;
-                        height: 28px;
-
-                        border-radius: 50%;
-                        font-weight: bold;
-                        color: white;
-
-                        font-size: 14px;
-                        }
-
-                        /* 모바일에서 약간 축소 */
-                        @media (max-width: 576px) {
-                        .num-ball {
-                            width: 26px;
-                            height: 26px;
-                            font-size: 13px;
+                        /* ✅ 기존에 넣었던 min-width는 모바일에서 반드시 무효화 */
+                        #statsTable th,
+                        #statsTable td{
+                            min-width:0 !important;
                         }
                         }
-
-                        #statsTable th:nth-child(2),
-                        #statsTable th:nth-child(3),
-                        #statsTable th:nth-child(4),
-                        #statsTable th:nth-child(5),
-                        #statsTable td:nth-child(2),
-                        #statsTable td:nth-child(3),
-                        #statsTable td:nth-child(4),
-                        #statsTable td:nth-child(5) {
-                        min-width: 60px;
-                        }
-
-
                         </style>
+
 
 
 
