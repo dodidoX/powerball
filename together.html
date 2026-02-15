@@ -404,6 +404,39 @@
                                 html, body { overflow-x: hidden; }
                                 #wrapper, #content-wrapper, #content { overflow-x: hidden; }
 
+                                /* ✅ 1) 페이지 전체는 가로로 절대 안 늘어나게 */
+                                html, body {
+                                width: 100%;
+                                max-width: 100%;
+                                overflow-x: hidden;
+                                }
+
+                                /* SB-admin-2 래퍼들도 가로 넘침 방지 */
+                                #wrapper, #content-wrapper, #content {
+                                width: 100%;
+                                max-width: 100%;
+                                overflow-x: hidden;
+                                }
+
+                                /* ✅ 2) 가로 스크롤은 cooccur-wrap만 담당 */
+                                .cooccur-wrap{
+                                width: 100%;
+                                max-width: 100%;
+                                overflow-x: auto;
+                                overflow-y: auto;
+                                -webkit-overflow-scrolling: touch;
+
+                                /* 핵심: 부모를 밀어내지 않게 */
+                                display: block;
+                                }
+
+                                /* ✅ 3) 테이블은 wrap 안에서만 크게(페이지 전체를 키우지 않게) */
+                                #cooccur{
+                                display: inline-table;        /* 핵심: table이 바깥 레이아웃을 밀어내는 걸 방지 */
+                                width: max-content !important; 
+                                min-width: 100% !important;
+                                }
+
                             </style>
 
                         </div>
@@ -413,7 +446,7 @@
             </div>
 
 
-        </div>
+            </div>
 
 
 
