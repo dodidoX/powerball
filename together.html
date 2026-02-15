@@ -109,6 +109,7 @@
                                     <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                                    
                                 </div>
                                 <div class="card-body p-0">
+                                    <div class="cooccur-info" id="cooccurInfo">셀을 선택하면 행/열 정보가 표시됩니다.</div>
                                     <div class="cooccur-wrap">
                                     <table class="table" id="cooccur" width="100%"></table>
                                     </div> <!-- 여기에 출력-->
@@ -218,6 +219,7 @@
                             // 5) 테이블에 붙이기
                             table.appendChild(thead);
                             table.appendChild(tbody);
+                            attachCooccurInteractions();
                             }
 
                             /* ===== 아래 함수들은 기존 그대로 ===== */
@@ -304,9 +306,98 @@
                             }
 
                             document.addEventListener("DOMContentLoaded", initRoundSelectorsAndTable);
+
+                            function clearCooccurSelection(){
+                            const table = document.getElementById("cooccur");
+                            if (!table) return;
+
+                            table.querySelectorAll(".is-selected").forEach(el => el.classList.remove("is-selected"));
+                            table.querySelectorAll("tr.is-row-active").forEach(el => el.classList.remove("is-row-active"));
+                            table.querySelectorAll("td.is-col-active").forEach(el => el.classList.remove("is-col-active"));
+                            table.querySelectorAll("th.is-col-header-active").forEach(el => el.classList.remove("is-col-header-active"));
+                            table.querySelectorAll("th.is-row-header-active").forEach(el => el.classList.remove("is-row-header-active"));
+                            }
+
+
+                            let COOCCUR_BOUND = false;
+
+                            function attachCooccurInteractions(){
+                            if (COOCCUR_BOUND) return; // ✅ 한 번만 바인딩
+                            COOCCUR_BOUND = true;
+
+                            const table = document.getElementById("cooccur");
+                            const info  = document.getElementById("cooccurInfo");
+                            if (!table) return;
+
+                            let lastTd = null; // ✅ 같은 셀 반복 처리 방지
+
+                            const handlePick = (td) => {
+                                if (!td || td.tagName !== "TD") return;
+                                if (td === lastTd) return; // ✅ 같은 셀은 스킵
+                                lastTd = td;
+
+                                const tr = td.closest("tr");
+                                if (!tr) return;
+
+                                const rowHeader = tr.querySelector("th");  // 왼쪽 sticky 행번호
+                                const r = rowHeader ? parseInt(rowHeader.textContent, 10) : null;
+
+                                // td.cellIndex: row 안에서의 인덱스(0=th, 1..45=td)
+                                const c = td.cellIndex; // 1..45
+                                const v = td.textContent;
+
+                                clearCooccurSelection();
+
+                                // 선택 셀
+                                td.classList.add("is-selected");
+
+                                // 행 강조
+                                tr.classList.add("is-row-active");
+                                if (rowHeader) rowHeader.classList.add("is-row-header-active");
+
+                                // 열 강조: nth-child는 1-based, 첫번째는 th라 td는 (c+1)
+                                table.querySelectorAll(`tbody tr td:nth-child(${c+1})`).forEach(cell => {
+                                cell.classList.add("is-col-active");
+                                });
+
+                                // 열 헤더(th) 강조: thead에서 (c+1)번째 th
+                                const colHeader = table.querySelector(`thead tr th:nth-child(${c+1})`);
+                                if (colHeader) colHeader.classList.add("is-col-header-active");
+
+                                // 정보 표시
+                                if (info && Number.isFinite(r) && Number.isFinite(c)) {
+                                info.textContent = `선택: 행 ${r} (번호 ${r}) · 열 ${c} (번호 ${c}) · 값 ${v}`;
+                                }
+                            };
+
+                            // ✅ PC/모바일 공통: 클릭(탭)
+                            table.addEventListener("click", (e) => {
+                                const td = e.target.closest("td");
+                                handlePick(td);
+                            });
+
+                            // ✅ PC 편의: hover는 mouseover로 (mousemove 금지)
+                            table.addEventListener("mouseover", (e) => {
+                                if ("ontouchstart" in window) return; // 모바일 hover 비활성
+                                const td = e.target.closest("td");
+                                if (td) handlePick(td);
+                            });
+
+                            // ✅ 테이블 밖 클릭 시 선택 해제
+                            document.addEventListener("click", (e) => {
+                                if (!table.contains(e.target)) {
+                                lastTd = null;
+                                clearCooccurSelection();
+                                if (info) info.textContent = "";
+                                }
+                            });
+                            }
+
+
+
                             </script>
 
-                            <style>
+                        <style>
                             /* =========================
                             cooccur 최종 레이아웃 (중복 제거 버전)
                             - 페이지는 절대 가로로 늘어나지 않음
@@ -432,7 +523,48 @@
                                 font-size: 10px;
                             }
                             }
-                            </style>
+
+                            /* ===== 선택/가이드 ===== */
+                            #cooccur th, #cooccur td { position: relative; } /* outline 안정화 */
+
+                            #cooccur td.is-selected{
+                            outline: 3px solid rgba(17,24,39,0.85);
+                            outline-offset: -2px;
+                            z-index: 50;
+                            }
+
+                            #cooccur tr.is-row-active td,
+                            #cooccur tr.is-row-active th{
+                            box-shadow: inset 0 0 0 2px rgba(17,24,39,0.20);
+                            }
+
+                            #cooccur td.is-col-active{
+                            box-shadow: inset 0 0 0 2px rgba(17,24,39,0.20);
+                            }
+
+                            /* 행/열 헤더도 같이 강조 */
+                            #cooccur thead th.is-col-header-active,
+                            #cooccur tbody th.is-row-header-active{
+                            box-shadow: inset 0 0 0 3px rgba(17,24,39,0.35);
+                            }
+
+                            /* 상단 정보 바 */
+                            .cooccur-info{
+                            padding: 8px 12px;
+                            font-size: 12px;
+                            line-height: 1.2;
+                            border-bottom: 1px solid rgba(0,0,0,0.06);
+                            background: #fff;
+                            position: sticky;   /* 스크롤 내려도 보이게(선택) */
+                            top: 0;
+                            z-index: 60;
+                            }
+                            @media (max-width:576px){
+                            .cooccur-info{ font-size: 11px; padding: 8px 10px; }
+                            }
+
+
+                        </style>
 
 
                         </div>
@@ -440,8 +572,6 @@
                 </div>
 
             </div>
-
-
 
             <footer class="sticky-footer bg-white mt-auto">
                 <div class="container py-2">
