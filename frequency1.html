@@ -420,10 +420,7 @@
                         }
 
 
-                        /* =========================
-                        로또 번호 공
-                        ========================= */
-
+                        /* 로또 번호 공 */
                         #stats .num-ball{
                         color:#fff !important;
                         font-weight:700;
@@ -441,31 +438,22 @@
 
                         font-size:0.95rem;
 
-                        box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25);
+                        /* ✅ 기존 음영 제거 */
+                        box-shadow: none !important;
+                        /* 혹시 다른 효과가 붙는 경우까지 대비 */
+                        filter: none !important;
                         }
 
+                        /* =========================
+                        번호 색상 (그라데이션 제거 → 단색)
+                        ========================= */
 
-                        /* 번호 색상 */
+                        #stats .ball-yellow{ background: none !important; background-color:#f1c40f !important; }
+                        #stats .ball-blue  { background: none !important; background-color:#3498db !important; }
+                        #stats .ball-red   { background: none !important; background-color:#e74c3c !important; }
+                        #stats .ball-gray  { background: none !important; background-color:#7f8c8d !important; }
+                        #stats .ball-green { background: none !important; background-color:#2ecc71 !important; }
 
-                        #stats .ball-yellow{
-                        background:linear-gradient(145deg,#ffd700,#f1c40f);
-                        }
-
-                        #stats .ball-blue{
-                        background:linear-gradient(145deg,#4da3ff,#3498db);
-                        }
-
-                        #stats .ball-red{
-                        background:linear-gradient(145deg,#ff6b6b,#e74c3c);
-                        }
-
-                        #stats .ball-gray{
-                        background:linear-gradient(145deg,#9aa0a6,#7f8c8d);
-                        }
-
-                        #stats .ball-green{
-                        background:linear-gradient(145deg,#58d68d,#2ecc71);
-                        }
 
 
                         /* =========================
