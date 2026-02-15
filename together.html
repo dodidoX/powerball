@@ -446,7 +446,7 @@
                             host.dataset.ready = "1";
 
                             // 1~5 버튼 만들기
-                            for (let k = 1; k <= 5; k++){
+                            for (let k = 1; k <= 4; k++){
                                 const btn = document.createElement("button");
                                 btn.type = "button";
                                 btn.className = "rank-btn";
@@ -513,7 +513,7 @@
                                 .filter(v => v > 0)         
                                 .sort((a,b) => b-a);
 
-                                const upto = Math.max(1, Math.min(5, ACTIVE_RANK)); // 1~5
+                                const upto = Math.max(1, Math.min(4, ACTIVE_RANK)); // 1~4
                                 const allowed = new Set(uniqDesc.slice(0, upto));  // 1등~K등 값들(동점 묶임)
 
                                 if (allowed.size === 0) return;
