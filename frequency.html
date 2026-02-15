@@ -82,11 +82,16 @@
                     <div>
                         <p class="mb-4"> 이곳에서는 역대 로또 당첨번호에 대한  <strong><u>회차별 번호 출현 횟수</u></strong>를 확인할 수 있습니다.
                         해당 데이터를 활용해서 <a class="collapse-item" href="numbers_generator.html"><strong><u>번호 생성 페이지</u></strong></a>에서 번호를 생성해보세요</p>
-                        <p>조회하고 싶은 회차 범위를 입력하세요
-                            <select id="round_range_start"></select> ~
-                            <select id="round_range_end"></select>
-                            <button id="calculateStatsButton">조회하기</button></p> <!-- 드롭 다운 -->
+                            <div class="range-bar">
+                                <div class="range-label">조회하고 싶은 회차 범위를 입력하세요</div>
 
+                                <div class="range-controls">
+                                    <select id="round_range_start"></select>
+                                    <span class="range-tilde">~</span>
+                                    <select id="round_range_end"></select>
+                                    <button id="calculateStatsButton">조회하기</button>
+                                </div>
+                            </div>
                         </div>
                     <!-- Content Row -->
                     <div class="row">
@@ -478,6 +483,43 @@
                         }
 
                         }
+
+                        /* 회차 범위 UI */
+                        .range-bar{
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        flex-wrap: wrap;              
+                        margin-bottom: 12px;
+                        }
+
+                        .range-label{
+                        white-space: nowrap;          
+                        }
+
+                        .range-controls{
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        flex-wrap: wrap;              
+                        }
+
+                        @media (max-width: 576px){
+                        .range-label{
+                            flex: 0 0 100%;
+                            white-space: normal;      
+                        }
+                        .range-controls{
+                            flex: 0 0 100%;
+                        }
+
+                        #calculateStatsButton{
+                            padding: 6px 10px;
+                            font-size: 12px;
+                        }
+                        }
+
+
                         </style>
 
                     </div>
