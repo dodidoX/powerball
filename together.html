@@ -681,8 +681,7 @@
                             .cooccur-info{ font-size: 11px; padding: 8px 10px; }
                             }
 
-
-                            /* ✅ 랭크 필터 버튼 영역 */
+                            /* 랭크 필터 버튼 영역 */
                             .rank-filter{
                             display:flex;
                             gap:8px;
@@ -690,7 +689,7 @@
                             padding: 10px 0 6px;
                             }
 
-                            /* ✅ 버튼 토글 느낌 (부트스트랩 쓰면 클래스만으로도 OK) */
+                            /* 버튼 토글 느낌 (부트스트랩 쓰면 클래스만으로도 OK) */
                             .rank-filter .rank-btn{
                             padding: 6px 10px;
                             border: 1px solid rgba(0,0,0,0.2);
@@ -705,13 +704,23 @@
                             border-color:#4e73df;
                             }
 
-                            /* ✅ 필터로 숨기는 셀: 값은 유지, 화면만 흰색으로 */
+                            /* 필터로 숨기는 셀: 값은 유지, 화면만 흰색으로 */
                             #cooccur td.cooccur-muted{
                             background-color:#fff !important; /* inline background 덮기 */
                             color:transparent !important;     /* 숫자 숨김 */
                             font-weight:400 !important;
                             }
 
+                            /* 모바일에서 대각선(자기자신) 숫자 3자리 넘침 방지 */
+                            @media (max-width: 576px){
+                            #cooccur td.diag-cell{
+                                font-size: 9px !important;    
+                                line-height: 1 !important;
+                                padding: 2px 2px !important; 
+                                letter-spacing: -0.2px;       
+                            }
+                            }
+                            #cooccur td.diag-cell{ overflow: hidden; text-overflow: clip; }
 
 
                         </style>
