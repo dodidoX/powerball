@@ -368,14 +368,25 @@
                                 font-weight: 700;
                                 }
 
-                                /* ✅ 좌상단 코너 헤더 전용: 2줄이지만 높이는 최대한 낮게 */
+                                /* ✅ 좌상단 코너 헤더 전용: 2줄 + 높이 최소 + 세로깨짐 방지 */
                                 #cooccur thead th:first-child{
                                 text-align: center;
                                 vertical-align: middle;
-                                white-space: normal !important;     /* 코너만 줄바꿈 허용 */
-                                line-height: 1.05;                  /* 높이 줄이기 */
-                                padding: 4px 6px !important;        /* 헤더 패딩 줄이기 */
-                                font-size: 0.72rem;                 /* 글자 줄여서 1칸 높이에 가깝게 */
+
+                                /* 줄바꿈은 <br>에서만 나게 */
+                                white-space: pre-line !important;     /* 핵심: br 줄바꿈은 살리고, 자동 줄바꿈 최소화 */
+
+                                /* 한글이 한 글자씩 세로로 찢어지는 것 방지 */
+                                word-break: keep-all;                 /* 단어(한국어는 어절) 유지 */
+                                overflow-wrap: normal;                /* 강제 줄바꿈 금지 */
+
+                                /* 코너셀 폭 확보 (세로로 깨지는 근본 원인 해결) */
+                                min-width: 88px;                      /* 필요하면 80~110 사이로 조절 */
+                                width: 88px;
+
+                                line-height: 1.05;
+                                padding: 4px 6px !important;
+                                font-size: 0.72rem;
                                 }
 
                                 /* 두 번째 줄(번호↓)만 살짝 더 작게 */
@@ -385,10 +396,6 @@
                                 opacity: 0.9;
                                 }
 
-                                #cooccur thead th{
-                                padding-top: 6px;
-                                padding-bottom: 6px;
-                                }
 
                             </style>
 
