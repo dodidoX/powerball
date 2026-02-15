@@ -321,6 +321,20 @@
 
                             let COOCCUR_BOUND = false;
 
+                            function ballClass(n){
+                            // 로또 구간: 1~10, 11~20, 21~30, 31~40, 41~45
+                            if (n <= 10) return "ball-yellow";
+                            if (n <= 20) return "ball-blue";
+                            if (n <= 30) return "ball-red";
+                            if (n <= 40) return "ball-gray";
+                            return "ball-green";
+                            }
+
+                            function ballHtml(n){
+                            return `<span class="num-ball ${ballClass(n)}">${n}</span>`;
+                            }
+
+
                             function attachCooccurInteractions(){
                             if (COOCCUR_BOUND) return; // ✅ 한 번만 바인딩
                             COOCCUR_BOUND = true;
@@ -366,7 +380,23 @@
 
                                 // 정보 표시
                                 if (info && Number.isFinite(r) && Number.isFinite(c)) {
-                                info.textContent = `선택: 행 ${r} (번호 ${r}) · 열 ${c} (번호 ${c}) · 값 ${v}`;
+                                // rowHeader의 값(대각선)은 "숫자 r 의 총 출현"이라고 보면 됨
+                                // 대부분 matrix[r][r] 또는 대각선 td에 들어있는 값과 동일
+                                // 여기서는 가장 안전하게 "대각선 값"을 DOM에서 가져옴
+                                const diagTd = tr.querySelector(`td.diag-cell`) || tr.querySelector(`td:nth-child(${r+1})`);
+                                const total = diagTd ? parseInt(diagTd.textContent, 10) : null;
+
+                                const together = parseInt(v, 10);
+
+                                const leftBall  = ballHtml(r);
+                                const rightBall = ballHtml(c);
+
+                                if (Number.isFinite(total)) {
+                                    info.innerHTML = `${leftBall} 숫자 <b>${total}</b>회 출현 중 ${rightBall} 숫자 <b>${together}</b>회 동반 출현`;
+                                } else {
+                                    // 혹시 total을 못 읽어오면 최소 문장
+                                    info.innerHTML = `${leftBall} 숫자와 ${rightBall} 숫자는 <b>${together}</b>회 동반 출현`;
+                                }
                                 }
                             };
 
