@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5RZ8RQX8B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-K5RZ8RQX8B');
+  </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Lotto Number Generator</title>
+
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+      
+</head>
+<style>
+    
+</style>
+
+<body id="page-top">
+
+
+    <div id="wrapper">
+    
+
+
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
+
+
+            <div id="content" class="flex-grow-1">
+
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+
+                  <!-- 왼쪽: 브랜드 -->
+                  <a class="navbar-brand font-weight-bold" href="index.html">로또 라이프</a>
+
+                  <!-- 오른쪽 정렬을 위한 공간 -->
+                  <ul class="navbar-nav ml-auto">
+
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-cog mr-1"></i>
+                        메뉴
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
+                        <a class="dropdown-item" href="numbers_generator.html">번호 생성</a>
+                        <a class="dropdown-item" href="tables.html">역대 당첨 현황</a>
+                        <a class="dropdown-item" href="match.html">내 번호 성적</a>
+                        <a class="dropdown-item" href="frequency.html">번호 출현 현황</a>
+                        <a class="dropdown-item" href="together.html">동반 출현 번호</a>
+                        <a class="dropdown-item" href="places.html">1등 당첨점</a>
+                      </div>
+                    </li>
+
+                  </ul>
+
+                </nav>
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-1 text-gray-800">회차별 번호 출현 횟수</h1>
+                    <div>
+                        <p class="mb-4"> 이곳에서는 역대 로또 당첨번호에 대한  <strong><u>회차별 번호 출현 횟수</u></strong>를 확인할 수 있습니다.
+                        해당 데이터를 활용해서 <a class="collapse-item" href="numbers_generator.html"><strong><u>번호 생성 페이지</u></strong></a>에서 번호를 생성해보세요</p>
+                            
+                        <!-- ▼ 추가 시작: 필터 드롭다운 3개 + 출력창 -->
+                        <div class="card shadow-sm mb-4" id="freqPicker">
+                        <div class="card-body p-3">
+                            <div class="d-flex flex-column flex-lg-row align-items-lg-end gap-2">
+
+                            <!-- 드롭다운 1: 회차 범위 -->
+                            <div class="form-group mb-2 mb-lg-0 mr-lg-2" style="min-width: 220px;">
+                                <label class="small text-muted mb-1" for="ddRange">회차 범위</label>
+                                <select id="ddRange" class="form-control">
+                                <option value="100">최근 100회차</option>
+                                <option value="200">최근 200회차</option>
+                                <option value="300">최근 300회차</option>
+                                <option value="500">최근 500회차</option>
+                                <option value="all">전회차</option>
+                                </select>
+                            </div>
+
+                            <!-- 드롭다운 2: 최다/최소 -->
+                            <div class="form-group mb-2 mb-lg-0 mr-lg-2" style="min-width: 160px;">
+                                <label class="small text-muted mb-1" for="ddMode">기준</label>
+                                <select id="ddMode" class="form-control">
+                                <option value="max">최다</option>
+                                <option value="min">최소</option>
+                                </select>
+                            </div>
+
+                            <!-- 드롭다운 3: 1등/1등+보너스 -->
+                            <div class="form-group mb-2 mb-lg-0 mr-lg-2" style="min-width: 220px;">
+                                <label class="small text-muted mb-1" for="ddIncludeBonus">대상</label>
+                                <select id="ddIncludeBonus" class="form-control">
+                                <option value="win">1등 번호</option>
+                                <option value="win_bonus">1등+보너스 번호</option>
+                                </select>
+                            </div>
+
+                            <!-- 버튼 + 출력창 -->
+                            <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-end gap-2 flex-grow-1">
+                                <button type="button" id="btnApplyPick" class="btn btn-primary">
+                                조건 적용
+                                </button>
+
+                                <div class="flex-grow-1">
+                                <label class="small text-muted mb-1 d-none d-sm-block">&nbsp;</label>
+
+                                <input id="pickOutput" class="form-control bg-white" type="text" readonly value="조건을 선택한 뒤 “조건 적용”을 눌러주세요.">
+
+
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+                        </div>
+                        <!-- ▲ 추가 끝 -->
+
+                            <div class="range-bar">
+                                <div class="range-label">조회하고 싶은 회차 범위를 입력하세요</div>
+
+                                <div class="range-controls">
+                                    <select id="round_range_start"></select>
+                                    <span class="range-tilde">~</span>
+                                    <select id="round_range_end"></select>
+                                    <button id="calculateStatsButton">조회하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- First Column -->
+                        <div class="col-12">
+
+
+                            <!-- Custom Text Color Utilities -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary" >번호 출현 횟수</h6>                
+                                    <div class="table-responsive card-body">
+                                    </div>      
+                                 <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                         <table class="table" id="stats" width="100%"></table>
+                                    </div>
+                                 </div>    
+                                                                    
+                                </div>
+                                
+                                <script>
+
+                                const API_BASE = "/.netlify/functions/count_numbers";
+
+                                let CACHE = null;
+                                let MIN_ROUND = 1;
+                                let MAX_ROUND = 1;
+
+
+                                /* 드롭다운 채우기 */
+                                function setSelectOptions(selectEl, min, max) {
+
+                                    selectEl.innerHTML = "";
+
+                                    for (let i = min; i <= max; i++) {
+
+                                        const opt = document.createElement("option");
+
+                                        opt.value = i;
+                                        opt.textContent = i;
+
+                                        selectEl.appendChild(opt);
+
+                                    }
+
+                                }
+
+                                async function fetchNumbers(start, end) {
+
+                                    const url = `${API_BASE}?start=${start}&end=${end}`;
+
+                                    const res = await fetch(url, { cache: "no-store" });
+
+                                    if (!res.ok)
+                                        throw new Error(`fetch failed: ${res.status}`);
+
+                                    return await res.json();
+
+                                }
+
+
+                                function calculateStats(numbersArray, includeBonus) {
+
+                                    const counts = Array(45).fill(0);
+
+                                    for (const item of numbersArray) {
+
+                                        for (let i = 1; i <= 6; i++) {
+
+                                            const num = parseInt(item[`number${i}`]);
+
+                                            if (num >= 1 && num <= 45)
+                                                counts[num - 1]++;
+
+                                        }
+
+                                        if (includeBonus) {
+
+                                            const b = parseInt(item.bonus);
+
+                                            if (b >= 1 && b <= 45)
+                                                counts[b - 1]++;
+
+                                        }
+
+                                    }
+
+                                    return counts.map((count, index) => ({
+                                        number: index + 1,
+                                        count
+                                    }))
+                                    .sort((a, b) => b.count - a.count);
+
+                                }
+
+
+                                function addRanks(stats) {
+
+                                    let prevCount = -1;
+                                    let prevRank = 0;
+
+                                    return stats.map((row, i) => {
+
+                                        if (row.count === prevCount)
+                                            row.rank = prevRank;
+
+                                        else {
+
+                                            row.rank = i + 1;
+                                            prevRank = row.rank;
+                                            prevCount = row.count;
+
+                                        }
+
+                                        return row;
+
+                                    });
+
+                                }
+
+
+                                function renderTable(statsNoBonus, statsBonus) {
+                                const table = document.getElementById("stats");
+
+                                if ($.fn.DataTable.isDataTable("#stats")) {
+                                    $("#stats").DataTable().clear().destroy();
+                                }
+
+                                table.innerHTML = "";
+
+                                const thead = document.createElement("thead");
+                                const tbody = document.createElement("tbody");
+
+                                const headers = [
+                                    "번호",
+                                    "출현 횟수(보너스 미포함)",
+                                    "순위",
+                                    "출현 횟수(보너스 포함)",
+                                    "순위"
+                                ];
+
+                                const trHead = document.createElement("tr");
+                                headers.forEach(h => {
+                                    const th = document.createElement("th");
+                                    th.textContent = h;
+                                    trHead.appendChild(th);
+                                });
+                                thead.appendChild(trHead);
+
+                                const mapA = new Map(statsNoBonus.map(x => [x.number, x]));
+                                const mapB = new Map(statsBonus.map(x => [x.number, x]));
+
+                                for (let i = 1; i <= 45; i++) {
+                                    const a = mapA.get(i);
+                                    const b = mapB.get(i);
+
+                                    let ballClass;
+                                    if (i <= 10) ballClass = "ball-yellow";
+                                    else if (i <= 20) ballClass = "ball-blue";
+                                    else if (i <= 30) ballClass = "ball-red";
+                                    else if (i <= 40) ballClass = "ball-gray";
+                                    else ballClass = "ball-green";
+
+                                    const tr = document.createElement("tr");
+                                    tr.innerHTML = `
+                                    <td><span class="num-ball ${ballClass}">${i}</span></td>
+                                    <td>${a.count}</td>
+                                    <td>${a.rank}</td>
+                                    <td>${b.count}</td>
+                                    <td>${b.rank}</td>
+                                    `;
+                                    tbody.appendChild(tr);
+                                }
+
+                                table.appendChild(thead);
+                                table.appendChild(tbody);
+
+                                $("#stats").DataTable({
+                                    paging: false,
+                                    searching: false,
+                                    info: false,
+                                    order: [],
+                                    autoWidth: false  
+                                });
+                                }
+
+
+                                async function runQuery() {
+
+                                    const start = parseInt(
+                                        document.getElementById("round_range_start").value
+                                    );
+
+                                    const end = parseInt(
+                                        document.getElementById("round_range_end").value
+                                    );
+
+                                    const data = await fetchNumbers(start, end);
+
+                                    const numbers = data.numbers;
+
+                                    const statsA = addRanks(
+                                        calculateStats(numbers, false)
+                                    );
+
+                                    const statsB = addRanks(
+                                        calculateStats(numbers, true)
+                                    );
+
+                                    renderTable(statsA, statsB);
+
+                                }
+
+
+                                async function init() {
+
+                                    const data = await fetchNumbers(1, 999999);
+
+                                    MIN_ROUND = data.meta.minRound;
+                                    MAX_ROUND = data.meta.maxRound;
+
+                                    const startSel =
+                                        document.getElementById("round_range_start");
+
+                                    const endSel =
+                                        document.getElementById("round_range_end");
+
+                                    setSelectOptions(startSel, MIN_ROUND, MAX_ROUND);
+                                    setSelectOptions(endSel, MIN_ROUND, MAX_ROUND);
+
+                                    startSel.value = MIN_ROUND;
+                                    endSel.value = MAX_ROUND;
+
+                                    await runQuery();
+
+                                }
+
+
+                                document.addEventListener("DOMContentLoaded", init);
+
+                                document
+                                .getElementById("calculateStatsButton")
+                                .addEventListener("click", runQuery);
+
+                                </script>
+
+
+                            </div>
+
+                        </div>
+
+
+                        <script>
+                        // 1) 최근 N회차 → start/end 계산
+                        function getStartEndByRecent(maxRound, rangeValue) {
+                            if (rangeValue === "all") {
+                            return { start: MIN_ROUND, end: MAX_ROUND };
+                            }
+                            const n = parseInt(rangeValue, 10);
+                            const end = maxRound;
+                            const start = Math.max(MIN_ROUND, end - n + 1);
+                            return { start, end };
+                        }
+
+                        // 2) 최다/최소(동률 포함) 번호 뽑기
+                        function pickNumbersByMode(stats, mode /* "max" | "min" */) {
+                            if (!stats || stats.length === 0) return [];
+
+                            const targetCount = (mode === "max")
+                            ? stats[0].count
+                            : stats[stats.length - 1].count;
+
+                            // 동률 포함해서 number만 추출
+                            return stats
+                            .filter(x => x.count === targetCount)
+                            .map(x => x.number)
+                            .sort((a, b) => a - b); // 출력은 오름차순이 보기 좋음
+                        }
+
+                        // 3) 출력 유틸
+                        function setPickOutput(text) {
+                            const out = document.getElementById("pickOutput");
+                            if (!out) return;
+
+                            if (out.tagName === "INPUT" || out.tagName === "TEXTAREA") {
+                            out.value = text;
+                            } else {
+                            out.textContent = text;
+                            }
+                        }
+
+                        // "조건 적용" 버튼 이벤트
+                        async function runPick() {
+                            try {
+                            const rangeValue = document.getElementById("ddRange")?.value || "100";
+                            const modeValue = document.getElementById("ddMode")?.value || "max"; // max|min
+                            const targetValue = document.getElementById("ddIncludeBonus")?.value || "win"; // win|win_bonus
+
+                            const includeBonus = (targetValue === "win_bonus");
+
+                            const { start, end } = getStartEndByRecent(MAX_ROUND, rangeValue);
+
+                            setPickOutput("불러오는 중...");
+
+                            const data = await fetchNumbers(start, end);
+                            const numbers = data.numbers || [];
+
+                            const stats = calculateStats(numbers, includeBonus); // 빈도 내림차순 정렬
+                            const picked = pickNumbersByMode(stats, modeValue);
+
+                            if (picked.length === 0) {
+                                setPickOutput("결과 없음");
+                                return;
+                            }
+
+                            // 콤마로 출력
+                            setPickOutput(picked.join(", "));
+                            } catch (err) {
+                            setPickOutput(`오류: ${String(err)}`);
+                            }
+                        }
+
+                        document.addEventListener("DOMContentLoaded", () => {
+                            const btn = document.getElementById("btnApplyPick");
+                            if (btn) btn.addEventListener("click", runPick);
+                        });
+                        </script>
+
+
+                    <style>
+                        #stats{
+                        width:100% !important;
+                        max-width:100% !important;
+                        table-layout: fixed;
+                        border-collapse: collapse;
+                        margin:0 !important;
+                        }
+
+                        /* 셀 기본 */
+                        #stats th,
+                        #stats td{
+                        text-align:center;
+                        vertical-align:middle;
+                        border:1px solid #e5e7eb;
+                        padding:8px 10px;
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                        white-space:nowrap;
+                        }
+
+                        /* 헤더 */
+                        #stats thead th{
+                        background-color:#f8f9fc;
+                        font-weight:600;
+                        line-height:1.2;
+                        }
+
+                        #stats th small{
+                        display:block;
+                        font-size:0.85em;
+                        color:#6c757d;
+                        }
+
+
+                        /* 로또 번호 공 */
+                        #stats .num-ball{
+                        color:#fff !important;
+                        font-weight:700;
+
+                        width:36px;
+                        height:36px;
+
+                        border-radius:50%;
+
+                        display:inline-flex;
+                        align-items:center;
+                        justify-content:center;
+
+                        margin:0 auto;
+
+                        font-size:0.95rem;
+
+
+                        box-shadow: none !important;
+                        filter: none !important;
+                        }
+
+
+                        #stats .ball-yellow{ background: none !important; background-color:#f1c40f !important; }
+                        #stats .ball-blue  { background: none !important; background-color:#3498db !important; }
+                        #stats .ball-red   { background: none !important; background-color:#e74c3c !important; }
+                        #stats .ball-gray  { background: none !important; background-color:#7f8c8d !important; }
+                        #stats .ball-green { background: none !important; background-color:#2ecc71 !important; }
+
+
+                        #stats_wrapper{
+                        width:100% !important;
+                        max-width:100% !important;
+                        margin:0 !important;
+                        padding:0 !important;
+                        }
+
+
+                        #stats_wrapper .row{
+                        margin-left:0 !important;
+                        margin-right:0 !important;
+                        }
+
+                        #stats_wrapper .row > [class*="col-"]{
+                        padding-left:0 !important;
+                        padding-right:0 !important;
+                        }
+
+                        #stats_wrapper .dt-layout-row{
+                        margin-left:0 !important;
+                        margin-right:0 !important;
+                        }
+
+                        #stats_wrapper .dt-layout-cell{
+                        padding-left:0 !important;
+                        padding-right:0 !important;
+                        }
+
+
+                        #stats_wrapper .dataTables_scroll,
+                        #stats_wrapper .dataTables_scrollHead,
+                        #stats_wrapper .dataTables_scrollHeadInner,
+                        #stats_wrapper .dataTables_scrollBody{
+                        width:100% !important;
+                        max-width:100% !important;
+                        }
+
+                        #stats_wrapper .dataTables_scrollHeadInner table{
+                        width:100% !important;
+                        }
+
+                        #stats.dataTable{
+                        width:100% !important;
+                        }
+
+
+                        @media (max-width:576px){
+
+                        #stats th,
+                        #stats td{
+                            padding:6px 4px;
+                            font-size:0.80rem;
+                            min-width:0 !important;
+                        }
+
+                        #stats th small{
+                            font-size:0.68rem;
+                        }
+
+
+                        #stats .num-ball{
+                            width:28px;
+                            height:28px;
+                            font-size:0.80rem;
+                        }
+
+                        #stats th:first-child,
+                        #stats td:first-child{
+                            width:46px;
+                        }
+
+                        }
+
+                        /* 회차 범위 UI */
+                        .range-bar{
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        flex-wrap: wrap;              
+                        margin-bottom: 12px;
+                        }
+
+                        .range-label{
+                        white-space: nowrap;          
+                        }
+
+                        .range-controls{
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        flex-wrap: wrap;              
+                        }
+
+                        @media (max-width: 576px){
+                        .range-label{
+                            flex: 0 0 100%;
+                            white-space: normal;      
+                        }
+                        .range-controls{
+                            flex: 0 0 100%;
+                        }
+
+                        #calculateStatsButton{
+                            padding: 6px 10px;
+                            font-size: 12px;
+                        }
+                        }
+
+                        #stats .ball-yellow{ background: none !important; background-color:#f1c40f !important; }
+                        #stats .ball-blue  { background: none !important; background-color:#3498db !important; }
+                        #stats .ball-red   { background: none !important; background-color:#e74c3c !important; }
+                        #stats .ball-gray  { background: none !important; background-color:#7f8c8d !important; }
+                        #stats .ball-green { background: none !important; background-color:#2ecc71 !important; }
+
+
+                    </style>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <footer class="sticky-footer bg-white mt-auto">
+                <div class="container py-2">
+                    <div class="text-center"> 
+                        <span> https://blog.naver.com/lottocreator </span>
+                    </div>
+                </div>
+            </footer>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/demo/datatables-demo.js"></script>
+
+
+</body>
+
+</html>
