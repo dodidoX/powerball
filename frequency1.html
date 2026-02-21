@@ -96,11 +96,11 @@
                             <div class="form-group mb-2 mb-lg-0 mr-lg-2" style="min-width: 220px;">
                                 <label class="small text-muted mb-1" for="ddRange">회차 범위</label>
                                 <select id="ddRange" class="form-control">
+                                <option value="all">전회차</option>
                                 <option value="100">최근 100회차</option>
                                 <option value="200">최근 200회차</option>
                                 <option value="300">최근 300회차</option>
                                 <option value="500">최근 500회차</option>
-                                <option value="all">전회차</option>
                                 </select>
                             </div>
 
@@ -120,6 +120,45 @@
                                 <option value="win">1등 번호</option>
                                 <option value="win_bonus">1등+보너스 번호</option>
                                 </select>
+                            </div>
+
+
+                            <!-- 드롭다운 4: 개수(1~30) -->
+                            <div class="form-group mb-2 mb-lg-0 mr-lg-2" style="min-width: 160px;">
+                            <label class="small text-muted mb-1" for="ddPickN">개수</label>
+                            <select id="ddPickN" class="form-control">
+                                <!-- 1~30 -->
+                                <option value="1">1개</option>
+                                <option value="2">2개</option>
+                                <option value="3">3개</option>
+                                <option value="4">4개</option>
+                                <option value="5">5개</option>
+                                <option value="6">6개</option>
+                                <option value="7">7개</option>
+                                <option value="8">8개</option>
+                                <option value="9">9개</option>
+                                <option value="10" selected>10개</option>
+                                <option value="11">11개</option>
+                                <option value="12">12개</option>
+                                <option value="13">13개</option>
+                                <option value="14">14개</option>
+                                <option value="15">15개</option>
+                                <option value="16">16개</option>
+                                <option value="17">17개</option>
+                                <option value="18">18개</option>
+                                <option value="19">19개</option>
+                                <option value="20">20개</option>
+                                <option value="21">21개</option>
+                                <option value="22">22개</option>
+                                <option value="23">23개</option>
+                                <option value="24">24개</option>
+                                <option value="25">25개</option>
+                                <option value="26">26개</option>
+                                <option value="27">27개</option>
+                                <option value="28">28개</option>
+                                <option value="29">29개</option>
+                                <option value="30">30개</option>
+                            </select>
                             </div>
 
                             <!-- 버튼 + 출력창 -->
@@ -407,53 +446,86 @@
 
 
                         <script>
-                        // 1) 최근 N회차 → start/end 계산
+                        /* =========================================================
+                        PICK UI (ddRange/ddMode/ddIncludeBonus/ddPickN) 전용 로직
+                        - "조건 적용" 클릭 시
+                            1) 회차 범위 계산
+                            2) fetchNumbers(start,end) 호출
+                            3) calculateStats(numbers, includeBonus)로 빈도 집계
+                            4) 최다/최소 기준으로 상위/하위 N개를 "동률 포함"해서 누적 추출
+                            5) 순위 순으로 콤마 출력 (동순위면 숫자 작은 것부터)
+                        ========================================================= */
+
+                        // ✅ 최근 N회차 → start/end 계산 (전회차 포함)
                         function getStartEndByRecent(maxRound, rangeValue) {
-                            if (rangeValue === "all") {
+                        if (rangeValue === "all") {
                             return { start: MIN_ROUND, end: MAX_ROUND };
-                            }
-                            const n = parseInt(rangeValue, 10);
-                            const end = maxRound;
-                            const start = Math.max(MIN_ROUND, end - n + 1);
-                            return { start, end };
+                        }
+                        const n = parseInt(rangeValue, 10);
+                        const end = maxRound;
+                        const start = Math.max(MIN_ROUND, end - n + 1);
+                        return { start, end };
                         }
 
-                        // 2) 최다/최소(동률 포함) 번호 뽑기
-                        function pickNumbersByMode(stats, mode /* "max" | "min" */) {
-                            if (!stats || stats.length === 0) return [];
-
-                            const targetCount = (mode === "max")
-                            ? stats[0].count
-                            : stats[stats.length - 1].count;
-
-                            // 동률 포함해서 number만 추출
-                            return stats
-                            .filter(x => x.count === targetCount)
-                            .map(x => x.number)
-                            .sort((a, b) => a - b); // 출력은 오름차순이 보기 좋음
-                        }
-
-                        // 3) 출력 유틸
+                        // ✅ 출력 유틸 (input/div 모두 대응)
                         function setPickOutput(text) {
-                            const out = document.getElementById("pickOutput");
-                            if (!out) return;
+                        const out = document.getElementById("pickOutput");
+                        if (!out) return;
 
-                            if (out.tagName === "INPUT" || out.tagName === "TEXTAREA") {
-                            out.value = text;
-                            } else {
-                            out.textContent = text;
-                            }
+                        const tag = (out.tagName || "").toUpperCase();
+                        if (tag === "INPUT" || tag === "TEXTAREA") out.value = text;
+                        else out.textContent = text;
                         }
 
-                        // "조건 적용" 버튼 이벤트
+                        // ✅ mode("max"=최다, "min"=최소)에 맞춰 정렬
+                        //    - 1차: count (max는 내림차순, min은 오름차순)
+                        //    - 2차: number 오름차순 (동순위에서 작은 숫자가 먼저)
+                        function orderStatsForPick(stats, mode) {
+                        const arr = (stats || []).slice();
+                        if (mode === "min") {
+                            arr.sort((a, b) => (a.count - b.count) || (a.number - b.number));
+                        } else {
+                            arr.sort((a, b) => (b.count - a.count) || (a.number - b.number));
+                        }
+                        return arr;
+                        }
+
+                        // ✅ 상위/하위 n개를 "동률 포함"으로 누적해서 뽑기
+                        //    - n번째 지점에서 동률이면 그 동률 그룹 전체 포함 → 결과는 n개 이상 가능
+                        function pickNWithTies(orderedStats, n) {
+                        const out = [];
+                        let i = 0;
+
+                        while (i < orderedStats.length && out.length < n) {
+                            const c = orderedStats[i].count;
+
+                            // 같은 count(=동순위) 그룹 모으기
+                            const group = [];
+                            while (i < orderedStats.length && orderedStats[i].count === c) {
+                            group.push(orderedStats[i].number);
+                            i++;
+                            }
+
+                            group.sort((a, b) => a - b); // 동순위는 숫자 오름차순
+                            out.push(...group);          // ✅ 컷에서 동률이면 그룹 통째로 포함
+                        }
+
+                        return out;
+                        }
+
+                        // ✅ 버튼 클릭 시 실행
                         async function runPick() {
-                            try {
-                            const rangeValue = document.getElementById("ddRange")?.value || "100";
-                            const modeValue = document.getElementById("ddMode")?.value || "max"; // max|min
-                            const targetValue = document.getElementById("ddIncludeBonus")?.value || "win"; // win|win_bonus
+                        try {
+                            const rangeValue  = document.getElementById("ddRange")?.value || "100";
+                            const modeValue   = document.getElementById("ddMode")?.value || "max";            // max|min
+                            const targetValue = document.getElementById("ddIncludeBonus")?.value || "win";    // win|win_bonus
+                            const pickNValue  = document.getElementById("ddPickN")?.value || "30";            // 1~30
 
                             const includeBonus = (targetValue === "win_bonus");
+                            const n = Math.max(1, Math.min(30, parseInt(pickNValue, 10) || 30));
 
+                            // init()에서 MIN_ROUND/MAX_ROUND는 이미 세팅되어 있어야 정상
+                            // (네 기존 init()이 fetchNumbers(1,999999)로 meta 받아서 세팅하므로 OK)
                             const { start, end } = getStartEndByRecent(MAX_ROUND, rangeValue);
 
                             setPickOutput("불러오는 중...");
@@ -461,24 +533,31 @@
                             const data = await fetchNumbers(start, end);
                             const numbers = data.numbers || [];
 
-                            const stats = calculateStats(numbers, includeBonus); // 빈도 내림차순 정렬
-                            const picked = pickNumbersByMode(stats, modeValue);
+                            // 빈도 계산 (네 기존 calculateStats 재사용)
+                            const statsRaw = calculateStats(numbers, includeBonus);
 
-                            if (picked.length === 0) {
-                                setPickOutput("결과 없음");
-                                return;
+                            // ✅ 최다/최소 기준 정렬(동순위 숫자 오름차순)
+                            const ordered = orderStatsForPick(statsRaw, modeValue);
+
+                            // ✅ N개(동률 포함) 누적 추출
+                            const pickedNums = pickNWithTies(ordered, n);
+
+                            if (!pickedNums.length) {
+                            setPickOutput("결과 없음");
+                            return;
                             }
 
-                            // 콤마로 출력
-                            setPickOutput(picked.join(", "));
-                            } catch (err) {
+                            // ✅ 순위 순(=ordered 그룹 순) + 동순위 숫자 오름차순 상태 유지
+                            setPickOutput(pickedNums.join(", "));
+                        } catch (err) {
                             setPickOutput(`오류: ${String(err)}`);
-                            }
+                        }
                         }
 
+                        // ✅ 이벤트 연결
                         document.addEventListener("DOMContentLoaded", () => {
-                            const btn = document.getElementById("btnApplyPick");
-                            if (btn) btn.addEventListener("click", runPick);
+                        const btn = document.getElementById("btnApplyPick");
+                        if (btn) btn.addEventListener("click", runPick);
                         });
                         </script>
 
