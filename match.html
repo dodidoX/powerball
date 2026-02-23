@@ -671,7 +671,7 @@
                         headers[11].textContent = "4등";
                         headers[12].textContent = "5등";
 
-                        // ✅ 짧은 헤더 모드 ON (CSS에서 글자 크게)
+                        // 짧은 헤더 모드 ON (CSS에서 글자 크게)
                         table.classList.add("compact-head");
                         shortHeads.forEach(th => th.classList.add("is-short"));
                         } else {
@@ -680,7 +680,7 @@
                         headers[11].textContent = originalTexts[2];
                         headers[12].textContent = originalTexts[3];
 
-                        // ✅ 짧은 헤더 모드 OFF
+                        // 짧은 헤더 모드 OFF
                         table.classList.remove("compact-head");
                         shortHeads.forEach(th => th.classList.remove("is-short"));
                         }
