@@ -612,24 +612,51 @@
                     }
                     });
                     </script>
+
                     <script>
-                        document.addEventListener("DOMContentLoaded", function(){
+                    document.addEventListener("DOMContentLoaded", function(){
 
-                            const isMobile = window.matchMedia("(max-width: 576px)").matches;
-                            if (!isMobile) return;
+                    const mq = window.matchMedia("(max-width: 576px)");
+                    const headers = document.querySelectorAll("#compareTable thead tr.col-head th");
 
-                            const headers = document.querySelectorAll("#compareTable thead tr.col-head th");
+                    if (!headers.length) return;
 
-                            // 0부터 시작하는 인덱스 기준
-                            headers[9].textContent  = "2등";
-                            headers[10].textContent = "3등";
-                            headers[11].textContent = "4등";
-                            headers[12].textContent = "5등";
+                    // 원래 텍스트 저장 (PC 복구용)
+                    const originalTexts = [
+                        headers[9]?.textContent,
+                        headers[10]?.textContent,
+                        headers[11]?.textContent,
+                        headers[12]?.textContent
+                    ];
 
-                            });
+                    function applyHeaderMode(e){
+
+                        const isMobile = e.matches ?? mq.matches;
+
+                        if (isMobile){
+                        headers[9].textContent  = "2등";
+                        headers[10].textContent = "3등";
+                        headers[11].textContent = "4등";
+                        headers[12].textContent = "5등";
+                        } else {
+                        headers[9].textContent  = originalTexts[0];
+                        headers[10].textContent = originalTexts[1];
+                        headers[11].textContent = originalTexts[2];
+                        headers[12].textContent = originalTexts[3];
+                        }
+                    }
+
+                    // 최초 실행
+                    applyHeaderMode(mq);
+
+                    // 화면 크기 변경 감지
+                    mq.addEventListener("change", applyHeaderMode);
+
+                    });
                     </script>
 
-                      
+
+                
                     
                 </div>
             </div>
