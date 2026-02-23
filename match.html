@@ -258,18 +258,18 @@
                         line-height: 1.1;
                         }
 
-                        /* 중간 구간 (태블릿 ~ 작은 PC): 긴 헤더가 칸을 넘치지 않게 자동 축소 */
+                        /* 중간 구간 */
                         @media (max-width: 900px){
                         #compareTable thead tr.col-head th:nth-child(n+10):nth-child(-n+13){
                             font-size: clamp(11px, 1.5vw, 13px);
                         }
                         }
 
-                        /* ✅ 모바일에서 짧은 헤더(2등/3등/4등/5등)로 바뀐 경우: 글자 크게 */
+                        /* 모바일 */
                         #compareTable thead tr.col-head th.is-short{
                         font-size: clamp(14px, 2.6vw, 20px) !important;
-                        font-weight: 800;
-                        letter-spacing: -0.2px;
+                        font-weight: 700;
+                        letter-spacing: 0;
                         }
 
 
