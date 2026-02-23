@@ -255,14 +255,23 @@
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        line-height: 1.1;
                         }
 
-                        /* 중간 구간 (태블릿 ~ 작은 PC) */
+                        /* 중간 구간 (태블릿 ~ 작은 PC): 긴 헤더가 칸을 넘치지 않게 자동 축소 */
                         @media (max-width: 900px){
                         #compareTable thead tr.col-head th:nth-child(n+10):nth-child(-n+13){
                             font-size: clamp(11px, 1.5vw, 13px);
                         }
                         }
+
+                        /* ✅ 모바일에서 짧은 헤더(2등/3등/4등/5등)로 바뀐 경우: 글자 크게 */
+                        #compareTable thead tr.col-head th.is-short{
+                        font-size: clamp(13px, 2.2vw, 18px) !important;
+                        font-weight: 800;
+                        letter-spacing: -0.2px;
+                        }
+
 
                         /* ===== 바디 영역 색 ===== */
                         #compareTable tbody td.input-cell{ background:#fbfdff; }
@@ -634,32 +643,46 @@
                     document.addEventListener("DOMContentLoaded", function(){
 
                     const mq = window.matchMedia("(max-width: 576px)");
+                    const table = document.getElementById("compareTable");
                     const headers = document.querySelectorAll("#compareTable thead tr.col-head th");
 
-                    if (!headers.length) return;
+                    if (!table || !headers.length) return;
+
+                    // 안전 체크: 13개 컬럼 이상이어야 2~5등 헤더가 존재
+                    if (headers.length < 13) return;
 
                     // 원래 텍스트 저장 (PC 복구용)
                     const originalTexts = [
-                        headers[9]?.textContent,
-                        headers[10]?.textContent,
-                        headers[11]?.textContent,
-                        headers[12]?.textContent
+                        headers[9].textContent,
+                        headers[10].textContent,
+                        headers[11].textContent,
+                        headers[12].textContent
                     ];
 
-                    function applyHeaderMode(e){
+                    // 2~5등 헤더 th 묶음
+                    const shortHeads = [headers[9], headers[10], headers[11], headers[12]];
 
-                        const isMobile = e.matches ?? mq.matches;
+                    function applyHeaderMode(e){
+                        const isMobile = (e && typeof e.matches === "boolean") ? e.matches : mq.matches;
 
                         if (isMobile){
                         headers[9].textContent  = "2등";
                         headers[10].textContent = "3등";
                         headers[11].textContent = "4등";
                         headers[12].textContent = "5등";
+
+                        // ✅ 짧은 헤더 모드 ON (CSS에서 글자 크게)
+                        table.classList.add("compact-head");
+                        shortHeads.forEach(th => th.classList.add("is-short"));
                         } else {
                         headers[9].textContent  = originalTexts[0];
                         headers[10].textContent = originalTexts[1];
                         headers[11].textContent = originalTexts[2];
                         headers[12].textContent = originalTexts[3];
+
+                        // ✅ 짧은 헤더 모드 OFF
+                        table.classList.remove("compact-head");
+                        shortHeads.forEach(th => th.classList.remove("is-short"));
                         }
                     }
 
