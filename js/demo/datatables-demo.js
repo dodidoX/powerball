@@ -34,15 +34,14 @@ $(document).ready(function () {
     if (!$btn.length) return;
 
     if (!NARROW){
-      // 넓은 상태: 상세열 항상 표시, 버튼은 존재하되 비활성
-      $btn.prop("disabled", true);
-      $btn.text("상세 열(넓은 화면에서는 항상 표시)");
-      $btn.removeClass("btn-primary").addClass("btn-outline-secondary");
+      // 넓은 화면: 버튼 숨김 + 상태 초기화
+      $btn.hide();
+      $btn.prop("disabled", false);   // 혹시 모를 disabled 제거
     } else {
-      // 좁은 상태: 버튼 활성
+      // 좁은 화면: 버튼 표시
+      $btn.show();
       $btn.prop("disabled", false);
       $btn.text(extrasShown ? "상세 열 접기" : "상세 열 펼치기");
-      $btn.removeClass("btn-primary").addClass("btn-outline-secondary");
     }
   }
 
