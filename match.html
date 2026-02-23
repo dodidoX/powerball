@@ -247,6 +247,23 @@
                         font-weight:700;
                         }
 
+                        /* 2~5등 헤더 반응형 보정 */
+
+                        /* 기본 (PC) */
+                        #compareTable thead tr.col-head th:nth-child(n+10):nth-child(-n+13){
+                        font-size: 14px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        }
+
+                        /* 중간 구간 (태블릿 ~ 작은 PC) */
+                        @media (max-width: 900px){
+                        #compareTable thead tr.col-head th:nth-child(n+10):nth-child(-n+13){
+                            font-size: clamp(11px, 1.5vw, 13px);
+                        }
+                        }
+
                         /* ===== 바디 영역 색 ===== */
                         #compareTable tbody td.input-cell{ background:#fbfdff; }
                         #compareTable tbody td.result-cell{ background:#fbfffb; }
