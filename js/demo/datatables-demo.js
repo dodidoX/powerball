@@ -12,6 +12,7 @@ $(document).ready(function () {
     searching: true,
     info: false,
     autoWidth: false,
+    order: [[0, "desc"]],   // 첫 번째 열(0번 인덱스) 내림차순, 오름차순 "asc"
     columnDefs: [
       {
         targets: 9, // 1등 당첨금액(원)
