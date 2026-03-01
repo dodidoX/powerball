@@ -319,6 +319,37 @@
         padding: 10px 0;
       }
 
+      /* =========================
+        Power Ball Buttons
+      ========================= */
+
+      #powerball .number-buttons{
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+      }
+
+      #powerball .pb-number-button{
+        background: #5c0f14;          
+        border: 1px solid #7a1c22;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 8px 0;
+        transition: all 0.15s ease;
+      }
+
+      #powerball .pb-number-button:hover{
+        background: #8b1e25;
+        transform: translateY(-1px);
+      }
+
+      #powerball .pb-number-button:active{
+        transform: translateY(1px);
+      }
+
+
       #GeneratedNumbers th,
       #GeneratedNumbers td {
         height: 22px !important;
@@ -424,6 +455,22 @@
         -webkit-text-stroke: 0.9px #000;
       }
     }
+
+    @media (max-width: 576px){
+
+      #powerball .number-buttons{
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 6px !important;
+      }
+
+      #powerball .pb-number-button{
+        border-radius: 8px;
+        font-size: 14px;
+        padding: 10px 0;
+      }
+    }
+
+
   </style>
 
 
