@@ -550,7 +550,7 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="1. 숫자 6개 이하 선택 시 무조건 출현<br>2. 숫자 7개 이상 선택 시 선택된 번호에서만 출현"
+                                      title="1. 숫자 5개 이하 선택 시 무조건 출현<br>2. 숫자 6개 이상 선택 시 선택된 번호에서만 출현"
                                     />
                                     <label for="includeCheck">숫자 포함</label>
                                   </p>
@@ -562,7 +562,7 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="선택 시 출현 번호에서 무조건 제외(최대 39개 선택 가능)"
+                                      title="선택 시 출현 번호에서 무조건 제외(최대 64개 선택 가능)"
                                     />
                                     <label for="excludeCheck">숫자 제외</label>
                                   </p>
@@ -663,7 +663,100 @@
                               </div> <!-- card shadow mb-4 -->
                             </div> <!-- col-12 col-lg-6 -->
                           </div>
-                      </div>
+
+                          <!-- powerball -->
+
+                          <div class="card shadow mb-4" id="powerball">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                                  data-toggle="collapse" data-target="#pickCollapse"
+                                  aria-expanded="true" aria-controls="pickCollapse"
+                                  style="cursor:pointer;">
+                                  <h6 class="m-0 font-weight-bold text-primary">번호 선택 및 제외 현황</h6></div>
+                              
+                            <div id="pickCollapse" class="collapse show">
+                              <div class="card-body">
+
+                                <div class="selection option-container"> 
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="includePowerball"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="1. 숫자 5개 이하 선택 시 무조건 출현<br>2. 숫자 6개 이상 선택 시 선택된 번호에서만 출현"
+                                    />
+                                    <label for="includePowerball">숫자 포함</label>
+                                  </p>
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="excludePowerball"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="선택 시 출현 번호에서 무조건 제외(최대 64개 선택 가능)"
+                                    />
+                                    <label for="excludePowerball">숫자 제외</label>
+                                  </p>
+                                  <p>
+                                    <input
+                                      type="checkbox"
+                                      id="weightedPowerball"
+                                      data-toggle="tooltip"
+                                      data-placement="top"
+                                      data-html="true"
+                                      data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                                      title="선택 후 가중치 설정 가능<br>ex1) 0% → 미출현<br>ex2) 100% → 미선택 번호와 동일 확률<br>ex3) 700% → 미선택 번호보다 700% 출현 확률 up"
+                                    />
+                                    <label for="weightedPowerball">가중치 설정(0%~1500%)</label>
+                                  </p>
+                                  <p>
+                                    <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
+                                  </p>
+                                  <p>
+                                    <button id="resetButton">숫자 초기화</button>
+                                  </p>
+                                </div>
+                                <div class="numpadding">
+                                  <div class="number-buttons">
+                                    <button class="number-button">1</button>
+                                    <button class="number-button">2</button>
+                                    <button class="number-button">3</button>
+                                    <button class="number-button">4</button>
+                                    <button class="number-button">5</button>
+                                    <button class="number-button">6</button>
+                                    <button class="number-button">7</button>
+                                    <button class="number-button">8</button>
+                                    <button class="number-button">9</button>
+                                    <button class="number-button">10</button>
+                                    <button class="number-button">11</button>
+                                    <button class="number-button">12</button>
+                                    <button class="number-button">13</button>
+                                    <button class="number-button">14</button>
+                                    <button class="number-button">15</button>
+                                    <button class="number-button">16</button>
+                                    <button class="number-button">17</button>
+                                    <button class="number-button">18</button>
+                                    <button class="number-button">19</button>
+                                    <button class="number-button">20</button>
+                                    <button class="number-button">21</button>
+                                    <button class="number-button">22</button>
+                                    <button class="number-button">23</button>
+                                    <button class="number-button">24</button>
+                                    <button class="number-button">25</button>
+                                    <button class="number-button">26</button>
+                                  </div>
+                                  <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                
+                                </div>
+                              </div> <!-- card shadow mb-4 -->
+                            </div> <!-- col-12 col-lg-6 -->
+                          </div>
+
+                        </div>
                     </div><!-- /.row --> 
 
 
