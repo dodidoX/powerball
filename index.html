@@ -686,32 +686,33 @@
                                 </div>
                                 <div class="numpadding">
                                   <div class="number-buttons">
-                                    <button class="number-button">1</button>
-                                    <button class="number-button">2</button>
-                                    <button class="number-button">3</button>
-                                    <button class="number-button">4</button>
-                                    <button class="number-button">5</button>
-                                    <button class="number-button">6</button>
-                                    <button class="number-button">7</button>
-                                    <button class="number-button">8</button>
-                                    <button class="number-button">9</button>
-                                    <button class="number-button">10</button>
-                                    <button class="number-button">11</button>
-                                    <button class="number-button">12</button>
-                                    <button class="number-button">13</button>
-                                    <button class="number-button">14</button>
-                                    <button class="number-button">15</button>
-                                    <button class="number-button">16</button>
-                                    <button class="number-button">17</button>
-                                    <button class="number-button">18</button>
-                                    <button class="number-button">19</button>
-                                    <button class="number-button">20</button>
-                                    <button class="number-button">21</button>
-                                    <button class="number-button">22</button>
-                                    <button class="number-button">23</button>
-                                    <button class="number-button">24</button>
-                                    <button class="number-button">25</button>
-                                    <button class="number-button">26</button>
+                                    <button class="pb-number-button">1</button>
+                                    <button class="pb-number-button">2</button>
+                                    <button class="pb-number-button">3</button>
+                                    <button class="pb-number-button">4</button>
+                                    <button class="pb-number-button">5</button>
+                                    <button class="pb-number-button">6</button>
+                                    <button class="pb-number-button">7</button>
+                                    <button class="pb-number-button">8</button>
+                                    <button class="pb-number-button">9</button>
+                                    <button class="pb-number-button">10</button>
+                                    <button class="pb-number-button">11</button>
+                                    <button class="pb-number-button">12</button>
+                                    <button class="pb-number-button">13</button>
+                                    <button class="pb-number-button">14</button>
+                                    <button class="pb-number-button">15</button>
+                                    <button class="pb-number-button">16</button>
+                                    <button class="pb-number-button">17</button>
+                                    <button class="pb-number-button">18</button>
+                                    <button class="pb-number-button">19</button>
+                                    <button class="pb-number-button">20</button>
+                                    <button class="pb-number-button">21</button>
+                                    <button class="pb-number-button">22</button>
+                                    <button class="pb-number-button">23</button>
+                                    <button class="pb-number-button">24</button>
+                                    <button class="pb-number-button">25</button>
+                                    <button class="pb-number-button">26</button>
+
                                   </div>
                                   <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
                                 
@@ -885,7 +886,7 @@
 
                                     numberButtons.forEach(btn => { btn.replaceWith(btn.cloneNode(true)); });
 
-                                    numberButtons = document.querySelectorAll(".number-button");
+                                    numberButtons = document.querySelectorAll("#pickCard .number-button");
 
                                     numberButtons.forEach(btn => {
                                       btn.addEventListener("click", () => {
@@ -998,7 +999,7 @@
                                     const dt = ensureHistDT();
                                     dt.rows().every(function(){
                                       const row = this.node();
-                                      for (let j=14; j<=18; j++) row.children[j].innerText = "";
+                                      for (let j=15; j<=19; j++) row.children[j].innerText = "";
                                     });
                                   }
                                   function compareInputWithTable() {
@@ -1013,7 +1014,7 @@
                                         return ball ? Number(ball.textContent) : Number(cells[2 + i].textContent);
                                       });
                                       picks.forEach((pick, idx) => {
-                                        const col = 14 + idx; 
+                                        const col = 15 + idx;
                                         cells[col].innerText = rowNums.includes(pick) ? "O" : "";
                                       });
                                     });
@@ -1108,20 +1109,22 @@
                                       generatedTbody.innerHTML = ""; 
 
                                       for (let i = 0; i < data.results.length; i++) {
-                                        const r = data.results[i];                    
-                                        const nums = r.numbers.slice().sort((a,b)=>a-b);
-                                        const powerball = Number(r.powerball);
+                                        const r = data.results[i];
+
+                                        const nums = r.numbers.slice().sort((a, b) => a - b);
+
+                                        // ✅ 서버는 power 라는 키로 내려줌
+                                        const powerball = Number(r.power);
 
                                         const cons = consecutiveLabel(nums);
-                                        const st   = statsOf(nums); 
-                                        const sumRec    = inRange(st.sum, sumMin, sumMax);
+                                        const st = statsOf(nums);
+                                        const sumRec = inRange(st.sum, sumMin, sumMax);
                                         const stddevRec = inRange(st.std, stdMin, stdMax);
-
 
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
-                                          ${nums.map(n => `<td class="num-cell"></td>`).join("")}
+                                          ${nums.map(() => `<td class="num-cell"></td>`).join("")}
                                           <td class="pb-cell"></td>
                                           <td>${cons}</td>
                                           <td>${st.sum}</td>
@@ -1133,16 +1136,21 @@
                                         `;
                                         generatedTbody.appendChild(tr);
 
-
+                                        // ✅ White 5개 채우기
                                         const tds = tr.querySelectorAll("td.num-cell");
-                                        if (pbTd) pbTd.appendChild(makeBall(powerball));
                                         tds.forEach((td, idx) => td.appendChild(makeBall(nums[idx])));
 
+                                        // ✅ PowerBall 1개 채우기
+                                        const pbTd = tr.querySelector("td.pb-cell");
+                                        if (pbTd && Number.isFinite(powerball)) pbTd.appendChild(makeBall(powerball));
+
+                                        // ✅ history에도 powerball 포함해서 넣기 (인자 순서 중요)
                                         updateHistory(
                                           nums,
+                                          powerball,
                                           st.sum,
                                           cons,
-                                          st.std.toFixed(2), 
+                                          st.std.toFixed(2),
                                           st.odd,
                                           st.even,
                                           sumRec,
@@ -1245,7 +1253,7 @@
                                     stdMinInput = byId("stddev_range_min");
                                     stdMaxInput = byId("stddev_range_max");
 
-                                    numberButtons = document.querySelectorAll(".number-button");
+                                    numberButtons = document.querySelectorAll("#pickCard .number-button");
                                     includeCheck = byId("includeCheck");
                                     excludeCheck = byId("excludeCheck");
                                     weightedCheck = byId("weightedCheck");
@@ -1434,7 +1442,7 @@
                                       if(!str) return [];
                                       return Array.from(new Set(
                                         str.split(",").map(s=>s.trim()).filter(Boolean).map(Number)
-                                          .filter(n=>Number.isInteger(n) && n>=1 && n<=29)
+                                          .filter(n=>Number.isInteger(n) && n>=1 && n<=26)
                                       )).sort((a,b)=>a-b);
                                     }
 
