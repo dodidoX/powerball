@@ -1043,7 +1043,7 @@
                                       const exclude = parseNumList(byId("excluded").value);
                                       const weighted = parseNumList(byId("weighted").value);
                                       const weightPercent = (function () {
-                                        let s = (byId("weightValue").value || "").trim();
+                                        let s = (byId("weightValueWB").value || "").trim();
                                         if (s.endsWith("%")) s = s.slice(0, -1);
                                         const n = parseFloat(s);
                                         if (!Number.isFinite(n)) return 100;
