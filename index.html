@@ -769,7 +769,7 @@
                                       iDisplayLength: -1,
                                       columnDefs: [
 
-                                        { targets: [0, 9, 10, 11, 12], type: 'num' },
+                                        { targets: [0, 8, 9, 10, 11], type: 'num' },
 
 
                                         {
@@ -786,7 +786,7 @@
                                         },
 
 
-                                        { targets: [1, 15,16,17,18,19,20, 21], orderable: false }
+                                        { targets: [1, 14,15,16,17,18, 19], orderable: false }
                                       ]
                                     });
 
@@ -864,26 +864,26 @@
                                     });
                                   }
 
-
-
                                   function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
                                     const dt = ensureHistDT();
-                                    const newRowData = [
-                                      historySeq++,                                       // No.
-                                      '<input type="checkbox" class="row-select">',       // 체크박스
-                                      ...numbers.map(n => ballHTML(n)),                   // 6개 번호(2~7) 로또공 
-                                      consecutive,                                        // 8
-                                      sum,                                                // 9
-                                      stddev,                                             // 10
-                                      oddCount,                                           // 11
-                                      evenCount,                                          // 12
-                                      sumRec,                                             // 13
-                                      stddevRec,                                          // 14
-                                      '', '', '', '', '', '',                             // 15~20: 비교 결과 "O" 들어갈 자리
-                                      '<button class="deleteBtn" type="button">삭제</button>', // 21
-                                    ];
-                                    const row = dt.row.add(newRowData).draw(false).node();
 
+                                    const compareCols = 5; // 69C5
+                                    const newRowData = [
+                                      historySeq++,                                 // 0 No.
+                                      '<input type="checkbox" class="row-select">', // 1
+                                      ...numbers.map(n => ballHTML(n)),             // 2~6 (5개)
+                                      consecutive,                                  // 7
+                                      sum,                                          // 8
+                                      stddev,                                       // 9
+                                      oddCount,                                     // 10
+                                      evenCount,                                    // 11
+                                      sumRec,                                       // 12
+                                      stddevRec,                                    // 13
+                                      ...Array(compareCols).fill(''),               // 14~18
+                                      '<button class="deleteBtn" type="button">삭제</button>', // 19
+                                    ];
+
+                                    const row = dt.row.add(newRowData).draw(false).node();
 
                                     $(row).find('button.deleteBtn').on('click', function(e){
                                       e.preventDefault();
@@ -893,18 +893,9 @@
 
                                       if (dt.rows().count() === 0) {
                                         historySeq = 1;
-                                      
-
                                         const selectAll = document.getElementById('selectAllHistory');
                                         if (selectAll) selectAll.checked = false;
-
-
-                                        dt.search('');                
-                                        dt.columns().every(function(){ 
-                                          this.search('');
-                                        });
-                                        dt.order([]).draw(false);      
-
+                                        dt.order([]).search('').columns().search('').draw(false);
                                       }
 
                                       window.scrollTo(0, y);
@@ -949,7 +940,7 @@
                                     const dt = ensureHistDT();
                                     dt.rows().every(function(){
                                       const row = this.node();
-                                      for (let j=14; j<=19; j++) row.children[j].innerText = "";
+                                      for (let j=14; j<=18; j++) row.children[j].innerText = "";
                                     });
                                   }
                                   function compareInputWithTable() {
@@ -959,7 +950,7 @@
                                     dt.rows().every(function() {
                                       const row = this.node();
                                       const cells = row.getElementsByTagName('td');
-                                      const rowNums = Array.from({ length: 6 }, (_, i) => {
+                                      const rowNums = Array.from({ length: 5 }, (_, i) => {
                                         const ball = cells[2 + i].querySelector('.num-ball');
                                         return ball ? Number(ball.textContent) : Number(cells[2 + i].textContent);
                                       });

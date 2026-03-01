@@ -107,7 +107,7 @@ function generateOneCombo(include, exclude, weighted, weightFactor) {
     candidates.push({ number: i, score });
   }
   if (candidates.length < remain) {
-    throw new Error("선택 가능한 숫자가 6개 미만입니다. 제외를 줄이세요.");
+    throw new Error("선택 가능한 숫자가 5개 미만입니다. 제외를 줄이세요.");
   }
   candidates.sort((a, b) => b.score - a.score);
   for (let i = 0; i < remain; i++) result.push(candidates[i].number);
@@ -170,7 +170,7 @@ exports.handler = async (event) => {
     }
     const availableCount = (NUM_MAX - NUM_MIN + 1) - new Set(exclude).size;
     if (availableCount < 5) {
-      return json(400, { error: "제외가 너무 많아 6개를 뽑을 수 없습니다. ‘숫자 제외’를 줄여주세요." });
+      return json(400, { error: "제외가 너무 많아 5개를 뽑을 수 없습니다. ‘숫자 제외’를 줄여주세요." });
     }
 
     // 생성
