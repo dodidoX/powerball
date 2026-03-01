@@ -55,8 +55,8 @@ function checkRateLimit(key) {
 // Node 18+ 실행. 외부 라이브러리 불필요.
 
 const NUM_MIN = 1;
-const NUM_MAX = 45;
-const MAX_EXCLUDE = 39;
+const NUM_MAX = 69;
+const MAX_EXCLUDE = 64;
 const crypto = require("node:crypto");
 
 function clamp(n, lo, hi) {
