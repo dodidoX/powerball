@@ -635,6 +635,12 @@
                               <div class="card-body">
 
                                 <div class="selection option-container"> 
+
+                                  <input type="hidden" id="pb_included" value="">
+                                  <input type="hidden" id="pb_excluded" value="">
+                                  <input type="hidden" id="pb_weighted" value="">
+
+
                                   <p>
                                     <input
                                       type="checkbox"
@@ -675,7 +681,7 @@
                                     <input type="text" id="weightValuePB" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
                                   </p>
                                   <p>
-                                    <button id="resetButton">숫자 초기화</button>
+                                    <button id="resetButtonPB">숫자 초기화</button>
                                   </p>
                                 </div>
                                 <div class="numpadding">
@@ -820,24 +826,23 @@
                                       iDisplayLength: -1,
                                       columnDefs: [
 
-                                        { targets: [0, 8, 9, 10, 11], type: 'num' },
+                                        { targets: [0, 9, 10, 11, 12], type: 'num' },
 
 
                                         {
-                                          targets: [2,3,4,5,6],
+                                          targets: [2,3,4,5,6,7],
                                           orderDataType: 'num-ball',
                                           render: function (data, type) {
-
                                             if (type === 'filter' || type === 'search') {
                                               const m = String(data).match(/\d+/);
                                               return m ? m[0] : '';
                                             }
-                                            return data; 
+                                            return data;
                                           }
                                         },
 
-
-                                        { targets: [1, 14,15,16,17,18, 19], orderable: false }
+                                        // 체크/대조5칸/삭제 버튼은 정렬 비활성
+                                        { targets: [1, 15,16,17,18,19, 20], orderable: false }
                                       ]
                                     });
 
@@ -915,23 +920,25 @@
                                     });
                                   }
 
-                                  function updateHistory(numbers, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
+                                  function updateHistory(numbers, powerball, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
                                     const dt = ensureHistDT();
-
+                                    if (!dt) return;
+                                    
                                     const compareCols = 5; // 69C5
                                     const newRowData = [
                                       historySeq++,                                 // 0 No.
                                       '<input type="checkbox" class="row-select">', // 1
                                       ...numbers.map(n => ballHTML(n)),             // 2~6 (5개)
-                                      consecutive,                                  // 7
-                                      sum,                                          // 8
-                                      stddev,                                       // 9
-                                      oddCount,                                     // 10
-                                      evenCount,                                    // 11
-                                      sumRec,                                       // 12
-                                      stddevRec,                                    // 13
-                                      ...Array(compareCols).fill(''),               // 14~18
-                                      '<button class="deleteBtn" type="button">삭제</button>', // 19
+                                      ballHTML(powerball),                              // 7 (Power)
+                                      consecutive,                                  // 8
+                                      sum,                                          // 9
+                                      stddev,                                       // 10
+                                      oddCount,                                     // 11
+                                      evenCount,                                    // 12
+                                      sumRec,                                       // 13
+                                      stddevRec,                                    // 14
+                                      ...Array(compareCols).fill(''),               // 15~19
+                                      '<button class="deleteBtn" type="button">삭제</button>', // 20
                                     ];
 
                                     const row = dt.row.add(newRowData).draw(false).node();
@@ -1050,6 +1057,19 @@
                                         return Math.max(0, Math.min(1500, n));
                                       })();
 
+                                      // Power Ball 입력 수집(프론트는 "입력만" 관리)
+                                      const pbInclude = parseNumList(byId("pb_included").value).filter(n => n>=1 && n<=26);
+                                      const pbExclude = parseNumList(byId("pb_excluded").value).filter(n => n>=1 && n<=26);
+                                      const pbWeighted = parseNumList(byId("pb_weighted").value).filter(n => n>=1 && n<=26);
+
+                                      const pbWeightPercent = (function () {
+                                        let s = (byId("weightValuePB").value || "").trim();
+                                        if (s.endsWith("%")) s = s.slice(0, -1);
+                                        const n = parseFloat(s);
+                                        if (!Number.isFinite(n)) return 100;
+                                        return Math.max(0, Math.min(1500, n));
+                                      })();
+
                                       const sumMin = parseFloat(byId("sum_range_min").value);
                                       const sumMax = parseFloat(byId("sum_range_max").value);
                                       const stdMin = parseFloat(byId("stddev_range_min").value);
@@ -1064,7 +1084,10 @@
                                           body: JSON.stringify({
                                             include, exclude, weighted,
                                             weightPercent,
-                                            count: 5,            
+                                            // ✅ PB도 서버로 전송
+                                            pbInclude, pbExclude, pbWeighted,
+                                            pbWeightPercent,
+                                            count: 5,
                                             sumMin, sumMax, stdMin, stdMax
                                           })
                                         });
@@ -1087,7 +1110,7 @@
                                       for (let i = 0; i < data.results.length; i++) {
                                         const r = data.results[i];                    
                                         const nums = r.numbers.slice().sort((a,b)=>a-b);
-
+                                        const powerball = Number(r.powerball);
 
                                         const cons = consecutiveLabel(nums);
                                         const st   = statsOf(nums); 
@@ -1099,6 +1122,7 @@
                                         tr.innerHTML = `
                                           <td>조합 ${i + 1}</td>
                                           ${nums.map(n => `<td class="num-cell"></td>`).join("")}
+                                          <td class="pb-cell"></td>
                                           <td>${cons}</td>
                                           <td>${st.sum}</td>
                                           <td>${st.std.toFixed(2)}</td>
@@ -1111,6 +1135,7 @@
 
 
                                         const tds = tr.querySelectorAll("td.num-cell");
+                                        if (pbTd) pbTd.appendChild(makeBall(powerball));
                                         tds.forEach((td, idx) => td.appendChild(makeBall(nums[idx])));
 
                                         updateHistory(
@@ -1151,7 +1176,7 @@
                                       const even = Number(tds[11].textContent);
                                       const sumRec = tds[12].textContent;
                                       const stdRec = tds[13].textContent;
-                                      updateHistory(nums, sum, cons, std, odd, even, sumRec, stdRec);
+                                      updateHistory(nums, powerball, sum, cons, std, odd, even, sumRec, stdRec);
                                       existing.add(key);
                                     });
                                   }
@@ -1398,12 +1423,113 @@
                                       $('[data-toggle="tooltip"]').tooltip({ html: true, container: 'body', trigger: 'hover'});
                                     }
 
+                                    // ===== Power Ball 입력 상태(프론트는 생성X, 입력만 관리) =====
+                                    const pbIncludedInput = byId("pb_included");
+                                    const pbExcludedInput = byId("pb_excluded");
+                                    const pbWeightedInput = byId("pb_weighted");
+
+                                    let pbButtons = document.querySelectorAll(".pb-number-button");
+
+                                    function parsePBList(str){
+                                      if(!str) return [];
+                                      return Array.from(new Set(
+                                        str.split(",").map(s=>s.trim()).filter(Boolean).map(Number)
+                                          .filter(n=>Number.isInteger(n) && n>=1 && n<=29)
+                                      )).sort((a,b)=>a-b);
+                                    }
+
+                                    function paintPBButtons(){
+                                      const inc = parsePBList(pbIncludedInput.value);
+                                      const exc = parsePBList(pbExcludedInput.value);
+                                      const wgt = parsePBList(pbWeightedInput.value);
+
+                                      pbButtons.forEach(btn=>{
+                                        const n = Number(btn.textContent);
+                                        let bg = "black";
+                                        if (inc.includes(n)) bg = "green";
+                                        else if (wgt.includes(n)) bg = "blue";
+                                        else if (exc.includes(n)) bg = "red";
+                                        btn.style.backgroundColor = bg;
+                                        btn.style.borderColor = "gray";
+                                      });
+                                    }
+
+                                    function attachPBHandlers(mode){
+                                      pbButtons.forEach(btn => { btn.replaceWith(btn.cloneNode(true)); });
+                                      pbButtons = document.querySelectorAll(".pb-number-button");
+
+                                      pbButtons.forEach(btn=>{
+                                        btn.addEventListener("click", ()=>{
+                                          const n = Number(btn.textContent);
+                                          const inc = parsePBList(pbIncludedInput.value);
+                                          const exc = parsePBList(pbExcludedInput.value);
+                                          const wgt = parsePBList(pbWeightedInput.value);
+
+                                          function toggle(list, inputEl){
+                                            const set = new Set(list);
+                                            if(set.has(n)) set.delete(n); else set.add(n);
+                                            inputEl.value = Array.from(set).sort((a,b)=>a-b).join(", ");
+                                          }
+
+                                          if(mode==="include"){
+                                            pbExcludedInput.value = exc.filter(x=>x!==n).join(", ");
+                                            pbWeightedInput.value = wgt.filter(x=>x!==n).join(", ");
+                                            toggle(inc, pbIncludedInput);
+                                          } else if(mode==="exclude"){
+                                            pbIncludedInput.value = inc.filter(x=>x!==n).join(", ");
+                                            pbWeightedInput.value = wgt.filter(x=>x!==n).join(", ");
+                                            toggle(exc, pbExcludedInput);
+                                          } else if(mode==="weight"){
+                                            pbIncludedInput.value = inc.filter(x=>x!==n).join(", ");
+                                            pbExcludedInput.value = exc.filter(x=>x!==n).join(", ");
+                                            toggle(wgt, pbWeightedInput);
+                                          }
+
+                                          paintPBButtons();
+                                        });
+                                      });
+                                    }
+
+                                    const includePB = byId("includePowerball");
+                                    const excludePB = byId("excludePowerball");
+                                    const weightedPB = byId("weightedPowerball");
+                                    const resetPB = byId("resetButtonPB");
+
+                                    if(includePB) includePB.addEventListener("change", ()=>{
+                                      if(includePB.checked){ excludePB.checked=false; weightedPB.checked=false; attachPBHandlers("include"); }
+                                      else attachPBHandlers(null);
+                                    });
+                                    if(excludePB) excludePB.addEventListener("change", ()=>{
+                                      if(excludePB.checked){ includePB.checked=false; weightedPB.checked=false; attachPBHandlers("exclude"); }
+                                      else attachPBHandlers(null);
+                                    });
+                                    if(weightedPB) weightedPB.addEventListener("change", ()=>{
+                                      if(weightedPB.checked){ includePB.checked=false; excludePB.checked=false; attachPBHandlers("weight"); }
+                                      else attachPBHandlers(null);
+                                    });
+
+                                    if(resetPB) resetPB.addEventListener("click", ()=>{
+                                      pbIncludedInput.value = "";
+                                      pbExcludedInput.value = "";
+                                      pbWeightedInput.value = "";
+                                      const pbWeight = byId("weightValuePB");
+                                      if(pbWeight) pbWeight.value = "";
+
+                                      includePB.checked = false;
+                                      excludePB.checked = false;
+                                      weightedPB.checked = false;
+
+                                      attachPBHandlers(null);
+                                      paintPBButtons();
+                                    });
+
+                                    attachPBHandlers(null);
+                                    paintPBButtons();
+
                                   });
                                   </script>
 
-                                
-                                  
-            
+
 
                             <script>
                               async function exportTableToExcel(filename) {
@@ -1695,7 +1821,7 @@
                                         <th>세번째</th>
                                         <th>네번째</th>
                                         <th>다섯번째</th>
-
+                                        <th>PowerBall</th>
                                         <th>연번</th>
                                         <th>총합</th>
                                         <th>표준편차</th>
@@ -1744,7 +1870,7 @@
                                         <th>세번째</th>
                                         <th>네번째</th>
                                         <th>다섯번째</th>
-
+                                        <th>PowerBall</th>
                                         <th>연번</th>
                                         <th>총합</th>
                                         <th>표준편차</th>
