@@ -473,62 +473,6 @@
 
                     <div class="row">
 
-                        <div class="col-12 col-lg-6 order-1 order-lg-1 d-none">
-
-                            <div class="card shadow mb-4" id="genCard">
-                              <div class="card-header py-3 d-flex justify-content-between align-items-center"
-                                  data-toggle="collapse" data-target="#genCollapse"
-                                  aria-expanded="false" aria-controls="genCollapse"
-                                  style="cursor:pointer;">
-                                <h6 class="m-0 font-weight-bold text-primary">로또 번호 생성기</h6>
-                                <span class="text-muted small">열기/닫기</span>
-                              </div>
-                              <div id="genCollapse" class="collapse">
-                                <div class="card-body">
-
-                                    <div class="container">
-                                      <div class="generator">
-                                      <h1>로또 번호 생성기</h1>
-                                      <p>
-                                        조건 1. 포함할 숫자를 입력하세요. ex) 1, 17, 35
-                                        <input type="text" id="included" value="">
-                                      </p>
-                                      <p>
-                                        조건 2. 제외할 숫자를 입력하세요. ex) 8, 23, 39
-                                        <input type="text" id="excluded" value="">
-                                      </p>
-                                      <p>
-                                        조건 3. 가중치를 설정할 숫자를 입력하세요. ex) 5, 43
-                                        <input type="text" id="weighted" value="">
-                                      </p>
-                                      <div class="gen-row">
-                                      <div class="gen-label">조건 4. 원하는 총합 범위를 입력하세요 ex) 96 ~ 175</div>
-                                        <div class="range-row">
-                                          <input type="text" id="sum_range_min" value="">
-                                          <span>~</span>
-                                          <input type="text" id="sum_range_max" value="">
-                                        </div>
-                                      </div>
-                                      <div class="gen-row">
-                                        <div class="gen-label">조건 5. 원하는 표준편차 범위를 입력하세요 ex) 8.5 ~ 15.5</div>
-                                        <div class="range-row">
-                                          <input type="text" id="stddev_range_min" value="">
-                                          <span>~</span>
-                                          <input type="text" id="stddev_range_max" value="">
-                                        </div>
-                                      </div>
-                                      <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
-
-                                      
-                                      </div>
-
-                                    </div>
-                                  </div>
-                              </div>
-                            </div>
-
-                        </div> 
-
                         <div class="col-12 col-lg-6 order-2 order-lg-2">
 
                           <div class="card shadow mb-4" id="pickCard">
@@ -542,6 +486,19 @@
                               <div class="card-body">
 
                                 <div class="selection option-container"> 
+
+                                  <!-- ✅ White Ball 상태 저장용 hidden inputs (기존 JS 호환) -->
+                                  <input type="hidden" id="included" value="">
+                                  <input type="hidden" id="excluded" value="">
+                                  <input type="hidden" id="weighted" value="">
+
+                                  <!-- ✅ 범위 조건도 계속 쓸 거면 hidden 또는 실제 UI로 배치 -->
+                                  <input type="hidden" id="sum_range_min" value="">
+                                  <input type="hidden" id="sum_range_max" value="">
+                                  <input type="hidden" id="stddev_range_min" value="">
+                                  <input type="hidden" id="stddev_range_max" value="">
+
+
                                   <p>
                                     <input
                                       type="checkbox"
@@ -579,7 +536,7 @@
                                     <label for="weightedCheck">가중치 설정(0%~1500%)</label>
                                   </p>
                                   <p>
-                                    <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
+                                    <input type="text" id="weightValueWB" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
                                   </p>
                                   <p>
                                     <button id="resetButton">숫자 초기화</button>
@@ -715,7 +672,7 @@
                                     <label for="weightedPowerball">가중치 설정(0%~1500%)</label>
                                   </p>
                                   <p>
-                                    <input type="text" id="weightValue" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
+                                    <input type="text" id="weightValuePB" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
                                   </p>
                                   <p>
                                     <button id="resetButton">숫자 초기화</button>
@@ -1245,7 +1202,7 @@
                                     includedInput = byId("included");
                                     excludedInput = byId("excluded");
                                     weightedInput = byId("weighted");
-                                    weightValueInput = byId("weightValue");
+                                    weightValueInput = byId("weightValueWB");
 
                                     weightValueInput.addEventListener("focus", () => {
                                       weightValueInput.value = weightValueInput.value.replace(/\s*%$/, "");
