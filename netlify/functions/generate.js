@@ -1,3 +1,5 @@
+// netlify/functins/generats.js
+
 // ── Rate limit 설정 ─────────────────────────────────────
 const SEC_LIMIT = 5;       // 1초당 3회
 const MIN_LIMIT = 250;     // 1분당 150회
@@ -82,9 +84,9 @@ function generateOneCombo(include, exclude, weighted, weightFactor) {
   const INC = include.filter(n => !EXCLUDED.has(n));
 
   const w = Number.isFinite(weightFactor) ? clamp(weightFactor, 0, 7) : 1;
-  const NEED = 6;
+  const NEED = 5;
 
-  if (INC.length >= NEED + 1) {
+  if (INC.length >= NEED ) {
     if (INC.length < NEED) throw new Error("포함 숫자가 부족합니다.");
     const pool = INC.map(n => ({
       number: n,
@@ -167,7 +169,7 @@ exports.handler = async (event) => {
       return json(400, { error: `‘숫자 제외’는 최대 ${MAX_EXCLUDE}개까지 가능합니다.` });
     }
     const availableCount = (NUM_MAX - NUM_MIN + 1) - new Set(exclude).size;
-    if (availableCount < 6) {
+    if (availableCount < 5) {
       return json(400, { error: "제외가 너무 많아 6개를 뽑을 수 없습니다. ‘숫자 제외’를 줄여주세요." });
     }
 

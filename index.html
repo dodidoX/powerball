@@ -773,7 +773,7 @@
 
 
                                         {
-                                          targets: [2,3,4,5,6,7],
+                                          targets: [2,3,4,5,6],
                                           orderDataType: 'num-ball',
                                           render: function (data, type) {
 
@@ -949,7 +949,7 @@
                                     const dt = ensureHistDT();
                                     dt.rows().every(function(){
                                       const row = this.node();
-                                      for (let j=15; j<=20; j++) row.children[j].innerText = "";
+                                      for (let j=14; j<=19; j++) row.children[j].innerText = "";
                                     });
                                   }
                                   function compareInputWithTable() {
@@ -964,7 +964,7 @@
                                         return ball ? Number(ball.textContent) : Number(cells[2 + i].textContent);
                                       });
                                       picks.forEach((pick, idx) => {
-                                        const col = 15 + idx; 
+                                        const col = 14 + idx; 
                                         cells[col].innerText = rowNums.includes(pick) ? "O" : "";
                                       });
                                     });
@@ -1189,7 +1189,7 @@
                                     histTbl = byId("historyTable");
                                     histTbody = byId("historyBody");
 
-                                    pickSelects = Array.from({ length: 6 }, (_, i) => byId(`number-input${i + 1}`));
+                                    pickSelects = Array.from({ length: 5 }, (_, i) => byId(`number-input${i + 1}`));
 
                                     pickSelects.forEach(sel => {
                                       if (!sel) return;
@@ -1216,7 +1216,7 @@
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
                                       // 0: No, 1: 체크박스, 2~7: 첫번째~여섯번째
-                                      const keep = new Set([0, 1, 2, 3, 4, 5, 6, 7]);
+                                      const keep = new Set([0, 1, 2, 3, 4, 5, 6]);
 
                                       dt.columns().every(function (idx) {
                                         const shouldShow = openExtra ? true : keep.has(idx);
@@ -1653,7 +1653,7 @@
                                         <th>세번째</th>
                                         <th>네번째</th>
                                         <th>다섯번째</th>
-                                        <th>여섯번째</th>
+
                                         <th>연번</th>
                                         <th>총합</th>
                                         <th>표준편차</th>
@@ -1702,7 +1702,7 @@
                                         <th>세번째</th>
                                         <th>네번째</th>
                                         <th>다섯번째</th>
-                                        <th>여섯번째</th>
+
                                         <th>연번</th>
                                         <th>총합</th>
                                         <th>표준편차</th>
@@ -1715,7 +1715,6 @@
                                         <th><select id="number-input3" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input4" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input5" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input6" placeholder="1~45 입력"></select></th>
                                         <th>삭제</th>
                                       </tr>
                                     </thead>
