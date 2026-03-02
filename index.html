@@ -920,6 +920,41 @@
                                   let generatedTbl, generatedTbody, histTbl, histTbody, pickSelects;
                                   let histDT = null;
 
+                                  let pbIncludedInput, pbExcludedInput, pbWeightedInput;
+
+                                  function parsePBList(str){
+                                    if(!str) return [];
+                                    return Array.from(new Set(
+                                      str.split(",").map(s=>s.trim()).filter(Boolean).map(Number)
+                                        .filter(n=>Number.isInteger(n) && n>=1 && n<=26)
+                                    )).sort((a,b)=>a-b);
+                                  }
+
+                                  function applyPBNumber(n, mode){
+                                    const inc = parsePBList(pbIncludedInput.value);
+                                    const exc = parsePBList(pbExcludedInput.value);
+                                    const wgt = parsePBList(pbWeightedInput.value);
+
+                                    function toggle(list){
+                                      const set = new Set(list);
+                                      if (set.has(n)) set.delete(n); else set.add(n);
+                                      return Array.from(set).sort((a,b)=>a-b).join(", ");
+                                    }
+
+                                    if (mode === "include") {
+                                      pbExcludedInput.value = exc.filter(x => x !== n).join(", ");
+                                      pbWeightedInput.value = wgt.filter(x => x !== n).join(", ");
+                                      pbIncludedInput.value = toggle(inc);
+                                    } else if (mode === "exclude") {
+                                      pbIncludedInput.value = inc.filter(x => x !== n).join(", ");
+                                      pbWeightedInput.value = wgt.filter(x => x !== n).join(", ");
+                                      pbExcludedInput.value = toggle(exc);
+                                    } else if (mode === "weight") {
+                                      pbIncludedInput.value = inc.filter(x => x !== n).join(", ");
+                                      pbExcludedInput.value = exc.filter(x => x !== n).join(", ");
+                                      pbWeightedInput.value = toggle(wgt);
+                                    }
+                                  }
 
                                   let historySeq = 1;
 
@@ -1540,8 +1575,9 @@
                                     }
 
                                     // 버튼(또는 내부 span 등)에서 숫자 얻기
-                                    function wbNumFromEl(el){
-                                      const btn = el.closest && el.closest("#pickCard .number-button");
+                                    function wbNumFromPointerEvent(e){
+                                      const el = document.elementFromPoint(e.clientX, e.clientY);
+                                      const btn = el && el.closest && el.closest("#pickCard .number-button");
                                       if (!btn) return null;
                                       const n = Number(btn.textContent);
                                       return Number.isFinite(n) ? n : null;
@@ -1566,7 +1602,7 @@
                                     }
 
                                     function wbOnPointerDown(e){
-                                      const n = wbNumFromEl(e.target);
+                                      const n = wbNumFromPointerEvent(e);
                                       if (n == null) return;
 
                                       const mode = wbGetMode();
@@ -1645,10 +1681,9 @@
                                       $('[data-toggle="tooltip"]').tooltip({ html: true, container: 'body', trigger: 'hover'});
                                     }
 
-                                    // ===== Power Ball 입력 상태(프론트는 생성X, 입력만 관리) =====
-                                    const pbIncludedInput = byId("pb_included");
-                                    const pbExcludedInput = byId("pb_excluded");
-                                    const pbWeightedInput = byId("pb_weighted");
+                                    pbIncludedInput = byId("pb_included");
+                                    pbExcludedInput = byId("pb_excluded");
+                                    pbWeightedInput = byId("pb_weighted");
 
                                     let pbButtons = document.querySelectorAll(".pb-number-button");
 
@@ -1743,8 +1778,9 @@
                                       return null;
                                     }
 
-                                    function pbNumFromEl(el){
-                                      const btn = el.closest && el.closest(".pb-number-button");
+                                    function pbNumFromPointerEvent(e){
+                                      const el = document.elementFromPoint(e.clientX, e.clientY);
+                                      const btn = el && el.closest && el.closest(".pb-number-button");
                                       if (!btn) return null;
                                       const n = Number(btn.textContent);
                                       return Number.isFinite(n) ? n : null;
@@ -1765,7 +1801,7 @@
                                     }
 
                                     function pbOnPointerDown(e){
-                                      const n = pbNumFromEl(e.target);
+                                      const n = pbNumFromPointerEvent(e)
                                       if (n == null) return;
 
                                       const mode = pbGetMode();
@@ -2192,7 +2228,7 @@
                                     <tbody id="historyBody">
                                     </tbody>
                                   </table>
-                                </div> 
+                                </div>
                                 <style>
                                   .hist-table-wrap{
                                     width: 100%;
