@@ -1454,6 +1454,8 @@
                                     const histTable = document.getElementById('historyTable');
                                     const histToggleBtn = document.getElementById('toggleHistExtra');
 
+
+
                                     function setHistoryColumns(openExtra) {
                                       const dt = ensureHistDT();
                                       if (!dt) return;
@@ -1480,16 +1482,15 @@
                                       });
 
                                       // ✅ 토글 직후 레이아웃이 바뀌는 타이밍 문제를 피하려고 rAF로 한 번 더 조정
-                                      requestAnimationFrame(() => {
-                                        dt.columns.adjust().draw(false);
-                                        setTimeout(() => dt.columns.adjust().draw(false), 50); // ✅ 한 번 더
-                                      });
+                                      dt.columns.adjust().draw(false);
                                     }
 
                                     if (histTable && histToggleBtn) {
                                       // 초기 상태: PC는 열림, 모바일은 닫힘
                                       const isMobile = window.matchMedia("(max-width: 576px)").matches;
                                       const initialOpen = !isMobile;
+
+                                      ensureHistDT();
 
                                       histTable.classList.toggle('show-extra', initialOpen);
                                       histToggleBtn.textContent = initialOpen ? '추가 정보 닫기' : '추가 정보 열기';
@@ -2329,11 +2330,11 @@
                                         <th>짝수</th>
                                         <th class="th-tight">총합<br>기준</th>
                                         <th class="th-tight">편차<br>기준</th>
-                                        <th><select id="number-input1" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input2" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input3" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input4" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input5" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input1" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input2" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input3" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input4" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input5" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th>삭제</th>
                                       </tr>
                                     </thead>
@@ -2342,27 +2343,41 @@
                                   </table>
                                 </div>
                                 <style>
-
+                                  /* =========================
+                                    History table wrapper
+                                    - 핵심: 모바일에서 overflow-x: hidden 금지 (겹침/깨짐 원인)
+                                    ========================= */
                                   .hist-table-wrap{
                                     width: 100%;
                                     overflow-x: auto;
                                     -webkit-overflow-scrolling: touch;
                                   }
 
-                                  /* 기본: 고정 레이아웃(닫힘 상태를 안정적으로) */
+                                  /* =========================
+                                    History table base
+                                    - DataTables/Bootstrap 기본 레이아웃을 최대한 유지
+                                    - table-layout: fixed 로 "폭 계산 안정화"
+                                    ========================= */
                                   #historyTable{
                                     width: 100%;
                                     table-layout: fixed;
+                                    margin: 0;
                                   }
 
-                                  /* show-extra: 가로 스크롤 허용 + 컬럼 자동 확장
-                                  #historyTable.show-extra{
+                                  /* 셀 공통: 줄바꿈 방지 + 잘림 처리(닫힘 상태에서 안정적) */
+                                  #historyTable th,
+                                  #historyTable td{
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    vertical-align: middle;
+                                  }
 
-                                    width: max-content;
-                                    min-width: 100%;
-                                  } */
-
-                                  /* ===== (핵심) 대조 select 5개 컬럼(16~20) 폭을 "항상" 통일 ===== */
+                                  /* =========================
+                                    16~20 (대조 select 5칸)
+                                    - 폭은 '셀'이 결정, select는 100%로만 따라가게
+                                    - 브라우저 기본 min-width 때문에 폭이 삐뚤어지는 문제 방지
+                                    ========================= */
                                   #historyTable thead th:nth-child(16),
                                   #historyTable thead th:nth-child(17),
                                   #historyTable thead th:nth-child(18),
@@ -2373,231 +2388,62 @@
                                   #historyTable tbody td:nth-child(18),
                                   #historyTable tbody td:nth-child(19),
                                   #historyTable tbody td:nth-child(20){
-                                    width: 72px !important;
-                                    min-width: 72px !important;
-                                    max-width: 72px !important;
+                                    width: 72px;
+                                    min-width: 72px;
+                                    max-width: 72px;
+                                    padding: 2px 3px;
+                                    box-sizing: border-box;
                                   }
 
-                                  /* 16~20 열(th/td) 폭 통일 */
-                                  #historyTable thead th:nth-child(16),
-                                  #historyTable thead th:nth-child(17),
-                                  #historyTable thead th:nth-child(18),
-                                  #historyTable thead th:nth-child(19),
-                                  #historyTable thead th:nth-child(20),
-                                  #historyTable tbody td:nth-child(16),
-                                  #historyTable tbody td:nth-child(17),
-                                  #historyTable tbody td:nth-child(18),
-                                  #historyTable tbody td:nth-child(19),
-                                  #historyTable tbody td:nth-child(20){
-                                    width: 72px !important;
-                                    min-width: 72px !important;
-                                    max-width: 72px !important;
-                                    padding: 2px 3px !important;
-                                    box-sizing: border-box !important;
-                                  }
-
-                                  /* select는 셀을 꽉 채우게 */
                                   #historyTable thead th:nth-child(16) select,
                                   #historyTable thead th:nth-child(17) select,
                                   #historyTable thead th:nth-child(18) select,
                                   #historyTable thead th:nth-child(19) select,
                                   #historyTable thead th:nth-child(20) select{
-                                    display:block !important;
-                                    width:100% !important;
-                                    min-width:0 !important;
-                                    box-sizing:border-box !important;
+                                    display: block;
+                                    width: 100%;
+                                    min-width: 0;          /* ✅ 이게 핵심: 브라우저 기본 min-width 제거 */
+                                    max-width: 100%;
+                                    box-sizing: border-box;
+                                    margin: 0;
                                   }
 
-                                  /* show-extra일 때는 잘림 방지(셀/텍스트가 보이도록) */
-                                  #historyTable.show-extra th,
-                                  #historyTable.show-extra td{
-                                    overflow: visible !important;
-                                    text-overflow: clip !important;
+                                  /* =========================
+                                    헤더 압축(th-tight)
+                                    ========================= */
+                                  #historyTable th.th-tight{
+                                    font-size: 10px;
+                                    line-height: 1.05;
+                                    padding: 2px 3px;
+                                    letter-spacing: -0.2px;
                                   }
 
-                                  /* ===== 공통: 모바일 타이포/패딩 ===== */
+                                  /* =========================
+                                    모바일 최적화
+                                    - 폰트/패딩은 최소만 조정
+                                    - 겹침 방지: wrapper는 계속 스크롤 가능해야 함
+                                    ========================= */
                                   @media (max-width: 576px){
-
-                                    .hist-table-wrap{ overflow-x: hidden !important; }
-                                    .hist-table-wrap.is-extra{ overflow-x: auto !important; }
-
-                                    #historyTable{
-                                      table-layout: fixed !important;
-                                      width: 100% !important;
-                                      margin: 0 !important;
-                                    }
-
                                     #historyTable th,
                                     #historyTable td{
-                                      padding: 1px 2px !important;
-                                      height: 22px !important;
-                                      line-height: 1.05 !important;
-                                      font-size: 11px !important;
-                                      white-space: nowrap !important;
-                                      overflow: hidden !important;
-                                      text-overflow: ellipsis !important;
+                                      font-size: 11px;
+                                      padding: 1px 2px;
+                                      height: 22px;
+                                      line-height: 1.05;
                                     }
-
                                     #historyTable thead th{
-                                      font-size: 10px !important;
-                                      height: 22px !important;
+                                      font-size: 10px;
                                     }
 
-                                    /* 체크박스 컬럼(2번) */
+                                    /* 체크박스(2열) 최소 폭 */
                                     #historyTable th:nth-child(2),
                                     #historyTable td:nth-child(2){
-                                      width: 28px !important;
-                                      min-width: 28px !important;
-                                    }
-                                    #historyTable th:nth-child(2) input{ transform: scale(0.95); }
-
-                                    /* 번호 5개 + PowerBall(3~8) */
-                                    #historyTable th:nth-child(3),
-                                    #historyTable td:nth-child(3),
-                                    #historyTable th:nth-child(4),
-                                    #historyTable td:nth-child(4),
-                                    #historyTable th:nth-child(5),
-                                    #historyTable td:nth-child(5),
-                                    #historyTable th:nth-child(6),
-                                    #historyTable td:nth-child(6),
-                                    #historyTable th:nth-child(7),
-                                    #historyTable td:nth-child(7),
-                                    #historyTable th:nth-child(8),
-                                    #historyTable td:nth-child(8){
-                                      width: 36px !important;
-                                      min-width: 36px !important;
+                                      width: 28px;
+                                      min-width: 28px;
+                                      max-width: 28px;
                                     }
 
-                                    #historyTable.show-extra{
-                                      table-layout: fixed !important;   /* ✅ 고정 유지 */
-                                      width: 100% !important;
-                                      min-width: 100% !important;
-                                    }
-                                  }
-
-                                  /* ===== PC(닫힘 상태)에서 기본 폭 정리 ===== */
-                                  @media (min-width: 577px){
-
-                                    #historyTable:not(.show-extra){
-                                      table-layout: fixed !important;
-                                      width: 100% !important;
-                                    }
-
-                                    /* No. */
-                                    #historyTable:not(.show-extra) th:nth-child(1),
-                                    #historyTable:not(.show-extra) td:nth-child(1){
-                                      width: 44px !important;
-                                      min-width: 44px !important;
-                                      max-width: 44px !important;
-                                      white-space: nowrap !important;
-                                    }
-
-                                    /* 체크박스 */
-                                    #historyTable:not(.show-extra) th:nth-child(2),
-                                    #historyTable:not(.show-extra) td:nth-child(2){
-                                      width: 34px !important;
-                                      min-width: 34px !important;
-                                      max-width: 34px !important;
-                                      white-space: nowrap !important;
-                                    }
-
-                                    /* 번호 5개 + PowerBall(3~8) */
-                                    #historyTable:not(.show-extra) th:nth-child(3),
-                                    #historyTable:not(.show-extra) td:nth-child(3),
-                                    #historyTable:not(.show-extra) th:nth-child(4),
-                                    #historyTable:not(.show-extra) td:nth-child(4),
-                                    #historyTable:not(.show-extra) th:nth-child(5),
-                                    #historyTable:not(.show-extra) td:nth-child(5),
-                                    #historyTable:not(.show-extra) th:nth-child(6),
-                                    #historyTable:not(.show-extra) td:nth-child(6),
-                                    #historyTable:not(.show-extra) th:nth-child(7),
-                                    #historyTable:not(.show-extra) td:nth-child(7),
-                                    #historyTable:not(.show-extra) th:nth-child(8),
-                                    #historyTable:not(.show-extra) td:nth-child(8){
-                                      width: calc((100% - 44px - 34px) / 6) !important;
-                                      min-width: 64px !important;
-                                      white-space: nowrap !important;
-                                    }
-                                  }
-
-                                  /* 연번/총합/기준(9,14,15) */
-                                  #historyTable th:nth-child(9),
-                                  #historyTable td:nth-child(9),
-                                  #historyTable th:nth-child(14),
-                                  #historyTable td:nth-child(14),
-                                  #historyTable th:nth-child(15),
-                                  #historyTable td:nth-child(15){
-                                    width: 52px !important;
-                                    min-width: 52px !important;
-                                    max-width: 52px !important;
-                                    white-space: nowrap;
-                                  }
-
-                                  /* '총합 기준/편차 기준' 헤더 압축 */
-                                  #historyTable th.th-tight{
-                                    font-size: 10px !important;
-                                    line-height: 1 !important;
-                                    padding: 1px 2px !important;
-                                    white-space: nowrap !important;
-                                    overflow: hidden !important;
-                                    text-overflow: ellipsis !important;
-                                    letter-spacing: -0.5px !important;
-                                  }
-
-                                  /* 포함 확인 버튼 모바일 */
-                                  @media (max-width: 576px){
-                                    #toggleCompare{
-                                      padding: 5px 10px !important;
-                                      font-size: 13px !important;
-                                      border-radius: 4px !important;
-                                      line-height: 1.1 !important;
-                                    }
-                                  }
-
-                                  /* ✅ 대조 select 5개(16~20) : th/td 폭 통일 + select가 셀을 100% 채우게 */
-                                  #historyTable{
-                                    table-layout: fixed; /* 닫힘/열림 상태 모두에서 폭 계산 안정화 */
-                                  }
-
-                                  /* 16~20 열 자체 폭을 "완전히 동일"하게 고정 */
-                                  #historyTable thead th:nth-child(16),
-                                  #historyTable thead th:nth-child(17),
-                                  #historyTable thead th:nth-child(18),
-                                  #historyTable thead th:nth-child(19),
-                                  #historyTable thead th:nth-child(20),
-                                  #historyTable tbody td:nth-child(16),
-                                  #historyTable tbody td:nth-child(17),
-                                  #historyTable tbody td:nth-child(18),
-                                  #historyTable tbody td:nth-child(19),
-                                  #historyTable tbody td:nth-child(20){
-                                    width: 72px !important;
-                                    min-width: 72px !important;
-                                    max-width: 72px !important;
-                                    padding: 2px 3px !important; /* 셀 패딩도 동일하게 */
-                                    box-sizing: border-box !important;
-                                  }
-
-                                  /* ✅ 핵심: select가 th 폭을 "그대로" 쓰게 강제 (1~5 모두 동일) */
-                                  #historyTable thead th:nth-child(16) select,
-                                  #historyTable thead th:nth-child(17) select,
-                                  #historyTable thead th:nth-child(18) select,
-                                  #historyTable thead th:nth-child(19) select,
-                                  #historyTable thead th:nth-child(20) select{
-                                    display: block !important;
-                                    width: 100% !important;
-                                    max-width: 100% !important;
-                                    min-width: 0 !important;          /* 브라우저 기본 min-width 제거(불일치 원인) */
-                                    box-sizing: border-box !important;
-                                    padding: 2px 4px !important;      /* select 내부 패딩도 동일하게 */
-                                    line-height: 1.2 !important;
-
-                                    /* 브라우저마다 다른 기본 UI 폭/여백 영향 최소화 */
-                                    -webkit-appearance: menulist !important;
-                                    appearance: menulist !important;
-                                  }
-
-                                  /* ✅ 모바일에서 더 타이트하게(원하면 숫자만 조절) */
-                                  @media (max-width: 576px){
+                                    /* 대조 select 5칸은 모바일에서 조금 더 줄임 */
                                     #historyTable thead th:nth-child(16),
                                     #historyTable thead th:nth-child(17),
                                     #historyTable thead th:nth-child(18),
@@ -2608,44 +2454,11 @@
                                     #historyTable tbody td:nth-child(18),
                                     #historyTable tbody td:nth-child(19),
                                     #historyTable tbody td:nth-child(20){
-                                      width: 62px !important;
-                                      min-width: 62px !important;
-                                      max-width: 62px !important;
-                                      padding: 1px 2px !important;
+                                      width: 62px;
+                                      min-width: 62px;
+                                      max-width: 62px;
                                     }
                                   }
-
-                                  /* ✅ historyTable 헤더(특히 select 들어있는 16~20) 높이 통일 */
-                                  #historyTable thead th{
-                                    vertical-align: middle !important;
-                                  }
-
-                                  /* ✅ 16~20 헤더 셀 자체 높이/패딩 통일 */
-                                  #historyTable thead th:nth-child(16),
-                                  #historyTable thead th:nth-child(17),
-                                  #historyTable thead th:nth-child(18),
-                                  #historyTable thead th:nth-child(19),
-                                  #historyTable thead th:nth-child(20){
-                                    padding: 2px 3px !important;
-                                    height: 28px !important;          /* ← 원하는 헤더 높이로 조절 */
-                                    line-height: 1 !important;
-                                  }
-
-                                  /* ✅ select 자체를 고정 높이로 맞추기 (이게 제일 중요) */
-                                  #historyTable thead th:nth-child(16) select,
-                                  #historyTable thead th:nth-child(17) select,
-                                  #historyTable thead th:nth-child(18) select,
-                                  #historyTable thead th:nth-child(19) select,
-                                  #historyTable thead th:nth-child(20) select{
-                                    height: 24px !important;          /* th(28) - padding(2+2) 정도로 맞춤 */
-                                    line-height: 24px !important;
-                                    padding: 0 4px !important;        /* 위아래 padding 0으로 */
-                                    font-size: 12px !important;
-                                    margin: 0 !important;
-                                    vertical-align: middle !important;
-                                    box-sizing: border-box !important;
-                                  }
-
                                 </style>
 
 
