@@ -2342,36 +2342,65 @@
                                   </table>
                                 </div>
                                 <style>
+
                                   .hist-table-wrap{
                                     width: 100%;
                                     overflow-x: auto;
                                     -webkit-overflow-scrolling: touch;
                                   }
 
+                                  /* 기본: 고정 레이아웃(닫힘 상태를 안정적으로) */
                                   #historyTable{
                                     width: 100%;
                                     table-layout: fixed;
                                   }
 
+                                  /* show-extra: 가로 스크롤 허용 + 컬럼 자동 확장 */
                                   #historyTable.show-extra{
                                     table-layout: auto;
                                     width: max-content;
                                     min-width: 100%;
                                   }
 
-                                  #historyTable thead select{
-                                    max-width: 70px;
+                                  /* ===== (핵심) 대조 select 5개 컬럼(16~20) 폭을 "항상" 통일 ===== */
+                                  #historyTable thead th:nth-child(16),
+                                  #historyTable thead th:nth-child(17),
+                                  #historyTable thead th:nth-child(18),
+                                  #historyTable thead th:nth-child(19),
+                                  #historyTable thead th:nth-child(20),
+                                  #historyTable tbody td:nth-child(16),
+                                  #historyTable tbody td:nth-child(17),
+                                  #historyTable tbody td:nth-child(18),
+                                  #historyTable tbody td:nth-child(19),
+                                  #historyTable tbody td:nth-child(20){
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
                                   }
 
+                                  #historyTable thead th:nth-child(16) select,
+                                  #historyTable thead th:nth-child(17) select,
+                                  #historyTable thead th:nth-child(18) select,
+                                  #historyTable thead th:nth-child(19) select,
+                                  #historyTable thead th:nth-child(20) select{
+                                    width: 70px !important;
+                                    min-width: 70px !important;
+                                    max-width: 70px !important;
+                                    display: inline-block !important;
+                                  }
 
+                                  /* show-extra일 때는 잘림 방지(셀/텍스트가 보이도록) */
+                                  #historyTable.show-extra th,
+                                  #historyTable.show-extra td{
+                                    overflow: visible !important;
+                                    text-overflow: clip !important;
+                                  }
+
+                                  /* ===== 공통: 모바일 타이포/패딩 ===== */
                                   @media (max-width: 576px){
 
-                                    .hist-table-wrap{
-                                      overflow-x: hidden !important;
-                                    }
-                                    .hist-table-wrap.is-extra{
-                                      overflow-x: auto !important;
-                                    }
+                                    .hist-table-wrap{ overflow-x: hidden !important; }
+                                    .hist-table-wrap.is-extra{ overflow-x: auto !important; }
 
                                     #historyTable{
                                       table-layout: fixed !important;
@@ -2395,25 +2424,15 @@
                                       height: 22px !important;
                                     }
 
-                                    /*#historyTable:not(.show-extra) th:nth-child(1),
-                                    #historyTable:not(.show-extra) td:nth-child(1){
-                                      display: none !important;
-                                    }*/
-
+                                    /* 체크박스 컬럼(2번) */
                                     #historyTable th:nth-child(2),
                                     #historyTable td:nth-child(2){
                                       width: 28px !important;
                                       min-width: 28px !important;
                                     }
-                                    #historyTable th:nth-child(2) input{
-                                      transform: scale(0.95);
-                                    }
+                                    #historyTable th:nth-child(2) input{ transform: scale(0.95); }
 
-                                    /*#historyTable:not(.show-extra) th:nth-child(2),
-                                    #historyTable:not(.show-extra) td:nth-child(2){
-                                      display: table-cell !important;
-                                    }*/
-
+                                    /* 번호 5개 + PowerBall(3~8) */
                                     #historyTable th:nth-child(3),
                                     #historyTable td:nth-child(3),
                                     #historyTable th:nth-child(4),
@@ -2435,34 +2454,17 @@
                                       min-width: 100% !important;
                                       table-layout: auto !important;
                                     }
-                                    #historyTable.show-extra th,
-                                    #historyTable.show-extra td{
-                                      overflow: visible !important;
-                                      text-overflow: clip !important;
-                                    }
-
-                                    #historyTable.show-extra th:nth-child(1),
-                                    #historyTable.show-extra td:nth-child(1){
-                                      display: table-cell !important;
-                                    }
                                   }
 
-                                  @media (max-width: 576px){
-                                    #toggleCompare{
-                                      padding: 5px 10px !important;
-                                      font-size: 13px !important;
-                                      border-radius: 4px !important;
-                                      line-height: 1.1 !important;
-                                    }
-                                  }
-
+                                  /* ===== PC(닫힘 상태)에서 기본 폭 정리 ===== */
                                   @media (min-width: 577px){
+
                                     #historyTable:not(.show-extra){
-                                      table-layout: fixed !important;   /* 폭 고정 */
+                                      table-layout: fixed !important;
                                       width: 100% !important;
                                     }
 
-                                    /* No. (1번 컬럼) 최소화 */
+                                    /* No. */
                                     #historyTable:not(.show-extra) th:nth-child(1),
                                     #historyTable:not(.show-extra) td:nth-child(1){
                                       width: 44px !important;
@@ -2471,7 +2473,7 @@
                                       white-space: nowrap !important;
                                     }
 
-                                    /* 체크박스 (2번 컬럼) 최소화 */
+                                    /* 체크박스 */
                                     #historyTable:not(.show-extra) th:nth-child(2),
                                     #historyTable:not(.show-extra) td:nth-child(2){
                                       width: 34px !important;
@@ -2480,7 +2482,7 @@
                                       white-space: nowrap !important;
                                     }
 
-                                    /* 첫번째~여섯번째(3~8번 컬럼) 균등 폭 */
+                                    /* 번호 5개 + PowerBall(3~8) */
                                     #historyTable:not(.show-extra) th:nth-child(3),
                                     #historyTable:not(.show-extra) td:nth-child(3),
                                     #historyTable:not(.show-extra) th:nth-child(4),
@@ -2494,11 +2496,12 @@
                                     #historyTable:not(.show-extra) th:nth-child(8),
                                     #historyTable:not(.show-extra) td:nth-child(8){
                                       width: calc((100% - 44px - 34px) / 6) !important;
-                                      min-width: 64px !important;     
+                                      min-width: 64px !important;
                                       white-space: nowrap !important;
                                     }
                                   }
 
+                                  /* 연번/총합/기준(9,14,15) */
                                   #historyTable th:nth-child(9),
                                   #historyTable td:nth-child(9),
                                   #historyTable th:nth-child(14),
@@ -2511,32 +2514,25 @@
                                     white-space: nowrap;
                                   }
 
+                                  /* '총합 기준/편차 기준' 헤더 압축 */
                                   #historyTable th.th-tight{
-                                    font-size: 10px !important;       
+                                    font-size: 10px !important;
                                     line-height: 1 !important;
                                     padding: 1px 2px !important;
-
-                                    white-space: nowrap !important;   
-                                    overflow: hidden !important;    
+                                    white-space: nowrap !important;
+                                    overflow: hidden !important;
                                     text-overflow: ellipsis !important;
-
-                                    letter-spacing: -0.5px !important; 
+                                    letter-spacing: -0.5px !important;
                                   }
 
-                                  /* show-extra일 때 대조 select 5개 컬럼 폭 고정 */
-                                  #historyTable.show-extra thead th:nth-child(n+16):nth-child(-n+20),
-                                  #historyTable.show-extra tbody td:nth-child(n+16):nth-child(-n+20){
-                                    width: 72px !important;
-                                    min-width: 72px !important;
-                                    max-width: 72px !important;
-                                    overflow: visible !important;
-                                  }
-
-                                  #historyTable.show-extra thead th:nth-child(n+16):nth-child(-n+20) select{
-                                    width: 70px !important;
-                                    min-width: 70px !important;
-                                    max-width: 70px !important;
-                                    display: inline-block !important;
+                                  /* 포함 확인 버튼 모바일 */
+                                  @media (max-width: 576px){
+                                    #toggleCompare{
+                                      padding: 5px 10px !important;
+                                      font-size: 13px !important;
+                                      border-radius: 4px !important;
+                                      line-height: 1.1 !important;
+                                    }
                                   }
                                 </style>
 
