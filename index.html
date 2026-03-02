@@ -2415,13 +2415,6 @@
                                     margin: 0;
                                   }
 
-                                  /* ✅ 좀비 방지: 기준 2컬럼은 강제 숨김 */
-                                  #historyTable thead th:nth-child(14),
-                                  #historyTable thead th:nth-child(15),
-                                  #historyTable tbody td:nth-child(14),
-                                  #historyTable tbody td:nth-child(15){
-                                    display: none !important;
-                                  }
 
                                   /* ✅ 대조 select 5칸(원본 기준 16~20) 폭 강제 고정 */
                                   #historyTable thead th:nth-child(16),
@@ -2493,12 +2486,30 @@
                                     }
                                   }
 
-                                  /* ✅ 좀비 방지: 기준 2컬럼은 DataTables가 실패해도 강제 숨김 */
-                                  #historyTable thead th:nth-child(14),
-                                  #historyTable thead th:nth-child(15),
-                                  #historyTable tbody td:nth-child(14),
-                                  #historyTable tbody td:nth-child(15){
-                                    display: none !important;
+                                  #historyTable thead th select#number-input1,
+                                  #historyTable thead th select#number-input2,
+                                  #historyTable thead th select#number-input3,
+                                  #historyTable thead th select#number-input4,
+                                  #historyTable thead th select#number-input5{
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
+                                    box-sizing: border-box !important;
+                                    display: block !important;
+                                    padding-right: 22px; /* 부트스트랩 화살표 공간 때문에 폭 튀는 것 방지 */
+                                  }
+
+                                  #historyTable thead th select#number-input1,
+                                  #historyTable thead th select#number-input2,
+                                  #historyTable thead th select#number-input3,
+                                  #historyTable thead th select#number-input4,
+                                  #historyTable thead th select#number-input5{
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
+                                    box-sizing: border-box !important;
+                                    display: block !important;
+                                    padding-right: 22px; /* 부트스트랩 화살표 공간 때문에 폭 튀는 것 방지 */
                                   }
 
                                 </style>
