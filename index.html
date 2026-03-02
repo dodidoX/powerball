@@ -454,6 +454,10 @@
       box-shadow: none !important;    /* 음영 없음 */
     }
 
+    .numpadding > button[type="button"]{
+      margin-top: 10px;
+    }
+
     /* 모바일 */
     @media (max-width: 576px){
       .num-ball{
@@ -557,7 +561,7 @@
                                   <p>
                                     <input
                                       type="checkbox"
-                                      id="includeCheck"
+                                      id="includeCheck" checked
                                       data-toggle="tooltip"
                                       data-placement="top"
                                       data-html="true"
@@ -701,7 +705,7 @@
                                   <p>
                                     <input
                                       type="checkbox"
-                                      id="includePowerball"
+                                      id="includePowerball" checked
                                       data-toggle="tooltip"
                                       data-placement="top"
                                       data-html="true"
@@ -1466,6 +1470,12 @@
                                     attachButtonHandlers(null);
                                     paintButtons();
 
+                                    if (includeCheck && includeCheck.checked) {
+                                      excludeCheck.checked = false;
+                                      weightedCheck.checked = false;
+                                      attachButtonHandlers("include");
+                                    }
+
                                     const btn = byId('toggleCompare');
                                     if (btn) {
                                       btn.innerText = "포함 확인 Off";
@@ -1579,6 +1589,12 @@
 
                                     attachPBHandlers(null);
                                     paintPBButtons();
+
+                                    if (includePB && includePB.checked) {
+                                      excludePB.checked = false;
+                                      weightedPB.checked = false;
+                                      attachPBHandlers("include");
+                                    }
 
                                   });
 
