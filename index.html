@@ -1458,15 +1458,18 @@
                                       const dt = ensureHistDT();
                                       if (!dt) return;
 
+                                      const isMobileNow = window.matchMedia("(max-width: 576px)").matches;
+
                                       const wrap = document.querySelector('.hist-table-wrap');
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
-                                      // ✅ No, 체크, 5개 숫자, PowerBall까지만 유지
+                                      // 닫힘 상태에서 "PowerBall까지" 유지
+                                      // PC: No(0)도 보이게 / 모바일: No(0)는 숨기고 싶으면 제외
                                       const keep = new Set([0,1,2,3,4,5,6,7]);
 
                                       dt.columns().every(function (idx) {
 
-                                        // 기준 컬럼은 항상 숨김
+                                        // 기준 컬럼(총합기준/편차기준)은 항상 숨김 (기존 유지)
                                         if (idx === 13 || idx === 14) {
                                           this.visible(false, false);
                                           return;
@@ -1476,7 +1479,10 @@
                                         this.visible(shouldShow, false);
                                       });
 
-                                      dt.columns.adjust().draw(false);
+                                      // ✅ 토글 직후 레이아웃이 바뀌는 타이밍 문제를 피하려고 rAF로 한 번 더 조정
+                                      requestAnimationFrame(() => {
+                                        dt.columns.adjust().draw(false);
+                                      });
                                     }
 
                                     if (histTable && histToggleBtn) {
@@ -2388,10 +2394,10 @@
                                       height: 22px !important;
                                     }
 
-                                    #historyTable:not(.show-extra) th:nth-child(1),
+                                    /*#historyTable:not(.show-extra) th:nth-child(1),
                                     #historyTable:not(.show-extra) td:nth-child(1){
                                       display: none !important;
-                                    }
+                                    }*/
 
                                     #historyTable th:nth-child(2),
                                     #historyTable td:nth-child(2){
@@ -2402,10 +2408,10 @@
                                       transform: scale(0.95);
                                     }
 
-                                    #historyTable:not(.show-extra) th:nth-child(2),
+                                    /*#historyTable:not(.show-extra) th:nth-child(2),
                                     #historyTable:not(.show-extra) td:nth-child(2){
                                       display: table-cell !important;
-                                    }
+                                    }*/
 
                                     #historyTable th:nth-child(3),
                                     #historyTable td:nth-child(3),
