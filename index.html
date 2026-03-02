@@ -1570,6 +1570,7 @@
                                     let wbLastNum = null;        // 마지막으로 처리한 숫자
                                     let wbSuppressClick = false; // 드래그 후 click 중복 방지
                                     let wbLastDir = 0; // ✅ 마지막 이동 방향: -1 / 0 / +1
+                                    let wbLastPointerUpAt = 0;
 
                                     function wbGetMode(){
                                       if (includeCheck && includeCheck.checked) return "include";
@@ -1657,9 +1658,11 @@
                                       wbDragging = false;
                                       wbLastDir = 0; // ✅ 추가(깔끔하게)
 
-                                      // ✅ 여기서 추가 토글 없음 (이미 move에서 다 처리됨)
-                                      // 드래그 직후 click 이벤트가 한 번 더 들어오는 경우 방지용 플래그는 잠깐 유지
-                                      setTimeout(() => { wbSuppressClick = false; }, 0);
+                                      // ✅ 추가: pointerup 시간을 기록 (tap 포함)
+                                      wbLastPointerUpAt = Date.now();
+
+                                      // ✅ 기존 0ms는 너무 빨라서 click 전에 풀려버림 → 넉넉히 유지
+                                      setTimeout(() => { wbSuppressClick = false; }, 350);
                                     }
 
                                     // 이벤트 바인딩
@@ -1671,12 +1674,17 @@
                                       wbContainer.addEventListener("pointercancel", wbEndDrag);
 
                                         wbContainer.addEventListener("click", (e) => {
-                                          if (!wbSuppressClick) return;
                                           const btn = e.target.closest(".number-button");
                                           if (!btn) return;
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }, true);                                      
+
+                                          // ✅ pointerup 직후 들어오는 click은 무조건 차단 (모바일 탭에서 핵심)
+                                          const justAfterPointer = (Date.now() - wbLastPointerUpAt) < 400;
+
+                                          if (wbSuppressClick || justAfterPointer) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                          }
+                                        }, true);                                   
                                     }
 
                                     if (includeCheck && includeCheck.checked) {
@@ -1777,6 +1785,7 @@
                                     let pbLastNum = null;
                                     let pbSuppressClick = false;
                                     let pbLastDir = 0;
+                                    let pbLastPointerUpAt = 0; 
 
                                     function pbGetMode(){
                                       if (includePB && includePB.checked) return "include";
@@ -1855,7 +1864,9 @@
                                       if (!pbDragging) return;
                                       pbDragging = false;
                                       pbLastDir = 0;
-                                      setTimeout(() => { pbSuppressClick = false; }, 0);
+
+                                      pbLastPointerUpAt = Date.now(); // ✅ 추가
+                                      setTimeout(() => { pbSuppressClick = false; }, 350); // ✅ 0 → 350ms
                                     }
 
                                     const pbContainer = document.getElementById("pbButtons") || document.querySelector("#powerball .number-buttons");
@@ -1866,11 +1877,15 @@
                                       pbContainer.addEventListener("pointercancel", pbEndDrag);
 
                                         pbContainer.addEventListener("click", (e) => {
-                                          if (!pbSuppressClick) return;
                                           const btn = e.target.closest(".pb-number-button");
                                           if (!btn) return;
-                                          e.preventDefault();
-                                          e.stopPropagation();
+
+                                          const justAfterPointer = (Date.now() - pbLastPointerUpAt) < 400;
+
+                                          if (pbSuppressClick || justAfterPointer) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                          }
                                         }, true);
                                     }
 
@@ -1880,8 +1895,45 @@
                                       attachPBHandlers("include");
                                     }
                                  
+                                    // ✅ 현재 모드(모바일/PC) 기억
+                                    let lastPickIsMobile = window.matchMedia("(max-width: 576px)").matches;
+
+                                    function setPickCollapseDefault(){
+                                      const isMobile = window.matchMedia("(max-width: 576px)").matches;
+
+                                      const wb = document.getElementById("pickCollapseWB");
+                                      const pb = document.getElementById("pickCollapsePB");
+                                      if (!wb || !pb) return;
+
+                                      const wbHeader = document.querySelector('[data-target="#pickCollapseWB"]');
+                                      const pbHeader = document.querySelector('[data-target="#pickCollapsePB"]');
+
+                                      if (isMobile) {
+                                        wb.classList.remove("show");
+                                        pb.classList.remove("show");
+                                        if (wbHeader) wbHeader.setAttribute("aria-expanded", "false");
+                                        if (pbHeader) pbHeader.setAttribute("aria-expanded", "false");
+                                      } else {
+                                        wb.classList.add("show");
+                                        pb.classList.add("show");
+                                        if (wbHeader) wbHeader.setAttribute("aria-expanded", "true");
+                                        if (pbHeader) pbHeader.setAttribute("aria-expanded", "true");
+                                      }
+                                    }
+
+                                    // ✅ resize에서는 “모바일/PC 전환”이 있을 때만 적용
+                                    function handlePickCollapseOnResize(){
+                                      const nowIsMobile = window.matchMedia("(max-width: 576px)").matches;
+                                      if (nowIsMobile === lastPickIsMobile) return; // ✅ 같은 모드면 아무것도 안함
+                                      lastPickIsMobile = nowIsMobile;
+                                      setPickCollapseDefault();
+                                    }
+
+                                    // ✅ 초기 1회만 기본값 적용
                                     setPickCollapseDefault();
-                                    window.addEventListener('resize', setPickCollapseDefault);
+
+                                    // ✅ 기존 resize 바인딩 교체
+                                    window.addEventListener('resize', handlePickCollapseOnResize);
                                   });
                        
                                 </script>
