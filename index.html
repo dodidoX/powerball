@@ -188,23 +188,41 @@
       min-width: 64px;
     }
 
-    #GeneratedNumbers .gen-extra{ display: none; }
-
     #GeneratedNumbers.show-extra{
       table-layout: auto;
       width: max-content;
       min-width: 100%;
     }
 
-    #GeneratedNumbers.show-extra .gen-extra{
-      display: table-cell;
-    }
 
     #GeneratedNumbers.show-extra th,
     #GeneratedNumbers.show-extra td{
       overflow: visible;
       text-overflow: clip;
     }
+
+    #GeneratedNumbers th.gen-extra:nth-child(13),
+    #GeneratedNumbers td.gen-extra:nth-child(13),
+    #GeneratedNumbers th.gen-extra:nth-child(14),
+    #GeneratedNumbers td.gen-extra:nth-child(14){
+      display: none !important;
+    }
+
+    /* show-extra 상태에서도 강제 숨김 */
+    #GeneratedNumbers.show-extra th.gen-extra:nth-child(13),
+    #GeneratedNumbers.show-extra td.gen-extra:nth-child(13),
+    #GeneratedNumbers.show-extra th.gen-extra:nth-child(14),
+    #GeneratedNumbers.show-extra td.gen-extra:nth-child(14){
+      display: none !important;
+    }
+
+    #historyTable th:nth-child(14),
+    #historyTable td:nth-child(14),
+    #historyTable th:nth-child(15),
+    #historyTable td:nth-child(15){
+      display: none !important;
+    }
+
 
     #GeneratedNumbers.show-extra th:nth-child(2),
     #GeneratedNumbers.show-extra td:nth-child(2),
@@ -236,6 +254,17 @@
     #GeneratedNumbers.show-extra td:nth-child(14){
       width: 52px;    
       min-width: 52px;
+    }
+
+    #GeneratedNumbers:not(.show-extra) th:nth-child(n+8),
+    #GeneratedNumbers:not(.show-extra) td:nth-child(n+8){
+      display: none !important;
+    }
+
+    /* PowerBall(7번 컬럼)는 유지 */
+    #GeneratedNumbers:not(.show-extra) th:nth-child(7),
+    #GeneratedNumbers:not(.show-extra) td:nth-child(7){
+      display: table-cell !important;
     }
 
     /* 5) Mobile */
@@ -1432,10 +1461,17 @@
                                       const wrap = document.querySelector('.hist-table-wrap');
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
-                                      // 0: No, 1: 체크박스, 2~7: 첫번째~여섯번째
-                                      const keep = new Set([0, 1, 2, 3, 4, 5, 6]);
+                                      // ✅ No, 체크, 5개 숫자, PowerBall까지만 유지
+                                      const keep = new Set([0,1,2,3,4,5,6,7]);
 
                                       dt.columns().every(function (idx) {
+
+                                        // 기준 컬럼은 항상 숨김
+                                        if (idx === 13 || idx === 14) {
+                                          this.visible(false, false);
+                                          return;
+                                        }
+
                                         const shouldShow = openExtra ? true : keep.has(idx);
                                         this.visible(shouldShow, false);
                                       });
