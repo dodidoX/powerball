@@ -1482,6 +1482,7 @@
                                       // ✅ 토글 직후 레이아웃이 바뀌는 타이밍 문제를 피하려고 rAF로 한 번 더 조정
                                       requestAnimationFrame(() => {
                                         dt.columns.adjust().draw(false);
+                                        setTimeout(() => dt.columns.adjust().draw(false), 50); // ✅ 한 번 더
                                       });
                                     }
 
@@ -2522,6 +2523,25 @@
                                     letter-spacing: -0.5px !important; 
                                   }
 
+                                  #historyTable.show-extra thead th:nth-child(16),
+                                  #historyTable.show-extra thead th:nth-child(17),
+                                  #historyTable.show-extra tbody td:nth-child(16),
+                                  #historyTable.show-extra tbody td:nth-child(17){
+                                    display: table-cell !important;
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
+                                    overflow: visible !important;
+                                  }
+
+                                  /* ✅ select 자체도 폭 강제 */
+                                  #historyTable.show-extra thead th:nth-child(16) select,
+                                  #historyTable.show-extra thead th:nth-child(17) select{
+                                    display: inline-block !important;
+                                    width: 70px !important;
+                                    min-width: 70px !important;
+                                    max-width: 70px !important;
+                                  }
                                 </style>
 
 
