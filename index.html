@@ -1569,6 +1569,7 @@
                                     let wbStartNum = null;
                                     let wbLastNum = null;        // 마지막으로 처리한 숫자
                                     let wbSuppressClick = false; // 드래그 후 click 중복 방지
+                                    let wbLastDir = 0; // ✅ 마지막 이동 방향: -1 / 0 / +1
 
                                     function wbGetMode(){
                                       if (includeCheck && includeCheck.checked) return "include";
@@ -1616,6 +1617,7 @@
                                       wbStartNum = n;
                                       wbLastNum = n;
                                       wbSuppressClick = true;
+                                      wbLastDir = 0;   // ✅ 추가
 
                                       // ✅ 시작 숫자는 즉시 토글 (바로 색 변경)
                                       wbToggleOne(n, mode);
@@ -1636,14 +1638,24 @@
                                       const mode = wbGetMode();
                                       if (!mode) return;
 
-                                      // ✅ 마지막 처리 숫자에서 현재 숫자까지 "변화분"만 토글
+                                      const dir = Math.sign(n - wbLastNum);
+                                      if (dir === 0) return;
+
+                                      // ✅ 방향이 바뀌는 순간, 턴 포인트(현재 wbLastNum)도 한 번 토글해서 되돌림
+                                      if (wbLastDir !== 0 && dir !== wbLastDir) {
+                                        wbToggleOne(wbLastNum, mode);
+                                      }
+
                                       wbToggleDelta(wbLastNum, n, mode);
+
+                                      wbLastDir = dir;
                                       wbLastNum = n;
                                     }
 
                                     function wbEndDrag(e){
                                       if (!wbDragging) return;
                                       wbDragging = false;
+                                      wbLastDir = 0; // ✅ 추가(깔끔하게)
 
                                       // ✅ 여기서 추가 토글 없음 (이미 move에서 다 처리됨)
                                       // 드래그 직후 click 이벤트가 한 번 더 들어오는 경우 방지용 플래그는 잠깐 유지
@@ -1764,6 +1776,7 @@
                                     let pbStartNum = null;
                                     let pbLastNum = null;
                                     let pbSuppressClick = false;
+                                    let pbLastDir = 0;
 
                                     function pbGetMode(){
                                       if (includePB && includePB.checked) return "include";
@@ -1806,6 +1819,7 @@
                                       pbStartNum = n;
                                       pbLastNum = n;
                                       pbSuppressClick = true;
+                                      pbLastDir = 0;
 
                                       pbToggleOne(n, mode);
 
@@ -1824,13 +1838,23 @@
                                       const mode = pbGetMode();
                                       if (!mode) return;
 
+                                      const dir = Math.sign(n - pbLastNum);
+                                      if (dir === 0) return;
+
+                                      if (pbLastDir !== 0 && dir !== pbLastDir) {
+                                        pbToggleOne(pbLastNum, mode);
+                                      }
+
                                       pbToggleDelta(pbLastNum, n, mode);
+
+                                      pbLastDir = dir;
                                       pbLastNum = n;
                                     }
 
                                     function pbEndDrag(){
                                       if (!pbDragging) return;
                                       pbDragging = false;
+                                      pbLastDir = 0;
                                       setTimeout(() => { pbSuppressClick = false; }, 0);
                                     }
 
