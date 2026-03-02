@@ -1462,10 +1462,7 @@
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
                                       // ✅ No, 체크, 5개 숫자, PowerBall까지만 유지
-                                      const keep = new Set([
-                                        0,1,2,3,4,5,6,7,   // 기존 유지 컬럼
-                                        15,16,17,18,19    // ✅ 비교 select 5칸 추가
-                                      ]);
+                                      const keep = new Set([0,1,2,3,4,5,6,7]);
 
                                       dt.columns().every(function (idx) {
 
