@@ -2370,7 +2370,6 @@
                                 <style>
                                   /* =========================
                                     History table wrapper
-                                    - 스크롤은 wrapper가 담당
                                   ========================= */
                                   .hist-table-wrap{
                                     width: 100%;
@@ -2380,14 +2379,12 @@
                                   }
 
                                   /* =========================
-                                    History table
-                                    - 핵심: 내용폭만큼 테이블이 늘어나도록 해서
-                                      모바일에서도 가로 스크롤이 생기게 함
+                                    History table (✅ 폭 계산 안정화 버전)
                                   ========================= */
                                   #historyTable{
-                                    width: max-content !important;   /* ✅ 테이블이 내용만큼 넓어짐 → 스크롤 발생 */
-                                    min-width: 100% !important;      /* ✅ 내용이 적으면 100%로 유지 */
-                                    table-layout: auto !important;   /* ✅ auto가 열 너비를 자연스럽게 잡음 */
+                                    width: max-content !important;   /* 스크롤 유도 */
+                                    min-width: 100% !important;
+                                    table-layout: fixed !important;  /* ✅ auto 말고 fixed로 고정 (핵심) */
                                     margin: 0;
                                   }
 
@@ -2396,9 +2393,11 @@
                                   #historyTable td{
                                     white-space: nowrap;
                                     vertical-align: middle;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
                                   }
 
-                                  /* th-tight(총합기준/편차기준 같은 좁은 헤더) */
+                                  /* th-tight */
                                   #historyTable th.th-tight{
                                     font-size: 10px;
                                     line-height: 1.05;
@@ -2406,19 +2405,25 @@
                                     letter-spacing: -0.2px;
                                   }
 
-                                  /* select 기본 min-width 때문에 폭이 비정상적으로 커지는 문제 방지 */
+                                  /* select 폭 안정화 */
                                   #historyTable thead select.custom-select{
                                     display: block;
                                     width: 100% !important;
-                                    min-width: 0 !important;     /* ✅ 매우 중요 */
+                                    min-width: 0 !important;
                                     max-width: 100% !important;
                                     box-sizing: border-box;
                                     margin: 0;
                                   }
 
-                                  /* =========================
-                                    대조 select 5칸(16~20) 폭 고정
-                                  ========================= */
+                                  /* ✅ 좀비 방지: 기준 2컬럼은 강제 숨김 */
+                                  #historyTable thead th:nth-child(14),
+                                  #historyTable thead th:nth-child(15),
+                                  #historyTable tbody td:nth-child(14),
+                                  #historyTable tbody td:nth-child(15){
+                                    display: none !important;
+                                  }
+
+                                  /* ✅ 대조 select 5칸(원본 기준 16~20) 폭 강제 고정 */
                                   #historyTable thead th:nth-child(16),
                                   #historyTable thead th:nth-child(17),
                                   #historyTable thead th:nth-child(18),
@@ -2429,18 +2434,15 @@
                                   #historyTable tbody td:nth-child(18),
                                   #historyTable tbody td:nth-child(19),
                                   #historyTable tbody td:nth-child(20){
-                                    width: 72px;
-                                    min-width: 72px;
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
                                     padding: 2px 3px;
                                     box-sizing: border-box;
                                   }
 
-                                  /* =========================
-                                    모바일: 앞쪽 열(1~8)도 최소폭을 줘서
-                                    "input3 이전이 뭉개지는 현상" 방지
-                                  ========================= */
+                                  /* 모바일 */
                                   @media (max-width: 576px){
-
                                     #historyTable th,
                                     #historyTable td{
                                       font-size: 11px;
@@ -2450,21 +2452,14 @@
                                     }
                                     #historyTable thead th{ font-size: 10px; }
 
-                                    /* No(1열) */
                                     #historyTable th:nth-child(1),
                                     #historyTable td:nth-child(1){
-                                      width: 44px;
-                                      min-width: 44px;
+                                      width: 44px; min-width: 44px;
                                     }
-
-                                    /* 체크박스(2열) */
                                     #historyTable th:nth-child(2),
                                     #historyTable td:nth-child(2){
-                                      width: 28px;
-                                      min-width: 28px;
+                                      width: 28px; min-width: 28px;
                                     }
-
-                                    /* 첫~다섯번째(3~7열) */
                                     #historyTable th:nth-child(3),
                                     #historyTable td:nth-child(3),
                                     #historyTable th:nth-child(4),
@@ -2475,18 +2470,13 @@
                                     #historyTable td:nth-child(6),
                                     #historyTable th:nth-child(7),
                                     #historyTable td:nth-child(7){
-                                      width: 44px;
-                                      min-width: 44px;
+                                      width: 44px; min-width: 44px;
                                     }
-
-                                    /* PowerBall(8열) */
                                     #historyTable th:nth-child(8),
                                     #historyTable td:nth-child(8){
-                                      width: 52px;
-                                      min-width: 52px;
+                                      width: 52px; min-width: 52px;
                                     }
 
-                                    /* 대조 select 5칸(16~20) 모바일에서 조금 더 축소 */
                                     #historyTable thead th:nth-child(16),
                                     #historyTable thead th:nth-child(17),
                                     #historyTable thead th:nth-child(18),
@@ -2497,8 +2487,9 @@
                                     #historyTable tbody td:nth-child(18),
                                     #historyTable tbody td:nth-child(19),
                                     #historyTable tbody td:nth-child(20){
-                                      width: 62px;
-                                      min-width: 62px;
+                                      width: 62px !important;
+                                      min-width: 62px !important;
+                                      max-width: 62px !important;
                                     }
                                   }
 
