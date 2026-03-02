@@ -2534,6 +2534,69 @@
                                       line-height: 1.1 !important;
                                     }
                                   }
+
+                                  /* ✅ 대조 select 5개(16~20) : th/td 폭 통일 + select가 셀을 100% 채우게 */
+                                  #historyTable{
+                                    table-layout: fixed; /* 닫힘/열림 상태 모두에서 폭 계산 안정화 */
+                                  }
+
+                                  /* 16~20 열 자체 폭을 "완전히 동일"하게 고정 */
+                                  #historyTable thead th:nth-child(16),
+                                  #historyTable thead th:nth-child(17),
+                                  #historyTable thead th:nth-child(18),
+                                  #historyTable thead th:nth-child(19),
+                                  #historyTable thead th:nth-child(20),
+                                  #historyTable tbody td:nth-child(16),
+                                  #historyTable tbody td:nth-child(17),
+                                  #historyTable tbody td:nth-child(18),
+                                  #historyTable tbody td:nth-child(19),
+                                  #historyTable tbody td:nth-child(20){
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
+                                    padding: 2px 3px !important; /* 셀 패딩도 동일하게 */
+                                    box-sizing: border-box !important;
+                                  }
+
+                                  /* ✅ 핵심: select가 th 폭을 "그대로" 쓰게 강제 (1~5 모두 동일) */
+                                  #historyTable thead th:nth-child(16) select,
+                                  #historyTable thead th:nth-child(17) select,
+                                  #historyTable thead th:nth-child(18) select,
+                                  #historyTable thead th:nth-child(19) select,
+                                  #historyTable thead th:nth-child(20) select{
+                                    display: block !important;
+                                    width: 100% !important;
+                                    max-width: 100% !important;
+                                    min-width: 0 !important;          /* 브라우저 기본 min-width 제거(불일치 원인) */
+                                    box-sizing: border-box !important;
+                                    padding: 2px 4px !important;      /* select 내부 패딩도 동일하게 */
+                                    line-height: 1.2 !important;
+
+                                    /* 브라우저마다 다른 기본 UI 폭/여백 영향 최소화 */
+                                    -webkit-appearance: menulist !important;
+                                    appearance: menulist !important;
+                                  }
+
+                                  /* ✅ 모바일에서 더 타이트하게(원하면 숫자만 조절) */
+                                  @media (max-width: 576px){
+                                    #historyTable thead th:nth-child(16),
+                                    #historyTable thead th:nth-child(17),
+                                    #historyTable thead th:nth-child(18),
+                                    #historyTable thead th:nth-child(19),
+                                    #historyTable thead th:nth-child(20),
+                                    #historyTable tbody td:nth-child(16),
+                                    #historyTable tbody td:nth-child(17),
+                                    #historyTable tbody td:nth-child(18),
+                                    #historyTable tbody td:nth-child(19),
+                                    #historyTable tbody td:nth-child(20){
+                                      width: 62px !important;
+                                      min-width: 62px !important;
+                                      max-width: 62px !important;
+                                      padding: 1px 2px !important;
+                                    }
+                                  }
+
+
                                 </style>
 
 
