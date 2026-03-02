@@ -200,10 +200,6 @@
       display: table-cell;
     }
 
-    #GeneratedNumbers .gen-extra {
-      display: none !important;
-    }
-
     #GeneratedNumbers.show-extra th,
     #GeneratedNumbers.show-extra td{
       overflow: visible;
@@ -1204,8 +1200,8 @@
                                           <td>${st.std.toFixed(2)}</td>
                                           <td class="gen-extra">${st.odd}</td>
                                           <td class="gen-extra">${st.even}</td>
-                                          <td class="gen-extra-0">${sumRec}</td>
-                                          <td class="gen-extra-0">${stddevRec}</td>
+                                          <td class="gen-extra">${sumRec}</td>
+                                          <td class="gen-extra">${stddevRec}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
@@ -2240,8 +2236,8 @@
                                         <th>표준편차</th>
                                         <th class="gen-extra">홀수</th>
                                         <th class="gen-extra">짝수</th>
-                                        <th class="gen-extra-0">총합 기준</th>
-                                        <th class="gen-extra-0">표준편차 기준</th>
+                                        <th class="gen-extra">총합 기준</th>
+                                        <th class="gen-extra">표준편차 기준</th>
                                       </tr>
                                     </thead>
                                     <tbody></tbody>
