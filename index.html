@@ -26,21 +26,31 @@
     
   <style>
 
-    table {
+    /* ❌ 기존 table / th / td / tr 전역 스타일은 삭제 */
+
+    /* ✅ 이 두 테이블에만 공통 룩 적용 */
+    #GeneratedNumbers,
+    #historyTable{
       width: 100%;
       border-collapse: collapse;
       font-family: Arial, sans-serif;
-      margin: 20px 0;
+      margin: 12px 0;
       border: 1px solid #000;
     }
-    th, td {
+
+    #GeneratedNumbers th, #GeneratedNumbers td,
+    #historyTable th, #historyTable td{
       border: 1px solid #ccc;
       text-align: center;
       padding: 6px;
     }
+
+    #GeneratedNumbers th, #historyTable th{
+      background: #f2f2f2;
+      font-weight: 700;
+    }
     th { background: #f2f2f2; font-weight: 700; }
-    tr:nth-child(even) { background: #f8f8f8; }
-    tr:hover { background: #e6e6e6; }
+
 
     /*  1) Number buttons / options */
     .numpadding { padding: 0 20px; }
@@ -112,11 +122,6 @@
     }
     #selectAllHistory { cursor: pointer; }
 
-    #historyTable td,
-    #historyTable th {
-      height: 6px;
-      min-height: 5px;
-    }
     #historyTable { margin: 12px 0; }
 
     /*  4) GeneratedNumbers */
@@ -201,25 +206,9 @@
       text-overflow: clip;
     }
 
-    #GeneratedNumbers th.gen-extra:nth-child(13),
-    #GeneratedNumbers td.gen-extra:nth-child(13),
-    #GeneratedNumbers th.gen-extra:nth-child(14),
-    #GeneratedNumbers td.gen-extra:nth-child(14){
-      display: none !important;
-    }
 
     /* show-extra 상태에서도 강제 숨김 */
-    #GeneratedNumbers.show-extra th.gen-extra:nth-child(13),
-    #GeneratedNumbers.show-extra td.gen-extra:nth-child(13),
-    #GeneratedNumbers.show-extra th.gen-extra:nth-child(14),
-    #GeneratedNumbers.show-extra td.gen-extra:nth-child(14){
-      display: none !important;
-    }
-
-    #historyTable th:nth-child(14),
-    #historyTable td:nth-child(14),
-    #historyTable th:nth-child(15),
-    #historyTable td:nth-child(15){
+    #GeneratedNumbers:not(.show-extra) .gen-extra{
       display: none !important;
     }
 
@@ -1439,13 +1428,24 @@
 
                                     pickSelects.forEach(sel => {
                                       if (!sel) return;
+
                                       sel.innerHTML = "";
+
+                                      // ✅ 기본 선택 옵션 추가
+                                      const defaultOp = document.createElement("option");
+                                      defaultOp.value = "";
+                                      defaultOp.textContent = "선택";
+                                      defaultOp.selected = true;
+                                      sel.appendChild(defaultOp);
+
+                                      // ✅ 1~69 숫자 옵션 추가
                                       for (let i = NUM_MIN; i <= NUM_MAX; i++) {
                                         const op = document.createElement("option");
                                         op.value = i;
                                         op.textContent = i;
                                         sel.appendChild(op);
                                       }
+
                                       sel.addEventListener('input', compareInputWithTable);
                                       sel.addEventListener('change', compareInputWithTable);
                                     });
@@ -2523,24 +2523,20 @@
                                     letter-spacing: -0.5px !important; 
                                   }
 
-                                  #historyTable.show-extra thead th:nth-child(16),
-                                  #historyTable.show-extra thead th:nth-child(17),
-                                  #historyTable.show-extra tbody td:nth-child(16),
-                                  #historyTable.show-extra tbody td:nth-child(17){
-                                    display: table-cell !important;
+                                  /* show-extra일 때 대조 select 5개 컬럼 폭 고정 */
+                                  #historyTable.show-extra thead th:nth-child(n+16):nth-child(-n+20),
+                                  #historyTable.show-extra tbody td:nth-child(n+16):nth-child(-n+20){
                                     width: 72px !important;
                                     min-width: 72px !important;
                                     max-width: 72px !important;
                                     overflow: visible !important;
                                   }
 
-                                  /* ✅ select 자체도 폭 강제 */
-                                  #historyTable.show-extra thead th:nth-child(16) select,
-                                  #historyTable.show-extra thead th:nth-child(17) select{
-                                    display: inline-block !important;
+                                  #historyTable.show-extra thead th:nth-child(n+16):nth-child(-n+20) select{
                                     width: 70px !important;
                                     min-width: 70px !important;
                                     max-width: 70px !important;
+                                    display: inline-block !important;
                                   }
                                 </style>
 
