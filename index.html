@@ -2355,12 +2355,12 @@
                                     table-layout: fixed;
                                   }
 
-                                  /* show-extra: 가로 스크롤 허용 + 컬럼 자동 확장 */
+                                  /* show-extra: 가로 스크롤 허용 + 컬럼 자동 확장
                                   #historyTable.show-extra{
-                                    table-layout: auto;
+
                                     width: max-content;
                                     min-width: 100%;
-                                  }
+                                  } */
 
                                   /* ===== (핵심) 대조 select 5개 컬럼(16~20) 폭을 "항상" 통일 ===== */
                                   #historyTable thead th:nth-child(16),
@@ -2378,15 +2378,34 @@
                                     max-width: 72px !important;
                                   }
 
+                                  /* 16~20 열(th/td) 폭 통일 */
+                                  #historyTable thead th:nth-child(16),
+                                  #historyTable thead th:nth-child(17),
+                                  #historyTable thead th:nth-child(18),
+                                  #historyTable thead th:nth-child(19),
+                                  #historyTable thead th:nth-child(20),
+                                  #historyTable tbody td:nth-child(16),
+                                  #historyTable tbody td:nth-child(17),
+                                  #historyTable tbody td:nth-child(18),
+                                  #historyTable tbody td:nth-child(19),
+                                  #historyTable tbody td:nth-child(20){
+                                    width: 72px !important;
+                                    min-width: 72px !important;
+                                    max-width: 72px !important;
+                                    padding: 2px 3px !important;
+                                    box-sizing: border-box !important;
+                                  }
+
+                                  /* select는 셀을 꽉 채우게 */
                                   #historyTable thead th:nth-child(16) select,
                                   #historyTable thead th:nth-child(17) select,
                                   #historyTable thead th:nth-child(18) select,
                                   #historyTable thead th:nth-child(19) select,
                                   #historyTable thead th:nth-child(20) select{
-                                    width: 70px !important;
-                                    min-width: 70px !important;
-                                    max-width: 70px !important;
-                                    display: inline-block !important;
+                                    display:block !important;
+                                    width:100% !important;
+                                    min-width:0 !important;
+                                    box-sizing:border-box !important;
                                   }
 
                                   /* show-extra일 때는 잘림 방지(셀/텍스트가 보이도록) */
@@ -2450,9 +2469,9 @@
                                     }
 
                                     #historyTable.show-extra{
-                                      width: max-content !important;
+                                      table-layout: fixed !important;   /* ✅ 고정 유지 */
+                                      width: 100% !important;
                                       min-width: 100% !important;
-                                      table-layout: auto !important;
                                     }
                                   }
 
