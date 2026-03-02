@@ -44,19 +44,22 @@
 
     /*  1) Number buttons / options */
     .numpadding { padding: 0 20px; }
-    .number-buttons {
+    .number-buttons{
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
+      grid-template-columns: repeat(10, 1fr); /* ✅ 1행 10개 */
+      gap: 4px;                               /* ✅ 약간 넓혀서 가독성 */
     }
-    .number-buttons .number-button {
+
+    /* 공통 버튼(기본) */
+    .number-buttons .number-button{
       background: #000;
-      border: 1px solid gray;
+      border: 1px solid #6f6f6f;
       color: #fff;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
-      padding: 8px 0;
+      font-size: 14px;      /* ✅ 조금 축소 */
+      padding: 6px 0;       /* ✅ 높이 축소 */
+      line-height: 1;
     }
 
     .option-container {
@@ -309,19 +312,17 @@
       }
 
       .numpadding { padding: 0 12px !important; }
-      .number-buttons {
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 6px !important;
+      #pickCard .number-buttons{
+        grid-template-columns: repeat(10, 1fr) !important;
+        gap: 4px !important;
       }
-      .number-buttons .number-button {
-        border-radius: 8px;
-        font-size: 14px;
-        padding: 10px 0;
+      #pickCard .number-buttons .number-button{
+        font-size: 12px !important;
+        padding: 4px 0 !important;  /* ✅ 모바일 높이 더 얇게 */
+        border-radius: 6px !important;
       }
 
-      /* =========================
-        Power Ball Buttons
-      ========================= */
+      /* Power Ball Buttons */
 
       #powerball .number-buttons{
         display: grid;
@@ -465,14 +466,13 @@
     @media (max-width: 576px){
 
       #powerball .number-buttons{
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 6px !important;
+        grid-template-columns: repeat(13, 1fr) !important; /* ✅ 폭 더 줄이기 */
+        gap: 4px !important;
       }
-
-      #powerball .pb-number-button{
-        border-radius: 8px;
-        font-size: 14px;
-        padding: 10px 0;
+      #powerball .number-buttons .number-button{
+        font-size: 12px !important;
+        padding: 4px 0 !important;
+        border-radius: 6px !important;
       }
     }
 
@@ -537,7 +537,7 @@
                                   style="cursor:pointer;">
                                   <h6 class="m-0 font-weight-bold text-primary">White Ball</h6></div>
                               
-                            <div id="pickCollapseWB" class="collapse show">
+                            <div id="pickCollapseWB" class="collapse">
                               <div class="card-body">
 
                                 <div class="selection option-container"> 
@@ -688,7 +688,7 @@
                                   style="cursor:pointer;">
                                   <h6 class="m-0 font-weight-bold text-primary">Power Ball</h6></div>
                               
-                            <div id="pickCollapsePB" class="collapse show">
+                            <div id="pickCollapsePB" class="collapse">
                               <div class="card-body">
 
                                 <div class="selection option-container"> 
@@ -1581,7 +1581,33 @@
                                     paintPBButtons();
 
                                   });
-                                  </script>
+
+                                  (function setPickCollapseDefault(){
+                                    const isMobile = window.matchMedia("(max-width: 576px)").matches;
+
+                                    const wb = document.getElementById("pickCollapseWB");
+                                    const pb = document.getElementById("pickCollapsePB");
+
+                                    if (!wb || !pb) return;
+
+                                    if (isMobile) {
+                                      wb.classList.remove("show");
+                                      pb.classList.remove("show");
+                                      // 헤더 aria도 맞춰주기
+                                      const wbHeader = document.querySelector('[data-target="#pickCollapseWB"]');
+                                      const pbHeader = document.querySelector('[data-target="#pickCollapsePB"]');
+                                      if (wbHeader) wbHeader.setAttribute("aria-expanded", "false");
+                                      if (pbHeader) pbHeader.setAttribute("aria-expanded", "false");
+                                    } else {
+                                      wb.classList.add("show");
+                                      pb.classList.add("show");
+                                      const wbHeader = document.querySelector('[data-target="#pickCollapseWB"]');
+                                      const pbHeader = document.querySelector('[data-target="#pickCollapsePB"]');
+                                      if (wbHeader) wbHeader.setAttribute("aria-expanded", "true");
+                                      if (pbHeader) pbHeader.setAttribute("aria-expanded", "true");
+                                    }
+                                  })();                                  
+                                </script>
 
 
 
