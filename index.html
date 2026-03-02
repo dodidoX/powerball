@@ -1091,34 +1091,61 @@
                                     }
                                   }
 
-
-
                                   function resetCompareIndicators() {
                                     const dt = ensureHistDT();
-                                    dt.rows().every(function(){
-                                      const row = this.node();
-                                      for (let j=15; j<=19; j++) row.children[j].innerText = "";
+                                    if (!dt) return;
+
+                                    dt.rows().every(function () {
+                                      const rIdx = this.index();
+
+                                      // 대조 5칸: 데이터 컬럼 15~19
+                                      for (let col = 15; col <= 19; col++) {
+                                        const node = dt.cell(rIdx, col).node();
+                                        if (node) node.textContent = "";
+                                      }
                                     });
                                   }
+
                                   function compareInputWithTable() {
                                     if (!isCompareFunctionOn) return;
+
                                     const dt = ensureHistDT();
-                                    const picks = pickSelects.map(sel => Number(sel.value));
-                                    dt.rows().every(function() {
-                                      const row = this.node();
-                                      const cells = row.getElementsByTagName('td');
-                                      const rowNums = Array.from({ length: 5 }, (_, i) => {
-                                        const ball = cells[2 + i].querySelector('.num-ball');
-                                        return ball ? Number(ball.textContent) : Number(cells[2 + i].textContent);
-                                      });
+                                    if (!dt) return;
+
+                                    // ✅ 빈값/선택 안함은 제외 (NaN 방지)
+                                    const picks = pickSelects
+                                      .map(sel => Number(sel && sel.value))
+                                      .filter(n => Number.isFinite(n));
+
+                                    // ✅ 선택이 없으면 기존 표시만 지우고 종료
+                                    resetCompareIndicators();
+                                    if (picks.length === 0) return;
+
+                                    dt.rows().every(function () {
+                                      const rIdx = this.index();
+
+                                      // 번호(첫번째~다섯번째): 데이터 컬럼 2~6
+                                      const rowNums = [];
+                                      for (let i = 0; i < 5; i++) {
+                                        const node = dt.cell(rIdx, 2 + i).node();
+                                        if (!node) { rowNums.push(NaN); continue; }
+
+                                        const ball = node.querySelector('.num-ball');
+                                        const t = ball ? ball.textContent : node.textContent;
+                                        const n = parseInt(String(t).match(/\d+/)?.[0] || "", 10);
+                                        rowNums.push(Number.isFinite(n) ? n : NaN);
+                                      }
+
+                                      // 대조 5칸(데이터 컬럼 15~19)에 O 표시
                                       picks.forEach((pick, idx) => {
+                                        if (idx >= 5) return; // 안전장치
                                         const col = 15 + idx;
-                                        cells[col].innerText = rowNums.includes(pick) ? "O" : "";
+                                        const node = dt.cell(rIdx, col).node();
+                                        if (node) node.textContent = rowNums.includes(pick) ? "O" : "";
                                       });
                                     });
                                   }
 
-                                    
                                     function makeBall(num, kind = "white"){
                                       const ball = document.createElement("span");
                                       ball.classList.add("num-ball");
