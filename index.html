@@ -2615,6 +2615,36 @@
                                     }
                                   }
 
+                                  /* ✅ historyTable 헤더(특히 select 들어있는 16~20) 높이 통일 */
+                                  #historyTable thead th{
+                                    vertical-align: middle !important;
+                                  }
+
+                                  /* ✅ 16~20 헤더 셀 자체 높이/패딩 통일 */
+                                  #historyTable thead th:nth-child(16),
+                                  #historyTable thead th:nth-child(17),
+                                  #historyTable thead th:nth-child(18),
+                                  #historyTable thead th:nth-child(19),
+                                  #historyTable thead th:nth-child(20){
+                                    padding: 2px 3px !important;
+                                    height: 28px !important;          /* ← 원하는 헤더 높이로 조절 */
+                                    line-height: 1 !important;
+                                  }
+
+                                  /* ✅ select 자체를 고정 높이로 맞추기 (이게 제일 중요) */
+                                  #historyTable thead th:nth-child(16) select,
+                                  #historyTable thead th:nth-child(17) select,
+                                  #historyTable thead th:nth-child(18) select,
+                                  #historyTable thead th:nth-child(19) select,
+                                  #historyTable thead th:nth-child(20) select{
+                                    height: 24px !important;          /* th(28) - padding(2+2) 정도로 맞춤 */
+                                    line-height: 24px !important;
+                                    padding: 0 4px !important;        /* 위아래 padding 0으로 */
+                                    font-size: 12px !important;
+                                    margin: 0 !important;
+                                    vertical-align: middle !important;
+                                    box-sizing: border-box !important;
+                                  }
 
                                 </style>
 
