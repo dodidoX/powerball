@@ -458,6 +458,9 @@
       margin-top: 10px;
     }
 
+    .number-buttons { user-select: none; -webkit-user-select: none; }
+    .number-button { touch-action: none; }
+
     /* 모바일 */
     @media (max-width: 576px){
       .num-ball{
@@ -1627,7 +1630,7 @@
                                     function wbOnPointerMove(e){
                                       if (!wbDragging) return;
 
-                                      const n = wbNumFromEl(e.target);
+                                      const n = wbNumFromPointerEvent(e);
                                       if (n == null) return;
 
                                       const mode = wbGetMode();
@@ -1686,15 +1689,6 @@
                                     pbWeightedInput = byId("pb_weighted");
 
                                     let pbButtons = document.querySelectorAll(".pb-number-button");
-
-                                    function parsePBList(str){
-                                      if(!str) return [];
-                                      return Array.from(new Set(
-                                        str.split(",").map(s=>s.trim()).filter(Boolean).map(Number)
-                                          .filter(n=>Number.isInteger(n) && n>=1 && n<=26)
-                                      )).sort((a,b)=>a-b);
-                                    }
-
 
 
                                     function paintPBButtons(){
@@ -1824,7 +1818,7 @@
                                     function pbOnPointerMove(e){
                                       if (!pbDragging) return;
 
-                                      const n = pbNumFromEl(e.target);
+                                      const n = pbNumFromPointerEvent(e);
                                       if (n == null) return;
 
                                       const mode = pbGetMode();
