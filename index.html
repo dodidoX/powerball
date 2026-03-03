@@ -859,12 +859,6 @@
                                     const even = nums.length - odd;
                                     return { sum, std: Number(std.toFixed(2)), odd, even };
                                   }
-                                  function inRange(val, lo, hi) {
-                                    if (!Number.isFinite(val) || !Number.isFinite(lo) || !Number.isFinite(hi)) return "";
-                                    return (val >= lo && val <= hi) ? "추천" : "";
-                                  }
-
-
 
                                   function byId(id){ return document.getElementById(id); }
 
@@ -905,10 +899,10 @@
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
                                       columnDefs: [
-
                                         { targets: [0, 9, 10, 11, 12], type: 'num' },
-                                        { targets: [13, 14], visible: false },
-                                        { targets: [15,16,17,18,19], width: "72px" },
+
+                                        // 대조 5칸 폭
+                                        { targets: [13,14,15,16,17], width: "72px" },
 
                                         {
                                           targets: [2,3,4,5,6,7],
@@ -923,7 +917,7 @@
                                         },
 
                                         // 체크/대조5칸/삭제 버튼은 정렬 비활성
-                                        { targets: [1, 15,16,17,18,19, 20], orderable: false }
+                                        { targets: [1, 13,14,15,16,17, 18], orderable: false }
                                       ]
                                     });
 
@@ -1017,25 +1011,23 @@
                                     });
                                   }
 
-                                  function updateHistory(numbers, powerball, sum, consecutive, stddev, oddCount, evenCount, sumRec, stddevRec) {
+                                  function updateHistory(numbers, powerball, sum, consecutive, stddev, oddCount, evenCount) {
                                     const dt = ensureHistDT();
                                     if (!dt) return;
-                                    
-                                    const compareCols = 5; // 69C5
+
+                                    const compareCols = 5; // 대조 5칸
                                     const newRowData = [
                                       historySeq++,                                 // 0 No.
                                       '<input type="checkbox" class="row-select">', // 1
-                                      ...numbers.map(n => ballHTML(n, "white")),    // 2~6 (5개)
-                                      ballHTML(powerball, "power"),                 // 7 (Power)
+                                      ...numbers.map(n => ballHTML(n, "white")),    // 2~6
+                                      ballHTML(powerball, "power"),                 // 7
                                       consecutive,                                  // 8
                                       sum,                                          // 9
                                       stddev,                                       // 10
                                       oddCount,                                     // 11
                                       evenCount,                                    // 12
-                                      sumRec,                                       // 13
-                                      stddevRec,                                    // 14
-                                      ...Array(compareCols).fill(''),               // 15~19
-                                      '<button class="deleteBtn" type="button">삭제</button>', // 20
+                                      ...Array(compareCols).fill(''),               // 13~17 (대조)
+                                      '<button class="deleteBtn" type="button">삭제</button>', // 18
                                     ];
 
                                     const row = dt.row.add(newRowData).draw(false).node();
@@ -1097,7 +1089,7 @@
                                       const rIdx = this.index();
 
                                       // 대조 5칸: 데이터 컬럼 15~19
-                                      for (let col = 15; col <= 19; col++) {
+                                      for (let col = 13; col <= 17; col++) {
                                         const node = dt.cell(rIdx, col).node();
                                         if (node) node.textContent = "";
                                       }
@@ -1137,7 +1129,7 @@
                                       // 대조 5칸(데이터 컬럼 15~19)에 O 표시
                                       picks.forEach((pick, idx) => {
                                         if (idx >= 5) return; // 안전장치
-                                        const col = 15 + idx;
+                                        const col = 13 + idx;
                                         const node = dt.cell(rIdx, col).node();
                                         if (node) node.textContent = rowNums.includes(pick) ? "O" : "";
                                       });
@@ -1230,8 +1222,6 @@
 
                                         const cons = consecutiveLabel(nums);
                                         const st = statsOf(nums);
-                                        const sumRec = inRange(st.sum, sumMin, sumMax);
-                                        const stddevRec = inRange(st.std, stdMin, stdMax);
 
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
@@ -1243,8 +1233,6 @@
                                           <td>${st.std.toFixed(2)}</td>
                                           <td class="gen-extra">${st.odd}</td>
                                           <td class="gen-extra">${st.even}</td>
-                                          <td class="gen-extra">${sumRec}</td>
-                                          <td class="gen-extra">${stddevRec}</td>
                                         `;
                                         generatedTbody.appendChild(tr);
 
@@ -1265,8 +1253,6 @@
                                           st.std.toFixed(2),
                                           st.odd,
                                           st.even,
-                                          sumRec,
-                                          stddevRec
                                         );
                                       }
 
@@ -1495,12 +1481,6 @@
                                       const keep = new Set([0,1,2,3,4,5,6,7]);
 
                                       dt.columns().every(function (idx) {
-
-                                        // 기준 컬럼(총합기준/편차기준)은 항상 숨김 (기존 유지)
-                                        if (idx === 13 || idx === 14) {
-                                          this.visible(false, false);
-                                          return;
-                                        }
 
                                         const shouldShow = openExtra ? true : keep.has(idx);
                                         this.visible(shouldShow, false);
@@ -2034,8 +2014,8 @@
                                 includeCols.forEach((c, i) => {
                                   let label = headerCells[c].innerText.trim();
 
-                                  if (c >= 15 && c <= 20) {
-                                    const idx = c - 14; 
+                                  if (c >= 13 && c <= 17) {
+                                    const idx = c - 12; // 1~5
                                     label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
                                   }
                                   else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
@@ -2178,8 +2158,8 @@
                                 includeCols.forEach((c, i) => {
                                   let label = headerCells[c].innerText.trim();
 
-                                  if (c >= 15 && c <= 20) {
-                                    const idx = c - 14; // 1~6
+                                  if (c >= 13 && c <= 17) {
+                                    const idx = c - 12; // 1~5
                                     label = selVals[idx] ? `대조(${selVals[idx]})` : `대조`;
                                   }
                                   else if (!label && headerCells[c].querySelector('input[type="checkbox"]')) {
@@ -2304,8 +2284,6 @@
                                         <th>표준편차</th>
                                         <th class="gen-extra">홀수</th>
                                         <th class="gen-extra">짝수</th>
-                                        <th class="gen-extra">총합 기준</th>
-                                        <th class="gen-extra">표준편차 기준</th>
                                       </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -2353,8 +2331,7 @@
                                         <th>표준편차</th>
                                         <th>홀수</th>
                                         <th>짝수</th>
-                                        <th class="th-tight">총합<br>기준</th>
-                                        <th class="th-tight">편차<br>기준</th>
+
                                         <th><select id="number-input1" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input2" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input3" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
@@ -2417,16 +2394,16 @@
 
 
                                   /* ✅ 대조 select 5칸(원본 기준 16~20) 폭 강제 고정 */
+                                  #historyTable thead th:nth-child(14),
+                                  #historyTable thead th:nth-child(15),
                                   #historyTable thead th:nth-child(16),
                                   #historyTable thead th:nth-child(17),
                                   #historyTable thead th:nth-child(18),
-                                  #historyTable thead th:nth-child(19),
-                                  #historyTable thead th:nth-child(20),
+                                  #historyTable tbody td:nth-child(14),
+                                  #historyTable tbody td:nth-child(15),
                                   #historyTable tbody td:nth-child(16),
                                   #historyTable tbody td:nth-child(17),
-                                  #historyTable tbody td:nth-child(18),
-                                  #historyTable tbody td:nth-child(19),
-                                  #historyTable tbody td:nth-child(20){
+                                  #historyTable tbody td:nth-child(18){
                                     width: 72px !important;
                                     min-width: 72px !important;
                                     max-width: 72px !important;
@@ -2470,16 +2447,16 @@
                                       width: 52px; min-width: 52px;
                                     }
 
+                                    #historyTable thead th:nth-child(14),
+                                    #historyTable thead th:nth-child(15),
                                     #historyTable thead th:nth-child(16),
                                     #historyTable thead th:nth-child(17),
                                     #historyTable thead th:nth-child(18),
-                                    #historyTable thead th:nth-child(19),
-                                    #historyTable thead th:nth-child(20),
+                                    #historyTable tbody td:nth-child(14),
+                                    #historyTable tbody td:nth-child(15),
                                     #historyTable tbody td:nth-child(16),
                                     #historyTable tbody td:nth-child(17),
-                                    #historyTable tbody td:nth-child(18),
-                                    #historyTable tbody td:nth-child(19),
-                                    #historyTable tbody td:nth-child(20){
+                                    #historyTable tbody td:nth-child(18){
                                       width: 62px !important;
                                       min-width: 62px !important;
                                       max-width: 62px !important;
