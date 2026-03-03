@@ -119,7 +119,11 @@
     }
     #selectAllHistory { cursor: pointer; }
 
-    #historyTable { margin: 12px 0; }
+    #historyTable { 
+      margin: 12px 0;
+      width: 100%;
+      table-layout: fixed;
+    }
 
     /*  4) GeneratedNumbers */
     .gen-table-wrap{
@@ -2376,8 +2380,7 @@
                                     History table (✅ 폭 계산 안정화 버전)
                                   ========================= */
                                   #historyTable{
-                                    width: max-content !important;   /* 스크롤 유도 */
-                                    min-width: 100% !important;
+                                    width: 100% !important;   /* 스크롤 유도 */
                                     table-layout: fixed !important;  /* ✅ auto 말고 fixed로 고정 (핵심) */
                                     margin: 0;
                                   }
@@ -2437,6 +2440,15 @@
                                       height: 22px;
                                       line-height: 1.05;
                                     }
+
+                                    #historyTable{
+                                      width: 100% !important;
+                                    }
+
+                                    .hist-table-wrap{
+                                      overflow-x: auto;
+                                    }
+
                                     #historyTable thead th{ font-size: 10px; }
 
                                     #historyTable th:nth-child(1),
@@ -2529,19 +2541,6 @@
                                     }
 
 
-                                  }
-
-                                  #historyTable thead th select#number-input1,
-                                  #historyTable thead th select#number-input2,
-                                  #historyTable thead th select#number-input3,
-                                  #historyTable thead th select#number-input4,
-                                  #historyTable thead th select#number-input5{
-                                    width: 72px !important;
-                                    min-width: 72px !important;
-                                    max-width: 72px !important;
-                                    box-sizing: border-box !important;
-                                    display: block !important;
-                                    padding-right: 22px; /* 부트스트랩 화살표 공간 때문에 폭 튀는 것 방지 */
                                   }
 
                                   #historyTable thead th select#number-input1,
