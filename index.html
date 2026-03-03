@@ -1031,23 +1031,6 @@
                                     ];
 
                                     const row = dt.row.add(newRowData).draw(false).node();
-
-                                    $(row).find('button.deleteBtn').on('click', function(e){
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      const y = window.pageYOffset || document.documentElement.scrollTop;
-                                      dt.row($(this).closest('tr')).remove().draw(false);
-
-                                      if (dt.rows().count() === 0) {
-                                        historySeq = 1;
-                                        const selectAll = document.getElementById('selectAllHistory');
-                                        if (selectAll) selectAll.checked = false;
-                                        dt.order([]).search('').columns().search('').draw(false);
-                                      }
-
-                                      window.scrollTo(0, y);
-                                      compareInputWithTable();
-                                    });
                                   }
 
                                   function deleteHistory() {
@@ -1497,6 +1480,38 @@
 
                                       ensureHistDT();
 
+                                      // ✅ historyTable 개별 삭제 버튼: 이벤트 위임(토글/리드로우에도 안정적)
+                                      (function bindHistoryDeleteDelegation(){
+                                        if (!window.jQuery) return;
+
+                                        $('#historyTable tbody').off('click.histDel');
+
+                                        $('#historyTable tbody').on('click.histDel', 'button.deleteBtn', function(e){
+                                          e.preventDefault();
+                                          e.stopPropagation();
+
+                                          const dt = ensureHistDT();
+                                          if (!dt) return;
+
+                                          const y = window.pageYOffset || document.documentElement.scrollTop;
+
+                                          dt.row($(this).closest('tr')).remove().draw(false);
+
+                                          if (dt.rows().count() === 0) {
+                                            historySeq = 1;
+                                            const selectAll = document.getElementById('selectAllHistory');
+                                            if (selectAll) selectAll.checked = false;
+                                            dt.order([]).search('').columns().search('').draw(false);
+                                          }
+
+                                          window.scrollTo(0, y);
+                                          compareInputWithTable();
+                                        });
+                                      })();
+
+
+
+
                                       histTable.classList.toggle('show-extra', initialOpen);
                                       histToggleBtn.textContent = initialOpen ? '추가 정보 닫기' : '추가 정보 열기';
 
@@ -1514,6 +1529,8 @@
                                         setHistoryColumns(open);
                                       });
                                     }
+
+
 
 
                                     const selectAll = byId('selectAllHistory');
