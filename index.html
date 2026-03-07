@@ -512,7 +512,7 @@
 
 
 
-                  <a class="navbar-brand font-weight-bold" href="index.html">PowerBall Number Generator</a>
+                  <a class="navbar-brand font-weight-bold" href="index.html">Powerball Number Generator</a>
 
 
                   <ul class="navbar-nav ml-auto">
@@ -1019,7 +1019,7 @@
                                       oddCount,                                     // 11
                                       evenCount,                                    // 12
                                       ...Array(compareCols).fill(''),               // 13~17
-                                      '<button class="deleteBtn" type="button">삭제</button>', // 18
+                                      '<button class="deleteBtn" type="button">Delete</button>', // 18
                                     ];
 
                                     const row = dt.row.add(newRowData).draw(false).node();
@@ -1046,11 +1046,11 @@
                                     isCompareFunctionOn = !isCompareFunctionOn;
                                     const btn = byId('toggleCompare');
                                     if (isCompareFunctionOn) {
-                                      btn.innerText = "포함 확인 On";
+                                      btn.innerText = "Include Check On";
                                       btn.classList.remove('off'); btn.classList.add('on');
                                       compareInputWithTable();
                                     } else {
-                                      btn.innerText = "포함 확인 Off";
+                                      btn.innerText = "Include Check Off";
                                       btn.classList.remove('on'); btn.classList.add('off');
                                       resetCompareIndicators();
                                     }
@@ -1063,7 +1063,6 @@
                                     dt.rows().every(function () {
                                       const rIdx = this.index();
 
-                                      // 대조 5칸: 데이터 컬럼 15~19
                                       for (let col = 13; col <= 17; col++) {
                                         const node = dt.cell(rIdx, col).node();
                                         if (node) node.textContent = "";
@@ -1077,19 +1076,16 @@
                                     const dt = ensureHistDT();
                                     if (!dt) return;
 
-                                    // ✅ 빈값/선택 안함은 제외 (NaN 방지)
                                     const picks = pickSelects
                                       .map(sel => Number(sel && sel.value))
                                       .filter(n => Number.isFinite(n));
 
-                                    // ✅ 선택이 없으면 기존 표시만 지우고 종료
                                     resetCompareIndicators();
                                     if (picks.length === 0) return;
 
                                     dt.rows().every(function () {
                                       const rIdx = this.index();
 
-                                      // 번호(첫번째~다섯번째): 데이터 컬럼 2~6
                                       const rowNums = [];
                                       for (let i = 0; i < 5; i++) {
                                         const node = dt.cell(rIdx, 2 + i).node();
@@ -1101,9 +1097,8 @@
                                         rowNums.push(Number.isFinite(n) ? n : NaN);
                                       }
 
-                                      // 대조 5칸(데이터 컬럼 15~19)에 O 표시
                                       picks.forEach((pick, idx) => {
-                                        if (idx >= 5) return; // 안전장치
+                                        if (idx >= 5) return; 
                                         const col = 13 + idx;
                                         const node = dt.cell(rIdx, col).node();
                                         if (node) node.textContent = rowNums.includes(pick) ? "O" : "";
@@ -1125,7 +1120,6 @@
                                     }
 
                                     async function generateNewNumbers() {
-                                      // 1) 입력값 수집
                                       const include = parseNumList(byId("included").value);
                                       const exclude = parseNumList(byId("excluded").value);
                                       const weighted = parseNumList(byId("weighted").value);
@@ -1137,7 +1131,6 @@
                                         return Math.max(0, Math.min(1500, n));
                                       })();
 
-                                      // Power Ball 입력 수집(프론트는 "입력만" 관리)
                                       const pbInclude = parseNumList(byId("pb_included").value).filter(n => n>=1 && n<=26);
                                       const pbExclude = parseNumList(byId("pb_excluded").value).filter(n => n>=1 && n<=26);
                                       const pbWeighted = parseNumList(byId("pb_weighted").value).filter(n => n>=1 && n<=26);
@@ -1155,7 +1148,6 @@
                                       const stdMin = parseFloat(byId("stddev_range_min").value);
                                       const stdMax = parseFloat(byId("stddev_range_max").value);
 
-                                      // 2) 서버 호출
                                       let res;
                                       try {
                                         res = await fetch("/api/generate", {
@@ -1164,7 +1156,6 @@
                                           body: JSON.stringify({
                                             include, exclude, weighted,
                                             weightPercent,
-                                            // ✅ PB도 서버로 전송
                                             pbInclude, pbExclude, pbWeighted,
                                             pbWeightPercent,
                                             count: 5,
@@ -1172,14 +1163,14 @@
                                           })
                                         });
                                       } catch (e) {
-                                        alert("서버 연결 실패: " + e);
+                                        alert("Failed to connect to server: " + e);
                                         return;
                                       }
 
                                       let data;
                                       try { data = await res.json(); } catch { data = {}; }
                                       if (!res.ok || !data.ok) {
-                                        alert("생성 실패: " + (data.error || res.status));
+                                        alert("Failed to generate numbers: " + (data.error || res.status));
                                         return;
                                       }
 
@@ -1192,7 +1183,6 @@
 
                                         const nums = r.numbers.slice().sort((a, b) => a - b);
 
-                                        // ✅ 서버는 power 라는 키로 내려줌
                                         const powerball = Number(r.power);
 
                                         const cons = consecutiveLabel(nums);
@@ -1200,7 +1190,7 @@
 
                                         const tr = document.createElement("tr");
                                         tr.innerHTML = `
-                                          <td>조합 ${i + 1}</td>
+                                          <td>Combination ${i + 1}</td>
                                           ${nums.map(() => `<td class="num-cell"></td>`).join("")}
                                           <td class="pb-cell"></td>
                                           <td>${cons}</td>
@@ -1211,15 +1201,15 @@
                                         `;
                                         generatedTbody.appendChild(tr);
 
-                                        // ✅ White 5개 채우기
+
                                         const tds = tr.querySelectorAll("td.num-cell");
                                         tds.forEach((td, idx) => td.appendChild(makeBall(nums[idx], "white")));
 
-                                        // ✅ PowerBall 1개 채우기
+
                                         const pbTd = tr.querySelector("td.pb-cell");
                                         if (pbTd) pbTd.appendChild(makeBall(powerball, "power"));
 
-                                        // ✅ history에도 powerball 포함해서 넣기 (인자 순서 중요)
+
                                         updateHistory(
                                           nums,
                                           powerball,
@@ -1355,25 +1345,25 @@
 
                                       if (isMobile) {
                                         genTable.classList.remove('show-extra');
-                                        toggleBtn.textContent = '추가 정보 열기';
+                                        toggleBtn.textContent = 'Show Details';
                                       } else {
                                         genTable.classList.add('show-extra');
-                                        toggleBtn.textContent = '추가 정보 닫기';
+                                        toggleBtn.textContent = 'Hide Details';
                                       }
 
                                       toggleBtn.addEventListener('click', () => {
                                         const open = genTable.classList.toggle('show-extra');
-                                        toggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                        toggleBtn.textContent = open ? 'Hide Details' : 'Show Details';
                                       });
 
                                       window.addEventListener('resize', () => {
                                         const mobileNow = window.matchMedia("(max-width: 576px)").matches;
                                         if (mobileNow) {
                                           genTable.classList.remove('show-extra');
-                                          toggleBtn.textContent = '추가 정보 열기';
+                                          toggleBtn.textContent = 'Show Details';
                                         } else {
                                           genTable.classList.add('show-extra');
-                                          toggleBtn.textContent = '추가 정보 닫기';
+                                          toggleBtn.textContent = 'Hide Details';
                                         }
                                       });
                                     }
@@ -1451,8 +1441,7 @@
                                       const wrap = document.querySelector('.hist-table-wrap');
                                       if (wrap) wrap.classList.toggle('is-extra', openExtra);
 
-                                      // 닫힘 상태에서 "PowerBall까지" 유지
-                                      // PC: No(0)도 보이게 / 모바일: No(0)는 숨기고 싶으면 제외
+
                                       const keep = new Set([0,1,2,3,4,5,6,7]);
 
                                       dt.columns().every(function (idx) {
@@ -1461,18 +1450,16 @@
                                         this.visible(shouldShow, false);
                                       });
 
-                                      // ✅ 토글 직후 레이아웃이 바뀌는 타이밍 문제를 피하려고 rAF로 한 번 더 조정
                                       dt.columns.adjust().draw(false);
                                     }
 
                                     if (histTable && histToggleBtn) {
-                                      // 초기 상태: PC는 열림, 모바일은 닫힘
                                       const isMobile = window.matchMedia("(max-width: 576px)").matches;
                                       const initialOpen = !isMobile;
 
                                       ensureHistDT();
 
-                                      // ✅ historyTable 개별 삭제 버튼: 이벤트 위임(토글/리드로우에도 안정적)
+
                                       (function bindHistoryDeleteDelegation(){
                                         if (!window.jQuery) return;
 
@@ -1505,14 +1492,14 @@
 
 
                                       histTable.classList.toggle('show-extra', initialOpen);
-                                      histToggleBtn.textContent = initialOpen ? '추가 정보 닫기' : '추가 정보 열기';
+                                      histToggleBtn.textContent = initialOpen ? 'Hide Details' : 'Show Details';
 
                                       setHistoryColumns(initialOpen);
                                       setTimeout(() => setHistoryColumns(initialOpen), 0);
 
                                       histToggleBtn.addEventListener('click', () => {
                                         const open = histTable.classList.toggle('show-extra');
-                                        histToggleBtn.textContent = open ? '추가 정보 닫기' : '추가 정보 열기';
+                                        histToggleBtn.textContent = open ? 'Hide Details' : 'Show Details';
                                         setHistoryColumns(open);
                                       });
 
@@ -1592,7 +1579,7 @@
                                     });
                                     excludedInput.addEventListener("input", () => {
                                       const exc = parseNumList(excludedInput.value);
-                                      if (exc.length >= 40) alert("너무 많은 번호를 입력하였습니다.");
+                                      if (exc.length >= 40) alert("Too many numbers selected.");
                                     });
                                       resetButton = byId("resetButton");
 
@@ -1622,12 +1609,11 @@
                                     attachButtonHandlers(null);
                                     paintButtons();
 
-                                    // ===== White Ball: 드래그로 구간 토글(실시간 색 변경) =====
                                     let wbDragging = false;
                                     let wbStartNum = null;
-                                    let wbLastNum = null;        // 마지막으로 처리한 숫자
-                                    let wbSuppressClick = false; // 드래그 후 click 중복 방지
-                                    let wbLastDir = 0; // ✅ 마지막 이동 방향: -1 / 0 / +1
+                                    let wbLastNum = null;       
+                                    let wbSuppressClick = false; 
+                                    let wbLastDir = 0; 
                                     let wbLastPointerUpAt = 0;
 
                                     function wbGetMode(){
@@ -1637,7 +1623,6 @@
                                       return null;
                                     }
 
-                                    // 버튼(또는 내부 span 등)에서 숫자 얻기
                                     function wbNumFromPointerEvent(e){
                                       const el = document.elementFromPoint(e.clientX, e.clientY);
                                       const btn = el && el.closest && el.closest("#pickCard .number-button");
@@ -1648,16 +1633,14 @@
 
                                     function wbToggleOne(n, mode){
                                       if (!mode) return;
-                                      applyWBNumber(n, mode); // ✅ 기존 클릭과 동일한 토글 로직 재사용
+                                      applyWBNumber(n, mode);
                                       paintButtons();
                                       compareInputWithTable();
                                     }
 
-                                    // lo~hi 범위에서 "이전 위치 -> 새 위치" 변화분만 토글
                                     function wbToggleDelta(prev, next, mode){
                                       if (prev == null || next == null || prev === next) return;
 
-                                      // prev -> next 이동 방향에 따라 1칸씩 전진하며 토글
                                       const step = (next > prev) ? 1 : -1;
                                       for (let x = prev + step; x !== next + step; x += step){
                                         wbToggleOne(x, mode);
@@ -1669,19 +1652,19 @@
                                       if (n == null) return;
 
                                       const mode = wbGetMode();
-                                      if (!mode) return; // 모드 선택 안하면 드래그 토글 기능 비활성
+                                      if (!mode) return; 
 
                                       e.preventDefault();
                                       wbDragging = true;
                                       wbStartNum = n;
                                       wbLastNum = n;
                                       wbSuppressClick = true;
-                                      wbLastDir = 0;   // ✅ 추가
+                                      wbLastDir = 0;  
 
-                                      // ✅ 시작 숫자는 즉시 토글 (바로 색 변경)
+
                                       wbToggleOne(n, mode);
 
-                                      // pointer capture로 버튼 영역 밖으로 나가도 move/up 잡힘
+
                                       const container = document.getElementById("wbButtons") || e.currentTarget;
                                       if (container && container.setPointerCapture) {
                                         try { container.setPointerCapture(e.pointerId); } catch {}
@@ -1700,7 +1683,6 @@
                                       const dir = Math.sign(n - wbLastNum);
                                       if (dir === 0) return;
 
-                                      // ✅ 방향이 바뀌는 순간, 턴 포인트(현재 wbLastNum)도 한 번 토글해서 되돌림
                                       if (wbLastDir !== 0 && dir !== wbLastDir) {
                                         wbToggleOne(wbLastNum, mode);
                                       }
@@ -1714,16 +1696,13 @@
                                     function wbEndDrag(e){
                                       if (!wbDragging) return;
                                       wbDragging = false;
-                                      wbLastDir = 0; // ✅ 추가(깔끔하게)
+                                      wbLastDir = 0; 
 
-                                      // ✅ 추가: pointerup 시간을 기록 (tap 포함)
                                       wbLastPointerUpAt = Date.now();
 
-                                      // ✅ 기존 0ms는 너무 빨라서 click 전에 풀려버림 → 넉넉히 유지
                                       setTimeout(() => { wbSuppressClick = false; }, 350);
                                     }
 
-                                    // 이벤트 바인딩
                                     const wbContainer = document.getElementById("wbButtons") || document.querySelector("#pickCard .number-buttons");
                                     if (wbContainer){
                                       wbContainer.addEventListener("pointerdown", wbOnPointerDown);
@@ -1735,7 +1714,6 @@
                                           const btn = e.target.closest(".number-button");
                                           if (!btn) return;
 
-                                          // ✅ pointerup 직후 들어오는 click은 무조건 차단 (모바일 탭에서 핵심)
                                           const justAfterPointer = (Date.now() - wbLastPointerUpAt) < 400;
 
                                           if (wbSuppressClick || justAfterPointer) {
@@ -1794,9 +1772,9 @@
                                           const n = Number(btn.textContent);
                                           if (!Number.isFinite(n)) return;
 
-                                          if (!mode) return;              // ✅ 모드 없으면 클릭 무시
-                                          applyPBNumber(n, mode);         // ✅ 토글 로직 통일
-                                          paintPBButtons();               // ✅ 색 갱신
+                                          if (!mode) return;           
+                                          applyPBNumber(n, mode);       
+                                          paintPBButtons();           
                                         });
                                       });
                                     }
@@ -1837,7 +1815,6 @@
                                     attachPBHandlers(null);
                                     paintPBButtons();
 
-                                    // ===== Power Ball: 드래그로 구간 토글(실시간 색 변경) =====
                                     let pbDragging = false;
                                     let pbStartNum = null;
                                     let pbLastNum = null;
@@ -1862,7 +1839,7 @@
 
                                     function pbToggleOne(n, mode){
                                       if (!mode) return;
-                                      applyPBNumber(n, mode); // ✅ 기존 클릭 토글 로직 재사용
+                                      applyPBNumber(n, mode);
                                       paintPBButtons();
                                     }
 
@@ -2272,27 +2249,27 @@
                               <div class="generation card-body">
 
                                 <div class="d-flex justify-content-end mb-2">
-                                  <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                  <button type="button" onclick="generateNewNumbers()">>Generate New Numbers</button>
                                 </div>
                                   <button type="button" id="toggleGenExtra" class="btn btn-sm btn-outline-secondary">
-                                    추가 정보 열기
+                                    Show Details
                                   </button>                                
                                 <div class="gen-table-wrap">
                                   <table id="GeneratedNumbers">
                                     <thead>
                                       <tr>
-                                        <th>추첨 조합</th>
-                                        <th>첫번째</th>
-                                        <th>두번째</th>
-                                        <th>세번째</th>
-                                        <th>네번째</th>
-                                        <th>다섯번째</th>
-                                        <th>PowerBall</th>
-                                        <th>연번</th>
-                                        <th>총합</th>
-                                        <th>표준편차</th>
-                                        <th class="gen-extra">홀수</th>
-                                        <th class="gen-extra">짝수</th>
+                                        <th>Generated combination</th>
+                                        <th>1st</th>
+                                        <th>2nd</th>
+                                        <th>3rd</th>
+                                        <th>4th</th>
+                                        <th>5th</th>
+                                        <th>Powerball</th>
+                                        <th>Consecutive</th>
+                                        <th>WB Sum</th>
+                                        <th>WB StdDev</th>
+                                        <th class="gen-extra">WB Odd</th>
+                                        <th class="gen-extra">WB Even</th>
                                       </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -2308,13 +2285,13 @@
                                   data-placement="top"
                                   data-html="true"
                                   data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                  title="모든 번호를 다 생성한 이후<br>딱 1번만 켜시는걸 추천드립니다">
-                                  포함 확인 Off
+                                  title="Turn this on only once after generating all numbers.">
+                                  Include Check Off
                                 </button>
 
                                   <div class="d-flex justify-content-end mb-2">
                                     <button type="button" id="toggleHistExtra" class="btn btn-sm btn-outline-secondary">
-                                      추가 정보 열기
+                                      Show Details
                                     </button>
 
                                   </div>
@@ -2325,28 +2302,28 @@
                                         <th id="noHeader"
                                             data-toggle="tooltip"
                                             data-placement="top"
-                                            title="모든 자료를 삭제해야 <br>연번 1부터 재시작">
+                                            title="Numbering starts from 1<br> after all data is deleted.">
                                             No.
                                         </th>
                                         <th><input type="checkbox" id="selectAllHistory"></th>
-                                        <th>첫번째</th>
-                                        <th>두번째</th>
-                                        <th>세번째</th>
-                                        <th>네번째</th>
-                                        <th>다섯번째</th>
-                                        <th>PowerBall</th>
-                                        <th>연번</th>
-                                        <th>총합</th>
-                                        <th>표준편차</th>
-                                        <th>홀수</th>
-                                        <th>짝수</th>
+                                        <th>1st</th>
+                                        <th>2nd</th>
+                                        <th>3rd</th>
+                                        <th>4th</th>
+                                        <th>5th</th>
+                                        <th>Powerball</th>
+                                        <th>Consecutive</th>
+                                        <th>WB Sum</th>
+                                        <th>WB StdDev</th>
+                                        <th>WB Odd</th>
+                                        <th>WB Even</th>
 
                                         <th><select id="number-input1" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input2" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input3" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input4" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
                                         <th><select id="number-input5" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
-                                        <th>삭제</th>
+                                        <th>Delete</th>
                                       </tr>
                                     </thead>
                                     <tbody id="historyBody">
@@ -2365,15 +2342,14 @@
                                   }
 
                                   /* =========================
-                                    History table (✅ 폭 계산 안정화 버전)
+                                    History table
                                   ========================= */
                                   #historyTable{
-                                    width: 100% !important;   /* 스크롤 유도 */
-                                    table-layout: fixed !important;  /* ✅ auto 말고 fixed로 고정 (핵심) */
+                                    width: 100% !important;  
+                                    table-layout: fixed !important; 
                                     margin: 0;
                                   }
 
-                                  /* 셀 공통 */
                                   #historyTable th,
                                   #historyTable td{
                                     white-space: nowrap;
@@ -2382,7 +2358,6 @@
                                     text-overflow: ellipsis;
                                   }
 
-                                  /* th-tight */
                                   #historyTable th.th-tight{
                                     font-size: 10px;
                                     line-height: 1.05;
@@ -2390,7 +2365,6 @@
                                     letter-spacing: -0.2px;
                                   }
 
-                                  /* select 폭 안정화 */
                                   #historyTable thead select.custom-select{
                                     display: block;
                                     width: 100% !important;
@@ -2401,7 +2375,6 @@
                                   }
 
 
-                                  /* ✅ 대조 select 5칸(원본 기준 16~20) 폭 강제 고정 */
                                   #historyTable thead th:nth-child(14),
                                   #historyTable thead th:nth-child(15),
                                   #historyTable thead th:nth-child(16),
@@ -2419,7 +2392,6 @@
                                     box-sizing: border-box;
                                   }
 
-                                  /* 모바일 */
                                   @media (max-width: 576px){
                                     #historyTable th,
                                     #historyTable td{
@@ -2447,7 +2419,6 @@
                                       padding: 1px 1px !important;
                                     }
 
-                                    /* 체크박스 */
                                     #historyTable th:nth-child(2),
                                     #historyTable td:nth-child(2){
                                       width: 22px !important;
@@ -2456,7 +2427,6 @@
                                       padding: 1px 1px !important;
                                     }
 
-                                    /* 체크박스 자체도 작게 */
                                     #historyTable th:nth-child(2) input[type="checkbox"]{
                                       transform: scale(0.85);
                                       transform-origin: center;
@@ -2506,21 +2476,19 @@
                                       padding: 0 !important;
                                     }
 
-                                    /* ✅ select 자체를 얇게 만들어서 헤더 1행 높이 커지는 문제 해결 */
                                     #historyTable thead th:nth-child(14) select,
                                     #historyTable thead th:nth-child(15) select,
                                     #historyTable thead th:nth-child(16) select,
                                     #historyTable thead th:nth-child(17) select,
                                     #historyTable thead th:nth-child(18) select{
-                                      height: 22px !important;        /* ✅ 헤더 높이와 맞춤 */
+                                      height: 22px !important;       
                                       line-height: 1.0 !important;
-                                      padding: 0 16px 0 4px !important; /* ✅ 오른쪽 화살표 공간만 남김 */
+                                      padding: 0 16px 0 4px !important; 
                                       font-size: 10px !important;
                                       border-radius: 0 !important;
                                       min-height: 0 !important;
                                     }
 
-                                    /* th 자체도 높이 고정(혹시 줄 높이로 커지는 것 방지) */
                                     #historyTable thead th{
                                       height: 22px !important;
                                       line-height: 1.0 !important;
@@ -2541,16 +2509,16 @@
                                     max-width: 72px !important;
                                     box-sizing: border-box !important;
                                     display: block !important;
-                                    padding-right: 22px; /* 부트스트랩 화살표 공간 때문에 폭 튀는 것 방지 */
+                                    padding-right: 22px; 
                                   }
 
                                 </style>
 
 
-                                <button onclick="deleteSelectedRows()" style="margin-top: 5px;">선택 삭제</button>
-                                <button onclick="deleteHistory()" style="margin-top: 5px;">전체 삭제</button>
-                                <button onclick="exportSelectedToExcel('선택_다운로드.xlsx')" style="margin-top: 5px;">선택 저장</button>
-                                <button onclick="exportTableToExcel('다운로드.xlsx')">전체 저장</button>
+                                <button onclick="deleteSelectedRows()" style="margin-top: 5px;">Delete Selected</button>
+                                <button onclick="deleteHistory()" style="margin-top: 5px;">Delete All</button>
+                                <button onclick="exportSelectedToExcel('selected_download.xlsx')" style="margin-top: 5px;">Export Selected</button>
+                                <button onclick="exportTableToExcel('all_download.xlsx')">Export All</button>
                               </div>
                             </div>
                         </div>
