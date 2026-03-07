@@ -575,7 +575,7 @@
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
                                       title="1. Select up to 5 numbers → They will always appear.<br>
-                                      2. If 6 or more numbers are selected, numbers will be generated only from them."
+                                      2. Select 6+ numbers → generated only from them"
                                     />
                                     <label for="includeCheck">Include</label>
                                   </p>
@@ -685,7 +685,7 @@
                                     <button class="number-button">68</button>
                                     <button class="number-button">69</button>
                                   </div>
-                                  <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                  <button type="button" onclick="generateNewNumbers()">Generate New Numbers</button>
                                 
                                 </div>
                               </div> <!-- card shadow mb-4 -->
@@ -722,9 +722,9 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="1. 숫자 5개 이하 선택 시 무조건 출현<br>2. 숫자 6개 이상 선택 시 선택된 번호에서만 출현"
+                                      title="Select 1+ numbers → generated only from them."
                                     />
-                                    <label for="includePowerball">숫자 포함</label>
+                                    <label for="includePowerball">Include</label>
                                   </p>
                                   <p>
                                     <input
@@ -734,9 +734,9 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="선택 시 출현 번호에서 무조건 제외(최대 64개 선택 가능)"
+                                      title="Selected numbers will always be excluded (maximum 25 numbers)."
                                     />
-                                    <label for="excludePowerball">숫자 제외</label>
+                                    <label for="excludePowerball">Exclude</label>
                                   </p>
                                   <p>
                                     <input
@@ -746,15 +746,15 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="선택 후 가중치 설정 가능<br>ex1) 0% → 미출현<br>ex2) 100% → 미선택 번호와 동일 확률<br>ex3) 700% → 미선택 번호보다 700% 출현 확률 up"
+                                      title="Set weight after selecting numbers"
                                     />
-                                    <label for="weightedPowerball">가중치 설정(0%~1500%)</label>
+                                    <label for="weightedPowerball">Weights(0%~1500%)</label>
                                   </p>
                                   <p>
-                                    <input type="text" id="weightValuePB" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
+                                    <input type="text" id="weightValuePB" placeholder="Input Weights(%)"  min="0.0" max="15.0">
                                   </p>
                                   <p>
-                                    <button id="resetButtonPB">숫자 초기화</button>
+                                    <button id="resetButtonPB">Reset</button>
                                   </p>
                                 </div>
                                 <div class="numpadding">
@@ -787,7 +787,7 @@
                                     <button class="number-button pb-number-button">26</button>
 
                                   </div>
-                                  <button type="button" onclick="generateNewNumbers()">새로운 번호 생성하기</button>
+                                  <button type="button" onclick="generateNewNumbers()">Generate New Numbers</button>
                                 
                                 </div>
                               </div> <!-- card shadow mb-4 -->
@@ -842,7 +842,7 @@
                                       if (nums[i] + 1 === nums[i + 1]) { run++; maxRun = Math.max(maxRun, run); }
                                       else run = 1;
                                     }
-                                    return maxRun >= 3 ? `${maxRun}연번` : "";
+                                    return maxRun >= 3 ? `${maxRun}Consecutive` : "";
                                   }
                                   function statsOf(nums) {
                                     const sum = nums.reduce((a, b) => a + b, 0);
@@ -888,14 +888,13 @@
                                       searching: false,
                                       lengthChange: false,
                                       autoWidth: false,
-                                      language: { emptyTable: "생성된 번호가 없습니다." },
+                                      language: { emptyTable: "No numbers generated." },
                                       order: [],
                                       aLengthMenu: [[-1], ["All"]],
                                       iDisplayLength: -1,
                                       columnDefs: [
                                         { targets: [0, 9, 10, 11, 12], type: 'num' },
 
-                                        // 대조 5칸 폭
                                         { targets: [13,14,15,16,17], width: "72px" },
 
                                         {
@@ -910,7 +909,6 @@
                                           }
                                         },
 
-                                        // 체크/대조5칸/삭제 버튼은 정렬 비활성
                                         { targets: [1, 13,14,15,16,17, 18], orderable: false }
                                       ]
                                     });
@@ -996,9 +994,9 @@
                                         const n = Number(btn.textContent);
                                         if (!Number.isFinite(n)) return;
 
-                                        if (!mode) return; // 모드(include/exclude/weight) 없으면 클릭 무시(원하면 여기서 기본 include로 처리도 가능)
+                                        if (!mode) return; 
 
-                                        applyWBNumber(n, mode);      // ✅ 클릭 토글 로직은 여기로 통일
+                                        applyWBNumber(n, mode);   
                                         paintButtons();
                                         compareInputWithTable();
                                       });
@@ -1009,7 +1007,7 @@
                                     const dt = ensureHistDT();
                                     if (!dt) return;
 
-                                    const compareCols = 5; // 대조 5칸
+                                    const compareCols = 5; 
                                     const newRowData = [
                                       historySeq++,                                 // 0 No.
                                       '<input type="checkbox" class="row-select">', // 1
@@ -1020,7 +1018,7 @@
                                       stddev,                                       // 10
                                       oddCount,                                     // 11
                                       evenCount,                                    // 12
-                                      ...Array(compareCols).fill(''),               // 13~17 (대조)
+                                      ...Array(compareCols).fill(''),               // 13~17
                                       '<button class="deleteBtn" type="button">삭제</button>', // 18
                                     ];
 
