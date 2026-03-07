@@ -522,7 +522,7 @@
                       <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-fw fa-cog mr-1"></i>
-                        메뉴
+                        Menu
                       </a>
                       <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
                         <a class="dropdown-item" href="numbers_generator.html">Number Generator</a>
@@ -1122,14 +1122,19 @@
                                     async function generateNewNumbers() {
                                       const include = parseNumList(byId("included").value);
                                       const exclude = parseNumList(byId("excluded").value);
-                                      const weighted = parseNumList(byId("weighted").value);
+                                      const weighted = parseNumList(byId("weighted").value);                                      
                                       const weightPercent = (function () {
                                         let s = (byId("weightValueWB").value || "").trim();
                                         if (s.endsWith("%")) s = s.slice(0, -1);
                                         const n = parseFloat(s);
                                         if (!Number.isFinite(n)) return 100;
                                         return Math.max(0, Math.min(1500, n));
-                                      })();
+                                      }
+
+                                      
+                                      
+                                      
+                                      )();
 
                                       const pbInclude = parseNumList(byId("pb_included").value).filter(n => n>=1 && n<=26);
                                       const pbExclude = parseNumList(byId("pb_excluded").value).filter(n => n>=1 && n<=26);
@@ -1384,6 +1389,25 @@
                                     });
                                     normalizePercentText(weightValueInput);
 
+
+                                    const weightValuePBInput = byId("weightValuePB");
+
+                                    if (weightValuePBInput) {
+                                      weightValuePBInput.addEventListener("focus", () => {
+                                        weightValuePBInput.value = weightValuePBInput.value.replace(/\s*%$/, "");
+                                      });
+
+                                      weightValuePBInput.addEventListener("input", () => {
+                                        weightValuePBInput.value = weightValuePBInput.value.replace(/[^\d.]/g, "");
+                                      });
+
+                                      weightValuePBInput.addEventListener("blur", () => {
+                                        normalizePercentText(weightValuePBInput);
+                                      });
+
+                                      normalizePercentText(weightValuePBInput);
+                                    }
+
                                     sumMinInput = byId("sum_range_min");
                                     sumMaxInput = byId("sum_range_max");
                                     stdMinInput = byId("stddev_range_min");
@@ -1407,14 +1431,12 @@
 
                                       sel.innerHTML = "";
 
-                                      // ✅ 기본 선택 옵션 추가
                                       const defaultOp = document.createElement("option");
                                       defaultOp.value = "";
-                                      defaultOp.textContent = "선택";
+                                      defaultOp.textContent = "Choose";
                                       defaultOp.selected = true;
                                       sel.appendChild(defaultOp);
 
-                                      // ✅ 1~69 숫자 옵션 추가
                                       for (let i = NUM_MIN; i <= NUM_MAX; i++) {
                                         const op = document.createElement("option");
                                         op.value = i;
@@ -1731,7 +1753,7 @@
 
                                     const btn = byId('toggleCompare');
                                     if (btn) {
-                                      btn.innerText = "포함 확인 Off";
+                                      btn.innerText = "Include Check Off";
                                       btn.classList.remove('on');
                                       btn.classList.add('off');
                                     }
@@ -1900,8 +1922,8 @@
                                       pbDragging = false;
                                       pbLastDir = 0;
 
-                                      pbLastPointerUpAt = Date.now(); // ✅ 추가
-                                      setTimeout(() => { pbSuppressClick = false; }, 350); // ✅ 0 → 350ms
+                                      pbLastPointerUpAt = Date.now(); 
+                                      setTimeout(() => { pbSuppressClick = false; }, 350); // 0 → 350ms
                                     }
 
                                     const pbContainer = document.getElementById("pbButtons") || document.querySelector("#powerball .number-buttons");
@@ -1930,7 +1952,6 @@
                                       attachPBHandlers("include");
                                     }
                                  
-                                    // ✅ 현재 모드(모바일/PC) 기억
                                     let lastPickIsMobile = window.matchMedia("(max-width: 576px)").matches;
 
                                     function setPickCollapseDefault(){
@@ -1956,24 +1977,19 @@
                                       }
                                     }
 
-                                    // ✅ resize에서는 “모바일/PC 전환”이 있을 때만 적용
                                     function handlePickCollapseOnResize(){
                                       const nowIsMobile = window.matchMedia("(max-width: 576px)").matches;
-                                      if (nowIsMobile === lastPickIsMobile) return; // ✅ 같은 모드면 아무것도 안함
+                                      if (nowIsMobile === lastPickIsMobile) return;
                                       lastPickIsMobile = nowIsMobile;
                                       setPickCollapseDefault();
                                     }
 
-                                    // ✅ 초기 1회만 기본값 적용
                                     setPickCollapseDefault();
 
-                                    // ✅ 기존 resize 바인딩 교체
                                     window.addEventListener('resize', handlePickCollapseOnResize);
                                   });
                        
                                 </script>
-
-
 
                             <script>
                               async function exportTableToExcel(filename) {
@@ -2249,7 +2265,7 @@
                               <div class="generation card-body">
 
                                 <div class="d-flex justify-content-end mb-2">
-                                  <button type="button" onclick="generateNewNumbers()">>Generate New Numbers</button>
+                                  <button type="button" onclick="generateNewNumbers()">Generate New Numbers</button>
                                 </div>
                                   <button type="button" id="toggleGenExtra" class="btn btn-sm btn-outline-secondary">
                                     Show Details
@@ -2318,11 +2334,11 @@
                                         <th>WB Odd</th>
                                         <th>WB Even</th>
 
-                                        <th><select id="number-input1" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input2" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input3" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input4" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
-                                        <th><select id="number-input5" class="custom-select custom-select-sm w-100" placeholder="1~45 입력"></select></th>
+                                        <th><select id="number-input1" class="custom-select custom-select-sm w-100" placeholder="1~69 입력"></select></th>
+                                        <th><select id="number-input2" class="custom-select custom-select-sm w-100" placeholder="1~69 입력"></select></th>
+                                        <th><select id="number-input3" class="custom-select custom-select-sm w-100" placeholder="1~69 입력"></select></th>
+                                        <th><select id="number-input4" class="custom-select custom-select-sm w-100" placeholder="1~69 입력"></select></th>
+                                        <th><select id="number-input5" class="custom-select custom-select-sm w-100" placeholder="1~69 입력"></select></th>
                                         <th>Delete</th>
                                       </tr>
                                     </thead>

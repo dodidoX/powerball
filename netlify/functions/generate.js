@@ -124,7 +124,7 @@ function generateWhiteCombo(include, exclude, weighted, weightFactor) {
   }
 
   if (candidates.length < remain) {
-    throw new Error("선택 가능한 White 숫자가 5개 미만입니다. 제외를 줄이세요.");
+    throw new Error("Less than 5 White Ball numbers available. Reduce exclusions.");
   }
 
   candidates.sort((a, b) => b.score - a.score);
@@ -149,7 +149,7 @@ function generatePowerballOne(pbInclude, pbExclude, pbWeighted, pbWeightFactor) 
     : Array.from({ length: PB_MAX - PB_MIN + 1 }, (_, i) => PB_MIN + i).filter(n => !EX.has(n));
 
   if (pool.length < 1) {
-    throw new Error("선택 가능한 Power Ball 숫자가 없습니다. 제외를 줄이세요.");
+    throw new Error("No Powerball numbers available. Reduce exclusions.");
   }
 
   const w = Number.isFinite(pbWeightFactor) ? clamp(pbWeightFactor, 0, 15) : 1;
@@ -177,7 +177,7 @@ exports.handler = async (event) => {
   if (rl.limited) {
     return json(
       429,
-      { error: "과도한 번호 생성은 제한됩니다.", retryAfterMs: rl.retryMs },
+      { error: "Generation limit exceeded.", retryAfterMs: rl.retryMs },
       {
         "Retry-After": String(Math.ceil(rl.retryMs / 1000)),
         "X-RateLimit-Limit-Second": String(SEC_LIMIT),
@@ -216,7 +216,7 @@ exports.handler = async (event) => {
 
     // ── 검증(White) ───────────────────────────────
     if (exclude.length > WB_MAX_EXCLUDE) {
-      return json(400, { error: `‘White 숫자 제외’는 최대 ${WB_MAX_EXCLUDE}개까지 가능합니다.` });
+      return json(400, { error: `You can exclude up to ${WB_MAX_EXCLUDE} White Ball numbers.` });
     }
     const wbAvailable = (WB_MAX - WB_MIN + 1) - new Set(exclude).size;
     if (wbAvailable < WB_NEED) {
@@ -225,7 +225,7 @@ exports.handler = async (event) => {
 
     // ── 검증(Power) ───────────────────────────────
     if (pbExclude.length > PB_MAX_EXCLUDE) {
-      return json(400, { error: `‘Power 숫자 제외’는 최대 ${PB_MAX_EXCLUDE}개까지 가능합니다.` });
+      return json(400, { error: `You can exclude up to ${PB_MAX_EXCLUDE}Powerball numbers.` });
     }
     const pbAvailable = (PB_MAX - PB_MIN + 1) - new Set(pbExclude).size;
     if (pbAvailable < 1) {
