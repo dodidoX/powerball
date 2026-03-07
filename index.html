@@ -26,9 +26,6 @@
     
   <style>
 
-    /* ❌ 기존 table / th / td / tr 전역 스타일은 삭제 */
-
-    /* ✅ 이 두 테이블에만 공통 룩 적용 */
     #GeneratedNumbers,
     #historyTable{
       border-collapse: collapse;
@@ -49,12 +46,12 @@
       font-weight: 700;
     }
 
-    /*  1) Number buttons / options */
+
     .numpadding { padding: 0 20px; }
     .number-buttons{
       display: grid;
-      grid-template-columns: repeat(10, 1fr); /* ✅ 1행 10개 */
-      gap: 4px;                               /* ✅ 약간 넓혀서 가독성 */
+      grid-template-columns: repeat(10, 1fr);
+      gap: 4px;                               
     }
 
     /* 공통 버튼(기본) */
@@ -64,8 +61,8 @@
       color: #fff;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;      /* ✅ 조금 축소 */
-      padding: 6px 0;       /* ✅ 높이 축소 */
+      font-size: 14px;    
+      padding: 6px 0;   
       line-height: 1;
     }
 
@@ -74,10 +71,9 @@
       align-items: center;
       gap: 20px;
       padding: 5px 0 0 20px;
-      flex-wrap: wrap; /* PC에서도 줄바꿈 가능하게 */
+      flex-wrap: wrap; 
     }
 
-    /* 2) Compare toggle button */
     #toggleCompare {
       transition: all 0.25s;
       padding: 10px 20px;
@@ -99,7 +95,6 @@
     }
     .tooltip-leftalign .tooltip-inner { text-align: left; }
 
-    /*  3) HistoryTable  */
     #historyTable th:last-child,
     #historyTable td:last-child {
       padding: 4px 6px;
@@ -125,7 +120,6 @@
       table-layout: fixed;
     }
 
-    /*  4) GeneratedNumbers */
     .gen-table-wrap{
       width: 100%;
       overflow-x: auto;
@@ -166,7 +160,7 @@
     #GeneratedNumbers td:nth-child(6),
     #GeneratedNumbers th:nth-child(7),
     #GeneratedNumbers td:nth-child(7){
-      width: 44px;        /* PC 기본 */
+      width: 44px;    
       min-width: 44px;
     }
 
@@ -208,7 +202,6 @@
     }
 
 
-    /* show-extra 상태에서도 강제 숨김 */
     #GeneratedNumbers:not(.show-extra) .gen-extra{
       display: none !important;
     }
@@ -251,13 +244,11 @@
       display: none !important;
     }
 
-    /* PowerBall(7번 컬럼)는 유지 */
     #GeneratedNumbers:not(.show-extra) th:nth-child(7),
     #GeneratedNumbers:not(.show-extra) td:nth-child(7){
       display: table-cell !important;
     }
 
-    /* 5) Mobile */
     @media (max-width: 576px) {
 
       .card-header.py-3 { padding: 10px 12px !important; }
@@ -337,11 +328,10 @@
       }
       #pickCard .number-buttons .number-button{
         font-size: 12px !important;
-        padding: 4px 0 !important;  /* ✅ 모바일 높이 더 얇게 */
+        padding: 4px 0 !important;  
         border-radius: 6px !important;
       }
 
-      /* Power Ball Buttons */
 
       #powerball .number-buttons{
         display: grid;
@@ -378,7 +368,6 @@
       }
       #GeneratedNumbers thead th { font-size: 10px !important; }
 
-      /* 모바일에서 폭 재배치: 숫자열(2~7) 최우선, 나머지는 더 좁게 */
       #GeneratedNumbers th:nth-child(2),
       #GeneratedNumbers td:nth-child(2),
       #GeneratedNumbers th:nth-child(3),
@@ -451,26 +440,25 @@
       line-height: 1;
       letter-spacing: 0;
 
-      /* 기본은 WhiteBall */
-      color: #111;               /* 검은 글자 */
-      background: #ffffff;       /* 흰 배경 */
-      border: 1px solid #cfcfcf; /* 음영 테두리 느낌 */
+
+      color: #111;             
+      background: #ffffff;       
+      border: 1px solid #cfcfcf;
       box-shadow: inset 0 2px 4px rgba(0,0,0,.18),
                   0 1px 2px rgba(0,0,0,.10);
 
-      /* 기존 효과 제거 */
+
       background-image: none !important;
       filter: none !important;
       text-shadow: none !important;
       -webkit-text-stroke: 0 !important;
     }
 
-    /* PowerBall 전용 */
     .num-ball.power{
-      background: #c9151e !important; /* 빨강 */
-      color: #fff !important;         /* 흰 글자 */
-      border: 0 !important;           /* 테두리 없음 */
-      box-shadow: none !important;    /* 음영 없음 */
+      background: #c9151e !important; 
+      color: #fff !important;  
+      border: 0 !important;   
+      box-shadow: none !important;  
     }
 
     .numpadding > button[type="button"]{
@@ -480,7 +468,7 @@
     .number-buttons { user-select: none; -webkit-user-select: none; }
     .number-button { touch-action: none; }
 
-    /* 모바일 */
+
     @media (max-width: 576px){
       .num-ball{
         width: 22px;
@@ -492,7 +480,7 @@
     @media (max-width: 576px){
 
       #powerball .number-buttons{
-        grid-template-columns: repeat(13, 1fr) !important; /* ✅ 폭 더 줄이기 */
+        grid-template-columns: repeat(13, 1fr) !important; 
         gap: 4px !important;
       }
       #powerball .number-buttons .number-button{
@@ -523,13 +511,13 @@
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
 
-                  <!-- 왼쪽: 브랜드 -->
-                  <a class="navbar-brand font-weight-bold" href="index.html">로또 라이프</a>
 
-                  <!-- 오른쪽 정렬을 위한 공간 -->
+                  <a class="navbar-brand font-weight-bold" href="index.html">PowerBall Number Generator</a>
+
+
                   <ul class="navbar-nav ml-auto">
 
-                    <!-- 로또 번호 생성 (드롭다운) -->
+
                     <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle" href="#" id="navGen" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -537,7 +525,7 @@
                         메뉴
                       </a>
                       <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="navGen">
-                        <a class="dropdown-item" href="numbers_generator.html">번호 생성</a>
+                        <a class="dropdown-item" href="numbers_generator.html">Number Generator</a>
                       </div>
                     </li>
 
@@ -568,12 +556,10 @@
 
                                 <div class="selection option-container"> 
 
-                                  <!-- ✅ White Ball 상태 저장용 hidden inputs (기존 JS 호환) -->
                                   <input type="hidden" id="included" value="">
                                   <input type="hidden" id="excluded" value="">
                                   <input type="hidden" id="weighted" value="">
 
-                                  <!-- ✅ 범위 조건도 계속 쓸 거면 hidden 또는 실제 UI로 배치 -->
                                   <input type="hidden" id="sum_range_min" value="">
                                   <input type="hidden" id="sum_range_max" value="">
                                   <input type="hidden" id="stddev_range_min" value="">
@@ -588,9 +574,10 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="1. 숫자 5개 이하 선택 시 무조건 출현<br>2. 숫자 6개 이상 선택 시 선택된 번호에서만 출현"
+                                      title="1. Select up to 5 numbers → They will always appear.<br>
+                                      2. If 6 or more numbers are selected, numbers will be generated only from them."
                                     />
-                                    <label for="includeCheck">숫자 포함</label>
+                                    <label for="includeCheck">Include</label>
                                   </p>
                                   <p>
                                     <input
@@ -600,9 +587,9 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="선택 시 출현 번호에서 무조건 제외(최대 64개 선택 가능)"
+                                      title="Selected numbers will always be excluded (maximum 64 numbers)."
                                     />
-                                    <label for="excludeCheck">숫자 제외</label>
+                                    <label for="excludeCheck">Exclude</label>
                                   </p>
                                   <p>
                                     <input
@@ -612,15 +599,18 @@
                                       data-placement="top"
                                       data-html="true"
                                       data-template='<div class="tooltip tooltip-leftalign" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
-                                      title="선택 후 가중치 설정 가능<br>ex1) 0% → 미출현<br>ex2) 100% → 미선택 번호와 동일 확률<br>ex3) 700% → 미선택 번호보다 700% 출현 확률 up"
+                                      title="Set weight after selecting numbers<br>
+                                      ex1) 0% → Never appear  <br>
+                                      ex2) 100% → Same chance as unselected numbers  <br>
+                                      ex3) 700% → 7× higher chance than unselected numbers"
                                     />
-                                    <label for="weightedCheck">가중치 설정(0%~1500%)</label>
+                                    <label for="weightedCheck">Weights(0%~1500%)</label>
                                   </p>
                                   <p>
-                                    <input type="text" id="weightValueWB" placeholder="가중치 입력(%)"  min="0.0" max="15.0">
+                                    <input type="text" id="weightValueWB" placeholder="Input Weights(%)"  min="0.0" max="15.0">
                                   </p>
                                   <p>
-                                    <button id="resetButton">숫자 초기화</button>
+                                    <button id="resetButton">Reset</button>
                                   </p>
                                 </div>
                                 <div class="numpadding">
